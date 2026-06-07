@@ -18,7 +18,7 @@ const tours = [
     name: "Heilige Tempels van Ubud",
     duration: "Hele dag",
     type: "Cultureel",
-    icon: "🛕",
+    image: "https://images.unsplash.com/photo-1573790387438-4da905039392?w=800&q=80&auto=format&fit=crop",
     highlights: ["Tirta Empul tempel", "Goa Gajah grot", "Lokale priester ontmoeting", "Traditioneel klederdracht"],
     prijs: "Vanaf €95 p.p.",
     tag: "Bestseller",
@@ -27,7 +27,7 @@ const tours = [
     name: "Rijstterrassen & Waterval",
     duration: "Hele dag",
     type: "Natuur",
-    icon: "🌾",
+    image: "https://images.unsplash.com/photo-1537953773345-d172ccf13cf4?w=800&q=80&auto=format&fit=crop",
     highlights: ["Tegalalang rijstterrassen", "Sekumpul waterval", "Koffie plantage bezoek", "Lokale lunch"],
     prijs: "Vanaf €85 p.p.",
     tag: "Natuur",
@@ -36,7 +36,7 @@ const tours = [
     name: "Zonsopgang op Mount Batur",
     duration: "Vroeg ochtend",
     type: "Avontuur",
-    icon: "🌋",
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80&auto=format&fit=crop",
     highlights: ["Vulkaan beklimming", "Zonsopgang op de krater", "Lokale gids", "Ontbijt op de top"],
     prijs: "Vanaf €75 p.p.",
     tag: "Avontuur",
@@ -45,7 +45,7 @@ const tours = [
     name: "Privé Koken & Markt Tour",
     duration: "Halve dag",
     type: "Culinair",
-    icon: "👨‍🍳",
+    image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80&auto=format&fit=crop",
     highlights: ["Lokale markt bezoek", "Bali kookles", "5 traditionele gerechten", "Recept boek mee"],
     prijs: "Vanaf €110 p.p.",
     tag: "Culinair",
@@ -54,7 +54,7 @@ const tours = [
     name: "Uluwatu Kliff & Kecak Dans",
     duration: "Middag & avond",
     type: "Cultureel",
-    icon: "🎭",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80&auto=format&fit=crop",
     highlights: ["Uluwatu tempel", "Sunset kliff wandeling", "Traditionele Kecak dans", "Diner aan zee"],
     prijs: "Vanaf €90 p.p.",
     tag: "Zonsondergang",
@@ -63,7 +63,7 @@ const tours = [
     name: "Privé Eiland Hopping",
     duration: "Hele dag",
     type: "Zee",
-    icon: "⛵",
+    image: "https://images.unsplash.com/photo-1559628129-67cf63b72248?w=800&q=80&auto=format&fit=crop",
     highlights: ["Privé boot", "Nusa Penida & Lembongan", "Snorkelen met manta's", "Strand picknick"],
     prijs: "Vanaf €195 p.p.",
     tag: "Premium",
@@ -112,49 +112,56 @@ export default function ToursPage() {
             <motion.div
               key={tour.name}
               variants={fadeUp}
-              className="group bg-[#1C2B1E] border border-[#C9A84C]/10 hover:border-[#C9A84C]/40 transition-all duration-500 p-8"
+              className="group bg-[#1C2B1E] border border-[#C9A84C]/10 hover:border-[#C9A84C]/40 transition-all duration-500"
             >
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="text-4xl opacity-60">{tour.icon}</div>
-                  <div>
-                    <span className="text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase border border-[#C9A84C]/30 px-2 py-1">
-                      {tour.tag}
-                    </span>
-                  </div>
+              {/* Image */}
+              <div className="aspect-[3/2] relative overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={tour.image}
+                  alt={tour.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1C2B1E] via-[#1C2B1E]/20 to-transparent pointer-events-none" />
+                <div className="absolute top-4 left-4">
+                  <span className="text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase border border-[#C9A84C]/50 px-2 py-1 bg-[#1C2B1E]/70 backdrop-blur-sm">
+                    {tour.tag}
+                  </span>
                 </div>
-                <div className="text-right">
-                  <p className="text-[#F5F0E8]/40 text-xs tracking-wider">{tour.type}</p>
-                  <p className="text-[#F5F0E8]/40 text-xs">{tour.duration}</p>
+                <div className="absolute top-4 right-4 text-right">
+                  <p className="text-[#F5F0E8]/70 text-xs tracking-wider">{tour.type}</p>
+                  <p className="text-[#F5F0E8]/50 text-xs">{tour.duration}</p>
                 </div>
               </div>
 
-              <h3
-                className="text-3xl font-light text-[#F5F0E8] group-hover:text-[#C9A84C] transition-colors duration-300 mb-5"
-                style={{ fontFamily: "var(--font-cormorant)" }}
-              >
-                {tour.name}
-              </h3>
-
-              <ul className="grid grid-cols-2 gap-2 mb-8">
-                {tour.highlights.map((h) => (
-                  <li key={h} className="flex items-start gap-2 text-[#F5F0E8]/55 text-sm">
-                    <span className="text-[#C9A84C] text-xs mt-0.5">✦</span>
-                    {h}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="flex items-center justify-between pt-5 border-t border-[#C9A84C]/10">
-                <p className="text-[#C9A84C] text-lg font-light" style={{ fontFamily: "var(--font-cormorant)" }}>
-                  {tour.prijs}
-                </p>
-                <Link
-                  href="/contact"
-                  className="px-6 py-2.5 border border-[#C9A84C]/30 text-[#C9A84C] text-xs tracking-[0.2em] uppercase hover:bg-[#C9A84C] hover:text-[#1C2B1E] transition-all duration-300"
+              <div className="p-8">
+                <h3
+                  className="text-3xl font-light text-[#F5F0E8] group-hover:text-[#C9A84C] transition-colors duration-300 mb-5"
+                  style={{ fontFamily: "var(--font-cormorant)" }}
                 >
-                  Boek Tour
-                </Link>
+                  {tour.name}
+                </h3>
+
+                <ul className="grid grid-cols-2 gap-2 mb-8">
+                  {tour.highlights.map((h) => (
+                    <li key={h} className="flex items-start gap-2 text-[#F5F0E8]/55 text-sm">
+                      <span className="text-[#C9A84C] text-xs mt-0.5">✦</span>
+                      {h}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="flex items-center justify-between pt-5 border-t border-[#C9A84C]/10">
+                  <p className="text-[#C9A84C] text-lg font-light" style={{ fontFamily: "var(--font-cormorant)" }}>
+                    {tour.prijs}
+                  </p>
+                  <Link
+                    href="/contact"
+                    className="px-6 py-2.5 border border-[#C9A84C]/30 text-[#C9A84C] text-xs tracking-[0.2em] uppercase hover:bg-[#C9A84C] hover:text-[#1C2B1E] transition-all duration-300"
+                  >
+                    Boek Tour
+                  </Link>
+                </div>
               </div>
             </motion.div>
           ))}

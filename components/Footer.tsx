@@ -27,10 +27,15 @@ export default function Footer() {
           <div>
             <h4 className="text-[#C9A84C] text-xs tracking-[0.3em] uppercase mb-6">Diensten</h4>
             <ul className="space-y-3">
-              {["Villa's Boeken", "Tours & Excursies", "Restaurants", "Privé Transfers"].map((item) => (
-                <li key={item}>
-                  <Link href="#" className="text-[#F5F0E8]/60 text-sm hover:text-[#C9A84C] transition-colors duration-300">
-                    {item}
+              {[
+                { label: "Villa's Boeken", href: "/villas" },
+                { label: "Tours & Excursies", href: "/tours" },
+                { label: "Restaurants", href: "/restaurants" },
+                { label: "Contact", href: "/contact" },
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link href={item.href} className="text-[#F5F0E8]/60 text-sm hover:text-[#C9A84C] transition-colors duration-300">
+                    {item.label}
                   </Link>
                 </li>
               ))}

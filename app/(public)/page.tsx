@@ -51,13 +51,14 @@ export default function HomePage() {
   return (
     <>
       {/* HERO */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen overflow-hidden flex flex-col">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0F1A10] via-[#1C2B1E] to-[#243628]" />
         <div className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full border border-[#C9A84C]/10 pointer-events-none" />
         <div className="absolute top-1/3 right-1/3 w-64 h-64 rounded-full border border-[#C9A84C]/5 pointer-events-none" />
         <div className="absolute bottom-1/4 left-1/4 w-80 h-80 rounded-full border border-[#C9A84C]/8 pointer-events-none" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 text-center pt-32 pb-24">
+          <div className="max-w-7xl mx-auto w-full">
           <motion.div
             variants={stagger}
             initial="hidden"
@@ -112,6 +113,7 @@ export default function HomePage() {
               </Link>
             </motion.div>
           </motion.div>
+          </div>
         </div>
 
         <motion.div

@@ -19,7 +19,7 @@ const restaurants = [
     location: "Uluwatu",
     cuisine: "Internationaal",
     sfeer: "Romantisch",
-    icon: "🌊",
+    image: "https://images.unsplash.com/photo-1514190051997-0f6f39ca5cde?w=800&q=80&auto=format&fit=crop",
     beschrijving: "Spectaculair restaurant gebouwd op de klif met onbegrensd uitzicht over de Indische Oceaan. Perfecte sunset dining.",
     prijs: "€€€€",
     tag: "Meest romantisch",
@@ -29,7 +29,7 @@ const restaurants = [
     location: "Ubud",
     cuisine: "Modern Aziatisch",
     sfeer: "Fine Dining",
-    icon: "🌿",
+    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80&auto=format&fit=crop",
     beschrijving: "Bekroond restaurant dat lokale Balinese ingrediënten verheft tot culinaire kunst. Reserveren ver van tevoren vereist.",
     prijs: "€€€€",
     tag: "Award Winning",
@@ -39,7 +39,7 @@ const restaurants = [
     location: "Seminyak",
     cuisine: "Indonesisch",
     sfeer: "Luxe Casual",
-    icon: "🏛️",
+    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80&auto=format&fit=crop",
     beschrijving: "In een prachtig bamboebouwwerk geniet je van verfijnde Indonesische keuken. Een van Bali's mooiste interieurs.",
     prijs: "€€€",
     tag: "Architectuur",
@@ -49,7 +49,7 @@ const restaurants = [
     location: "Ubud",
     cuisine: "Balinees",
     sfeer: "Authentiek",
-    icon: "🐷",
+    image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&q=80&auto=format&fit=crop",
     beschrijving: "Legendarische warung beroemd om de beste babi guling (suckling pig) van Bali. Een must-do voor de echte foodie.",
     prijs: "€",
     tag: "Lokale Legende",
@@ -59,7 +59,7 @@ const restaurants = [
     location: "Jimbaran",
     cuisine: "International",
     sfeer: "Beach Club",
-    icon: "🌅",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80&auto=format&fit=crop",
     beschrijving: "Elegante beach club met voeten in het zand. Verse zeevruchten, cocktails bij de oceaan en perfecte sunsets.",
     prijs: "€€€",
     tag: "Beach Dining",
@@ -69,7 +69,7 @@ const restaurants = [
     location: "Ubud",
     cuisine: "Frans-Aziatisch",
     sfeer: "Fine Dining",
-    icon: "🌺",
+    image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?w=800&q=80&auto=format&fit=crop",
     beschrijving: "Chef Chris Salans combineert klassieke Franse technieken met Balinese smaken in een tropische tuinomgeving.",
     prijs: "€€€€",
     tag: "Culinair Hoogtepunt",
@@ -140,9 +140,15 @@ export default function RestaurantsPage() {
               variants={fadeUp}
               className="group bg-[#1C2B1E] border border-[#C9A84C]/10 hover:border-[#C9A84C]/40 transition-all duration-500"
             >
-              {/* Image placeholder */}
-              <div className="aspect-[3/2] bg-[#243628] flex items-center justify-center relative">
-                <div className="text-[70px] opacity-10">{r.icon}</div>
+              {/* Image */}
+              <div className="aspect-[3/2] bg-[#243628] relative overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={r.image}
+                  alt={r.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0F1A10]/50 to-transparent pointer-events-none" />
                 <div className="absolute top-4 left-4">
                   <span className="bg-[#C9A84C] text-[#1C2B1E] text-[0.6rem] tracking-[0.2em] uppercase px-3 py-1.5">
                     {r.tag}
