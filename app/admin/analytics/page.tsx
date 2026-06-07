@@ -4,6 +4,14 @@ export const dynamic = "force-dynamic";
 
 const MONTHS = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
 
+type BookingRow = {
+  status: string;
+  total_price: number | null;
+  villa_name: string;
+  created_at: string;
+  total_nights: number | null;
+};
+
 async function getAnalytics() {
   try {
     const supabase = createServiceClient();
@@ -11,7 +19,7 @@ async function getAnalytics() {
       .from("bookings")
       .select("status, total_price, villa_name, created_at, total_nights");
 
-    const bookings = data ?? [];
+    const bookings: BookingRow[] = data ?? [];
     const accepted = bookings.filter((b) => b.status === "accepted");
     const now = new Date();
 
