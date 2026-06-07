@@ -130,7 +130,7 @@ function LocationInput({
 
   return (
     <div ref={ref} className="relative">
-      <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">
+      <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
         {label}
       </label>
       <div className="relative">
@@ -156,7 +156,7 @@ function LocationInput({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full left-0 right-0 z-50 bg-[#1A2B1C] border border-[#C9A84C]/25 border-t-0 max-h-52 overflow-y-auto shadow-2xl"
+            className="absolute top-full left-0 right-0 z-50 bg-[#1A2B1C] border border-[#C9A84C]/25 border-t-0 max-h-48 overflow-y-auto shadow-2xl"
           >
             {filtered.map((loc) => (
               <button
@@ -166,7 +166,7 @@ function LocationInput({
                   onChange(loc);
                   setOpen(false);
                 }}
-                className="w-full text-left px-4 py-3 text-sm text-[#F5F0E8]/70 hover:bg-[#243628] hover:text-[#F5F0E8] transition-colors border-b border-[#C9A84C]/10 last:border-0"
+                className="w-full text-left px-4 py-3.5 text-sm text-[#F5F0E8]/70 hover:bg-[#243628] hover:text-[#F5F0E8] transition-colors border-b border-[#C9A84C]/10 last:border-0"
               >
                 {loc}
               </button>
@@ -187,14 +187,14 @@ function PassengerCounter({
 }) {
   return (
     <div>
-      <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">
+      <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
         Reizigers
       </label>
       <div className="flex items-center bg-[#243628] border border-[#C9A84C]/20 h-[50px]">
         <button
           type="button"
           onClick={() => onChange(Math.max(1, value - 1))}
-          className="w-12 h-full flex items-center justify-center text-[#F5F0E8]/50 hover:text-[#C9A84C] hover:bg-[#1C2B1E] transition-colors text-lg font-light border-r border-[#C9A84C]/15"
+          className="w-14 h-full flex items-center justify-center text-[#F5F0E8]/50 hover:text-[#C9A84C] hover:bg-[#1C2B1E] transition-colors text-xl font-light border-r border-[#C9A84C]/15"
         >
           −
         </button>
@@ -204,7 +204,7 @@ function PassengerCounter({
         <button
           type="button"
           onClick={() => onChange(Math.min(8, value + 1))}
-          className="w-12 h-full flex items-center justify-center text-[#F5F0E8]/50 hover:text-[#C9A84C] hover:bg-[#1C2B1E] transition-colors text-lg font-light border-l border-[#C9A84C]/15"
+          className="w-14 h-full flex items-center justify-center text-[#F5F0E8]/50 hover:text-[#C9A84C] hover:bg-[#1C2B1E] transition-colors text-xl font-light border-l border-[#C9A84C]/15"
         >
           +
         </button>
@@ -387,35 +387,35 @@ export default function TransfersPage() {
             ter bevestiging.
           </p>
           <div className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-6 mb-8 text-left space-y-3">
-            <div className="flex justify-between text-sm">
-              <span className="text-[#F5F0E8]/40 uppercase tracking-wider text-[0.65rem]">
+            <div className="flex justify-between text-sm gap-4">
+              <span className="text-[#F5F0E8]/40 uppercase tracking-wider text-[0.65rem] shrink-0">
                 Referentie
               </span>
               <span className="text-[#C9A84C] font-mono tracking-wider">
                 #{bookingRef}
               </span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-[#F5F0E8]/40 uppercase tracking-wider text-[0.65rem]">
+            <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-0.5 sm:gap-4">
+              <span className="text-[#F5F0E8]/40 uppercase tracking-wider text-[0.65rem] shrink-0">
                 Route
               </span>
-              <span className="text-[#F5F0E8]/80 text-right">
+              <span className="text-[#F5F0E8]/80 sm:text-right break-words text-xs">
                 {from} → {to}
               </span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-[#F5F0E8]/40 uppercase tracking-wider text-[0.65rem]">
+            <div className="flex justify-between text-sm gap-4">
+              <span className="text-[#F5F0E8]/40 uppercase tracking-wider text-[0.65rem] shrink-0">
                 Service
               </span>
-              <span className="text-[#F5F0E8]/80">
+              <span className="text-[#F5F0E8]/80 text-right text-xs">
                 {tierLabel[selectedTier!]}
               </span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-[#F5F0E8]/40 uppercase tracking-wider text-[0.65rem]">
+            <div className="flex justify-between text-sm gap-4">
+              <span className="text-[#F5F0E8]/40 uppercase tracking-wider text-[0.65rem] shrink-0">
                 Datum & Tijd
               </span>
-              <span className="text-[#F5F0E8]/80">
+              <span className="text-[#F5F0E8]/80 text-right text-xs">
                 {date} {time && `om ${time}`}
               </span>
             </div>
@@ -453,7 +453,7 @@ export default function TransfersPage() {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="text-center mb-16"
+            className="text-center mb-10 sm:mb-16"
           >
             <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.5em] uppercase mb-6">
               Privé Vervoer op Bali
@@ -501,9 +501,9 @@ export default function TransfersPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">
+                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
                     Datum
                   </label>
                   <input
@@ -511,23 +511,25 @@ export default function TransfersPage() {
                     value={date}
                     min={new Date().toISOString().split("T")[0]}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-3.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
                     style={{ colorScheme: "dark" }}
                   />
                 </div>
                 <div>
-                  <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">
+                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
                     Tijdstip
                   </label>
                   <input
                     type="time"
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
-                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-3.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
                     style={{ colorScheme: "dark" }}
                   />
                 </div>
-                <PassengerCounter value={passengers} onChange={setPassengers} />
+                <div className="col-span-2 sm:col-span-1">
+                  <PassengerCounter value={passengers} onChange={setPassengers} />
+                </div>
               </div>
 
               <button
@@ -645,107 +647,114 @@ export default function TransfersPage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {TIERS.map((tier, i) => {
-              const isRecommended = aiResult?.tier === tier.id;
-              const isSelected = selectedTier === tier.id;
+          {/* Mobile: horizontal scroll — Desktop: 3-col grid */}
+          <div className="-mx-6 px-6 md:mx-0 md:px-0 overflow-x-auto md:overflow-visible pb-4 md:pb-0">
+            <div className="flex md:grid md:grid-cols-3 gap-4 w-max md:w-auto">
+              {TIERS.map((tier, i) => {
+                const isRecommended = aiResult?.tier === tier.id;
+                const isSelected = selectedTier === tier.id;
 
-              return (
-                <motion.div
-                  key={tier.id}
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                  onClick={() => handleTierSelect(tier.id)}
-                  className={`relative cursor-pointer group transition-all duration-300 ${
-                    isSelected
-                      ? "ring-2 ring-[#C9A84C]"
-                      : "hover:ring-1 hover:ring-[#C9A84C]/40"
-                  }`}
-                >
-                  {/* Badges */}
-                  <div className="absolute -top-3 left-4 flex gap-2">
-                    {"popular" in tier && tier.popular && !isRecommended && (
-                      <span className="bg-[#243628] border border-[#C9A84C]/30 text-[#C9A84C] text-[0.55rem] tracking-[0.2em] uppercase px-2 py-0.5">
-                        {tier.badge}
-                      </span>
-                    )}
-                    {isRecommended && (
-                      <motion.span
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="bg-[#C9A84C] text-[#1C2B1E] text-[0.55rem] tracking-[0.2em] uppercase px-2 py-0.5 font-medium"
-                      >
-                        ✦ AI Aanbevolen
-                      </motion.span>
-                    )}
-                  </div>
-
-                  <div
-                    className={`h-full bg-[#1C2B1E] border p-6 transition-all duration-300 ${
+                return (
+                  <motion.div
+                    key={tier.id}
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1, duration: 0.5 }}
+                    onClick={() => handleTierSelect(tier.id)}
+                    className={`relative cursor-pointer group transition-all duration-300 w-[78vw] sm:w-[55vw] md:w-auto flex-shrink-0 md:flex-shrink pt-4 ${
                       isSelected
-                        ? "border-[#C9A84C]/60 bg-[#1C2B1E]"
-                        : isRecommended
-                          ? "border-[#C9A84C]/35"
-                          : "border-[#C9A84C]/12 group-hover:border-[#C9A84C]/30"
+                        ? "ring-2 ring-[#C9A84C]"
+                        : "hover:ring-1 hover:ring-[#C9A84C]/40"
                     }`}
                   >
-                    {/* Header */}
-                    <div className="mb-6">
-                      <div className="text-3xl mb-3">{tier.emoji}</div>
-                      <h3
-                        className="text-2xl font-light text-[#F5F0E8] mb-1"
-                        style={{ fontFamily: "var(--font-cormorant)" }}
-                      >
-                        {tier.label}
-                      </h3>
-                      <p className="text-[#F5F0E8]/35 text-[0.65rem] tracking-wider uppercase">
-                        {tier.sublabel}
-                      </p>
+                    {/* Badges */}
+                    <div className="absolute top-1 left-4 flex gap-2">
+                      {"popular" in tier && tier.popular && !isRecommended && (
+                        <span className="bg-[#243628] border border-[#C9A84C]/30 text-[#C9A84C] text-[0.55rem] tracking-[0.2em] uppercase px-2 py-0.5">
+                          {tier.badge}
+                        </span>
+                      )}
+                      {isRecommended && (
+                        <motion.span
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          className="bg-[#C9A84C] text-[#1C2B1E] text-[0.55rem] tracking-[0.2em] uppercase px-2 py-0.5 font-medium"
+                        >
+                          ✦ AI Aanbevolen
+                        </motion.span>
+                      )}
                     </div>
 
-                    {/* Price from */}
-                    <div className="mb-5 pb-5 border-b border-[#C9A84C]/12">
-                      <span className="text-[#F5F0E8]/30 text-xs">vanaf </span>
-                      <span className="text-[#C9A84C] text-xl font-light">
-                        €{tier.priceFrom}
-                      </span>
-                    </div>
-
-                    {/* Features */}
-                    <ul className="space-y-2.5 mb-6">
-                      {tier.features.map((f) => (
-                        <li key={f} className="flex items-start gap-2.5 text-sm">
-                          <span className="text-[#C9A84C] text-xs mt-0.5 shrink-0">
-                            ✓
-                          </span>
-                          <span className="text-[#F5F0E8]/60 text-xs leading-relaxed">
-                            {f}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {/* Capacity */}
-                    <div className="flex items-center justify-between text-xs mb-5">
-                      <span className="text-[#F5F0E8]/30">👥 {tier.capacity}</span>
-                    </div>
-
-                    {/* CTA */}
                     <div
-                      className={`text-center py-2.5 text-[0.6rem] tracking-[0.25em] uppercase border transition-all ${
+                      className={`h-full bg-[#1C2B1E] border p-5 sm:p-6 transition-all duration-300 ${
                         isSelected
-                          ? "bg-[#C9A84C] text-[#1C2B1E] border-[#C9A84C]"
-                          : "text-[#C9A84C] border-[#C9A84C]/30 group-hover:bg-[#C9A84C]/10"
+                          ? "border-[#C9A84C]/60 bg-[#1C2B1E]"
+                          : isRecommended
+                            ? "border-[#C9A84C]/35"
+                            : "border-[#C9A84C]/12 group-hover:border-[#C9A84C]/30"
                       }`}
                     >
-                      {isSelected ? "✓ Geselecteerd" : "Selecteren"}
+                      {/* Header */}
+                      <div className="mb-5">
+                        <div className="text-3xl mb-3">{tier.emoji}</div>
+                        <h3
+                          className="text-2xl font-light text-[#F5F0E8] mb-1"
+                          style={{ fontFamily: "var(--font-cormorant)" }}
+                        >
+                          {tier.label}
+                        </h3>
+                        <p className="text-[#F5F0E8]/35 text-[0.65rem] tracking-wider uppercase">
+                          {tier.sublabel}
+                        </p>
+                      </div>
+
+                      {/* Price from */}
+                      <div className="mb-4 pb-4 border-b border-[#C9A84C]/12">
+                        <span className="text-[#F5F0E8]/30 text-xs">vanaf </span>
+                        <span className="text-[#C9A84C] text-xl font-light">
+                          €{tier.priceFrom}
+                        </span>
+                      </div>
+
+                      {/* Features */}
+                      <ul className="space-y-2.5 mb-5">
+                        {tier.features.map((f) => (
+                          <li key={f} className="flex items-start gap-2.5 text-sm">
+                            <span className="text-[#C9A84C] text-xs mt-0.5 shrink-0">
+                              ✓
+                            </span>
+                            <span className="text-[#F5F0E8]/60 text-xs leading-relaxed">
+                              {f}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* Capacity */}
+                      <div className="flex items-center justify-between text-xs mb-4">
+                        <span className="text-[#F5F0E8]/30">👥 {tier.capacity}</span>
+                      </div>
+
+                      {/* CTA */}
+                      <div
+                        className={`text-center py-3 text-[0.65rem] tracking-[0.25em] uppercase border transition-all ${
+                          isSelected
+                            ? "bg-[#C9A84C] text-[#1C2B1E] border-[#C9A84C]"
+                            : "text-[#C9A84C] border-[#C9A84C]/30 group-hover:bg-[#C9A84C]/10"
+                        }`}
+                      >
+                        {isSelected ? "✓ Geselecteerd" : "Selecteren"}
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
+          {/* Mobile swipe hint */}
+          <p className="md:hidden text-center text-[#F5F0E8]/20 text-[0.6rem] tracking-wider mt-2">
+            ← Swipe om alle opties te zien →
+          </p>
         </div>
       </section>
 
@@ -775,43 +784,51 @@ export default function TransfersPage() {
 
               {/* Booking Summary */}
               <div className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-5 mb-8">
-                <p className="text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-4">
+                <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-4">
                   Overzicht
                 </p>
-                <div className="grid grid-cols-2 gap-y-3 text-sm">
-                  <span className="text-[#F5F0E8]/35 text-[0.65rem] uppercase tracking-wider">
-                    Route
-                  </span>
-                  <span className="text-[#F5F0E8]/80 text-right text-xs">
-                    {from} → {to}
-                  </span>
-                  <span className="text-[#F5F0E8]/35 text-[0.65rem] uppercase tracking-wider">
-                    Datum & Tijd
-                  </span>
-                  <span className="text-[#F5F0E8]/80 text-right text-xs">
-                    {date} {time && `— ${time}`}
-                  </span>
-                  <span className="text-[#F5F0E8]/35 text-[0.65rem] uppercase tracking-wider">
-                    Reizigers
-                  </span>
-                  <span className="text-[#F5F0E8]/80 text-right text-xs">
-                    {passengers} {passengers === 1 ? "persoon" : "personen"}
-                  </span>
-                  <span className="text-[#F5F0E8]/35 text-[0.65rem] uppercase tracking-wider">
-                    Service
-                  </span>
-                  <span className="text-[#C9A84C] text-right text-xs tracking-wider">
-                    {tierLabel[selectedTier]}
-                  </span>
+                <div className="space-y-3 text-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-0.5 sm:gap-4">
+                    <span className="text-[#F5F0E8]/35 text-[0.65rem] uppercase tracking-wider shrink-0">
+                      Route
+                    </span>
+                    <span className="text-[#F5F0E8]/80 text-xs sm:text-right break-words">
+                      {from} → {to}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-[#F5F0E8]/35 text-[0.65rem] uppercase tracking-wider shrink-0">
+                      Datum & Tijd
+                    </span>
+                    <span className="text-[#F5F0E8]/80 text-right text-xs">
+                      {date} {time && `— ${time}`}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-[#F5F0E8]/35 text-[0.65rem] uppercase tracking-wider shrink-0">
+                      Reizigers
+                    </span>
+                    <span className="text-[#F5F0E8]/80 text-right text-xs">
+                      {passengers} {passengers === 1 ? "persoon" : "personen"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-[#F5F0E8]/35 text-[0.65rem] uppercase tracking-wider shrink-0">
+                      Service
+                    </span>
+                    <span className="text-[#C9A84C] text-right text-xs tracking-wider">
+                      {tierLabel[selectedTier]}
+                    </span>
+                  </div>
                   {aiResult?.reistijd && (
-                    <>
-                      <span className="text-[#F5F0E8]/35 text-[0.65rem] uppercase tracking-wider">
-                        Geschatte reistijd
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-[#F5F0E8]/35 text-[0.65rem] uppercase tracking-wider shrink-0">
+                        Reistijd
                       </span>
                       <span className="text-[#F5F0E8]/80 text-right text-xs">
                         {aiResult.reistijd}
                       </span>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
