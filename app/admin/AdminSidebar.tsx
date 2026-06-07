@@ -7,6 +7,7 @@ import { signOut } from "./_actions/signOut";
 const NAV = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/bookings", label: "Boekingen" },
+  { href: "/admin/calendar", label: "Kalender" },
   { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/villas", label: "Villa's" },
   { href: "/admin/tours", label: "Tours" },
