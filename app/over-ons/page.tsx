@@ -16,44 +16,38 @@ const stagger: Variants = {
 const waarden = [
   {
     icon: "✦",
+    title: "Lokale Wortels",
+    desc: "Wij werken uitsluitend samen met lokale Balinese partners die eerlijk worden beloond voor hun expertise en kennis van het eiland.",
+  },
+  {
+    icon: "✦",
     title: "Eerlijkheid",
-    desc: "Wij vertellen je wat wij echt aanbevelen, niet wat de hoogste commissie oplevert. Jouw vertrouwen is ons fundament.",
+    desc: "Wij vertellen je wat wij zelf gebruiken en aanbevelen. Geen gesponsorde aanbevelingen, geen hoge commissies — jouw vertrouwen is ons fundament.",
   },
   {
     icon: "✦",
-    title: "Kwaliteit",
-    desc: "Elk verblijf, elke tour en elk restaurant wordt persoonlijk getest en beoordeeld door ons team op Bali.",
+    title: "Persoonlijk Contact",
+    desc: "Je spreekt altijd rechtstreeks met Edwin of Citty. Geen callcenters, geen scripts — gewoon twee mensen die Bali kennen als hun broekzak.",
   },
   {
     icon: "✦",
-    title: "Persoonlijkheid",
-    desc: "Geen scripts, geen call centers. Je spreekt altijd met dezelfde persoon die jouw trip kent van A tot Z.",
-  },
-  {
-    icon: "✦",
-    title: "Lokale wortels",
-    desc: "Wij werken uitsluitend met lokale Balinese partners die eerlijk worden beloond voor hun expertise.",
+    title: "Totaalpakket",
+    desc: "Van villa tot vlucht, van restaurantreservering tot privétour. Wij ontzorgen jou volledig zodat jij alleen maar hoeft te genieten.",
   },
 ];
 
 const team = [
   {
-    naam: "Sander de Vries",
-    rol: "Oprichter & Bali Expert",
-    bio: "Woont 8 jaar op Bali. Oud-reisjournalist met een onstilbare liefde voor het eiland en zijn cultuur.",
-    initials: "SdV",
+    naam: "Edwin",
+    rol: "Oprichter & Bali Fanaat",
+    bio: "Al jarenlang valt Edwin in herhaling op Bali. Als mede-eigenaar van STOER Bracelets bouwde hij een diep netwerk op met lokale makers, villa-eigenaren en gidsen op het eiland.",
+    initials: "E",
   },
   {
-    naam: "Maya Putri",
-    rol: "Lokale Partner Coördinator",
-    bio: "Geboren en opgegroeid in Ubud. Maya kent elk verborgen hoekje van Bali en spreekt vloeiend Nederlands.",
-    initials: "MP",
-  },
-  {
-    naam: "Lisa Brouwer",
-    rol: "Klantenservice & Planning",
-    bio: "Vanuit Nederland de schakel tussen onze klanten en het team op Bali. Bereikbaar 7 dagen per week.",
-    initials: "LB",
+    naam: "Citty",
+    rol: "Oprichtster & Local Expert",
+    bio: "Citty kent Bali zoals weinig anderen. Met haar oog voor detail, gevoel voor luxe en passie voor het eiland zorgt zij ervoor dat elke reis tot in de puntjes klopt.",
+    initials: "C",
   },
 ];
 
@@ -76,12 +70,12 @@ export default function OverOnsPage() {
             >
               Gemaakt door
               <br />
-              <span className="italic text-[#C9A84C]">Bali-liefhebbers</span>
+              <span className="italic text-[#C9A84C]">echte fanaten</span>
             </motion.h1>
             <motion.p variants={fadeUp} className="text-[#F5F0E8]/65 text-xl leading-relaxed">
-              BaliLiving ontstond uit frustratie. Goede reisbureaus voor Bali bestonden niet —
-              je werd doorverwezen naar standaard pakketjes of een website vol anonieme villa&apos;s.
-              Wij besloten het anders te doen.
+              BaliLiving is opgericht door Edwin en Citty — twee Bali-verslaafden die al jarenlang
+              het eiland bezoeken en inmiddels diep geworteld zijn in de lokale gemeenschap.
+              Wat begon als een persoonlijke liefde voor Bali, groeide uit tot een missie.
             </motion.p>
           </motion.div>
         </div>
@@ -100,7 +94,7 @@ export default function OverOnsPage() {
             <div className="aspect-square bg-[#1C2B1E] border border-[#C9A84C]/20 flex items-center justify-center">
               <div className="text-center p-12">
                 <div className="text-[100px] opacity-20">🌿</div>
-                <p className="text-[#F5F0E8]/30 text-sm tracking-widest uppercase mt-4">Team foto plaatshouder</p>
+                <p className="text-[#F5F0E8]/30 text-sm tracking-widest uppercase mt-4">Edwin & Citty op Bali</p>
               </div>
             </div>
             <div className="absolute -top-4 -left-4 w-24 h-24 border-t border-l border-[#C9A84C]/40" />
@@ -110,42 +104,92 @@ export default function OverOnsPage() {
           <motion.div variants={fadeUp}>
             <div className="space-y-6 text-[#F5F0E8]/65 leading-relaxed text-lg">
               <p>
-                In 2018 verhuisde onze oprichter Sander naar Ubud. Wat begon als een sabbatical
-                groeide uit tot een missie: het beste van Bali toegankelijk maken voor Nederlanders
-                die echt willen genieten — zonder de stress van zelf alles uitzoeken.
+                Edwin en Citty zijn al jaren vaste bezoekers van Bali. Als mede-eigenaren van
+                <span className="text-[#C9A84C]"> STOER Bracelets</span> kwamen ze in contact
+                met de mooiste lokale makers en ambachtslieden op het eiland — en ze raakten
+                volledig verliefd op de Bali lifestyle.
               </p>
               <p>
-                We bouwden een netwerk op van de beste lokale partners: villa-eigenaren, gidsen,
-                restaurateurs. Mensen die we persoonlijk kennen en vertrouwen. Geen middelmannen,
-                geen onpersoonlijke boekingssites.
+                Wat hen stoorde? Dat mooie reizen naar Bali voor veel Nederlanders onnodig
+                ingewikkeld of anoniem waren. Geen persoonlijk contact, geen eerlijke aanbevelingen,
+                geen echte lokale connectie. Dat wilden ze anders doen.
               </p>
               <p>
-                Vandaag helpen we honderden Nederlanders per jaar aan hun droomreis naar Bali.
-                Elk op hun eigen manier. Elk volledig ontzorgd.
+                BaliLiving biedt een totaalpakket: villa&apos;s, tours, restaurants en alles
+                daartussenin. Volledig persoonlijk, volledig lokaal, en altijd met de warmte
+                van mensen die het eiland echt kennen en liefhebben.
               </p>
             </div>
             <div className="flex items-center gap-6 mt-10">
               <div className="text-center">
-                <div className="text-4xl font-light text-[#C9A84C]" style={{ fontFamily: "var(--font-cormorant)" }}>8+</div>
-                <div className="text-[#F5F0E8]/40 text-xs tracking-wider">Jaar op Bali</div>
-              </div>
-              <div className="w-px h-12 bg-[#C9A84C]/20" />
-              <div className="text-center">
-                <div className="text-4xl font-light text-[#C9A84C]" style={{ fontFamily: "var(--font-cormorant)" }}>5000+</div>
-                <div className="text-[#F5F0E8]/40 text-xs tracking-wider">Blije reizigers</div>
-              </div>
-              <div className="w-px h-12 bg-[#C9A84C]/20" />
-              <div className="text-center">
                 <div className="text-4xl font-light text-[#C9A84C]" style={{ fontFamily: "var(--font-cormorant)" }}>100%</div>
-                <div className="text-[#F5F0E8]/40 text-xs tracking-wider">Persoonlijk</div>
+                <div className="text-[#F5F0E8]/40 text-xs tracking-wider">Lokale partners</div>
+              </div>
+              <div className="w-px h-12 bg-[#C9A84C]/20" />
+              <div className="text-center">
+                <div className="text-4xl font-light text-[#C9A84C]" style={{ fontFamily: "var(--font-cormorant)" }}>Jaren</div>
+                <div className="text-[#F5F0E8]/40 text-xs tracking-wider">Bali ervaring</div>
+              </div>
+              <div className="w-px h-12 bg-[#C9A84C]/20" />
+              <div className="text-center">
+                <div className="text-4xl font-light text-[#C9A84C]" style={{ fontFamily: "var(--font-cormorant)" }}>Totaal</div>
+                <div className="text-[#F5F0E8]/40 text-xs tracking-wider">Ontzorgd</div>
               </div>
             </div>
           </motion.div>
         </motion.div>
       </section>
 
+      {/* STOER Bracelets verbinding */}
+      <section className="py-20 bg-[#131E14]">
+        <div className="max-w-7xl mx-auto px-6">
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            variants={stagger}
+            className="grid md:grid-cols-2 gap-16 items-center"
+          >
+            <motion.div variants={fadeUp}>
+              <p className="text-[#C9A84C] text-xs tracking-[0.4em] uppercase mb-4">De Connectie</p>
+              <h2
+                className="text-5xl font-light text-[#F5F0E8] mb-6"
+                style={{ fontFamily: "var(--font-cormorant)" }}
+              >
+                Geworteld in
+                <br />
+                <span className="italic text-[#C9A84C]">de lokale cultuur</span>
+              </h2>
+              <p className="text-[#F5F0E8]/60 leading-relaxed mb-6">
+                Via STOER Bracelets bouwden Edwin en Citty jarenlange relaties op met lokale
+                Balinese families, villa-eigenaren, restauranthouders en gidsen. Geen
+                tussenpersonen, geen anonieme boekingssites — maar mensen die ze persoonlijk
+                kennen en vertrouwen.
+              </p>
+              <p className="text-[#F5F0E8]/60 leading-relaxed">
+                Die lokale wortels zijn de basis van alles wat BaliLiving doet. Jij profiteert
+                van connecties die je zelf nooit zou kunnen opbouwen.
+              </p>
+            </motion.div>
+            <motion.div variants={fadeUp} className="grid grid-cols-2 gap-4">
+              {[
+                { nr: "1", text: "Persoonlijk netwerk van lokale villa-eigenaren" },
+                { nr: "2", text: "Eerlijke aanbevelingen, geen commissie-gedreven keuzes" },
+                { nr: "3", text: "Directe communicatie, 7 dagen per week bereikbaar" },
+                { nr: "4", text: "Ter plekke support tijdens jouw verblijf op Bali" },
+              ].map((item) => (
+                <div key={item.nr} className="border border-[#C9A84C]/15 p-6 hover:border-[#C9A84C]/40 transition-all duration-300">
+                  <div className="text-[#C9A84C]/40 text-xs tracking-[0.3em] mb-3">0{item.nr}</div>
+                  <p className="text-[#F5F0E8]/65 text-sm leading-relaxed">{item.text}</p>
+                </div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Waarden */}
-      <section className="py-24 bg-[#131E14]">
+      <section className="py-24 bg-[#1C2B1E]">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div
             initial="hidden"
@@ -201,19 +245,19 @@ export default function OverOnsPage() {
             </h2>
           </motion.div>
 
-          <motion.div variants={stagger} className="grid md:grid-cols-3 gap-8">
+          <motion.div variants={stagger} className="grid md:grid-cols-2 gap-12 max-w-3xl mx-auto">
             {team.map((lid) => (
               <motion.div key={lid.naam} variants={fadeUp} className="text-center group">
-                <div className="w-28 h-28 rounded-full bg-[#1C2B1E] border border-[#C9A84C]/20 group-hover:border-[#C9A84C]/60 transition-all duration-300 flex items-center justify-center mx-auto mb-6">
+                <div className="w-32 h-32 rounded-full bg-[#1C2B1E] border border-[#C9A84C]/20 group-hover:border-[#C9A84C]/60 transition-all duration-300 flex items-center justify-center mx-auto mb-6">
                   <span
-                    className="text-[#C9A84C] text-2xl font-light"
+                    className="text-[#C9A84C] text-4xl font-light"
                     style={{ fontFamily: "var(--font-cormorant)" }}
                   >
                     {lid.initials}
                   </span>
                 </div>
                 <h3
-                  className="text-2xl font-light text-[#F5F0E8] mb-1"
+                  className="text-3xl font-light text-[#F5F0E8] mb-1"
                   style={{ fontFamily: "var(--font-cormorant)" }}
                 >
                   {lid.naam}
@@ -245,7 +289,8 @@ export default function OverOnsPage() {
             <span className="italic">kennen</span>
           </motion.h2>
           <motion.p variants={fadeUp} className="text-[#1C2B1E]/70 mb-10">
-            Plan een gratis, vrijblijvend gesprek. Wij horen graag over jouw Bali droom.
+            Plan een gratis, vrijblijvend gesprek met Edwin of Citty.
+            Wij horen graag over jouw Bali droom.
           </motion.p>
           <motion.div variants={fadeUp}>
             <Link

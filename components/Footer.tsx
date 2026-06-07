@@ -19,7 +19,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-[#F5F0E8]/50 text-sm leading-relaxed">
-              Jouw complete gids voor een onvergetelijke Bali ervaring. Van villa tot restaurant, wij regelen alles.
+              Opgericht door Edwin & Citty — pure Bali-fanaten met een diep lokaal netwerk. Jouw totaalpakket voor Bali.
             </p>
           </div>
 

@@ -54,7 +54,7 @@ export default function ContactPage() {
               <span className="italic text-[#C9A84C]">begint hier</span>
             </motion.h1>
             <motion.p variants={fadeUp} className="text-[#F5F0E8]/60 text-lg max-w-xl leading-relaxed">
-              Vertel ons over jouw Bali droom. Wij nemen binnen 24 uur contact op voor een vrijblijvend gesprek.
+              Vertel Edwin of Citty over jouw Bali droom. Wij nemen binnen 24 uur persoonlijk contact op voor een vrijblijvend gesprek.
             </motion.p>
           </motion.div>
         </div>
@@ -135,7 +135,7 @@ export default function ContactPage() {
                     Bericht ontvangen
                   </h3>
                   <p className="text-[#F5F0E8]/55 leading-relaxed">
-                    Bedankt voor je bericht. Een van onze Bali-experts neemt
+                    Bedankt voor je bericht. Edwin of Citty neemt
                     binnen 24 uur persoonlijk contact met je op.
                   </p>
                 </div>

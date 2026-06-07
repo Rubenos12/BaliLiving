@@ -179,13 +179,14 @@ export default function HomePage() {
             </h2>
             <div className="space-y-5 text-[#F5F0E8]/65 leading-relaxed">
               <p>
-                BaliLiving is opgericht door Nederland&apos;s meest ervaren Bali-kenners.
-                We wonen en werken op het eiland — we kennen elke verborgen parel,
-                elke betrouwbare lokale partner en elk moment dat Bali magisch maakt.
+                BaliLiving is opgericht door Edwin en Citty — pure Bali-fanaten en mede-eigenaren
+                van STOER Bracelets. Jarenlang kwamen zij op het eiland en bouwden een diep
+                persoonlijk netwerk op met lokale villa-eigenaren, gidsen en restauranthouders.
               </p>
               <p>
-                Geen standaard pakketreizen. Geen call centers. Gewoon directe,
-                persoonlijke service van mensen die Bali net zo lief hebben als jij.
+                Dat netwerk zetten zij nu voor jou in. Geen standaard pakketreizen, geen
+                anonieme boekingssites. Gewoon directe, eerlijke service van mensen die Bali
+                net zo lief hebben als jij.
               </p>
             </div>
             <Link
