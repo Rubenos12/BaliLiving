@@ -8,11 +8,11 @@ type BookingStat = { status: string; total_price: number | null; created_at: str
 async function getStats() {
   try {
     const supabase = createServiceClient();
-    const [bookings, villas, tours, transfers, restaurants] = await Promise.all([
+    const [bookings, villas, tours, transferRequests, restaurants] = await Promise.all([
       supabase.from("bookings").select("status, total_price, created_at"),
       supabase.from("villas").select("id", { count: "exact", head: true }),
       supabase.from("tours").select("id", { count: "exact", head: true }),
-      supabase.from("transfers").select("id", { count: "exact", head: true }),
+      supabase.from("transfer_requests").select("id, status"),
       supabase.from("restaurants").select("id", { count: "exact", head: true }),
     ]);
 
@@ -29,15 +29,19 @@ async function getStats() {
       .filter((b) => b.status === "accepted")
       .reduce((s, b) => s + (b.total_price ?? 0), 0);
 
+    const allTransferRequests = transferRequests.data ?? [];
+    const pendingTransfers = allTransferRequests.filter((t: { status: string }) => t.status === "pending").length;
+
     return {
       pending, accepted, monthRevenue, totalRevenue,
       villas: villas.count ?? 0,
       tours: tours.count ?? 0,
-      transfers: transfers.count ?? 0,
+      transfers: allTransferRequests.length,
+      pendingTransfers,
       restaurants: restaurants.count ?? 0,
     };
   } catch {
-    return { pending: 0, accepted: 0, monthRevenue: 0, totalRevenue: 0, villas: 0, tours: 0, transfers: 0, restaurants: 0 };
+    return { pending: 0, accepted: 0, monthRevenue: 0, totalRevenue: 0, villas: 0, tours: 0, transfers: 0, pendingTransfers: 0, restaurants: 0 };
   }
 }
 
@@ -54,7 +58,7 @@ export default async function AdminDashboard() {
   const inventory = [
     { label: "Villa's", value: stats.villas, href: "/admin/villas", icon: "🏡" },
     { label: "Tours", value: stats.tours, href: "/admin/tours", icon: "🌴" },
-    { label: "Transfers", value: stats.transfers, href: "/admin/transfers", icon: "🚐" },
+    { label: "Transfer aanvragen", value: stats.transfers, href: "/admin/transfers", icon: "🚐", badge: stats.pendingTransfers > 0 ? `${stats.pendingTransfers} openstaand` : undefined },
     { label: "Restaurants", value: stats.restaurants, href: "/admin/restaurants", icon: "🍜" },
   ];
 
@@ -108,6 +112,11 @@ export default async function AdminDashboard() {
               </span>
             </div>
             <div className="text-[#F5F0E8]/50 text-sm">{item.label}</div>
+            {"badge" in item && item.badge && (
+              <div className="mt-2 text-[0.6rem] tracking-wider text-yellow-400">
+                ● {item.badge}
+              </div>
+            )}
           </Link>
         ))}
       </div>

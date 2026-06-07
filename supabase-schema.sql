@@ -277,3 +277,71 @@ CREATE POLICY "Public read published restaurants"
 CREATE POLICY "Auth users can manage restaurants"
   ON restaurants FOR ALL
   USING (auth.role() = 'authenticated');
+
+-- ============================================================
+-- Transfer Requests table (customer-submitted on-demand transfers)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS transfer_requests (
+  id                    uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  from_location         text NOT NULL,
+  to_location           text NOT NULL,
+  transfer_date         date NOT NULL,
+  transfer_time         text NOT NULL DEFAULT '',
+  passengers            integer NOT NULL DEFAULT 1,
+  tier                  text NOT NULL DEFAULT 'normaal' CHECK (tier IN ('normaal', 'luxe', 'vip')),
+  guest_name            text NOT NULL,
+  guest_email           text NOT NULL,
+  guest_phone           text NOT NULL DEFAULT '',
+  notes                 text NOT NULL DEFAULT '',
+  ai_recommendation     text NOT NULL DEFAULT '',
+  estimated_travel_time text NOT NULL DEFAULT '',
+  status                text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'rejected')),
+  created_at            timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE transfer_requests ENABLE ROW LEVEL SECURITY;
+
+-- Anyone can submit a transfer request
+CREATE POLICY "Anyone can create transfer requests"
+  ON transfer_requests FOR INSERT
+  WITH CHECK (true);
+
+-- Only authenticated users (admin) can read and update
+CREATE POLICY "Auth users can read transfer requests"
+  ON transfer_requests FOR SELECT
+  USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Auth users can update transfer requests"
+  ON transfer_requests FOR UPDATE
+  USING (auth.role() = 'authenticated');
+
+-- ============================================================
+-- Contact Inquiries table (contact form submissions)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS contact_inquiries (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  naam        text NOT NULL,
+  email       text NOT NULL,
+  telefoon    text NOT NULL DEFAULT '',
+  interesse   text NOT NULL DEFAULT '',
+  reisdatum   text NOT NULL DEFAULT '',
+  bericht     text NOT NULL,
+  status      text NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'read', 'replied')),
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE contact_inquiries ENABLE ROW LEVEL SECURITY;
+
+-- Anyone can submit a contact inquiry
+CREATE POLICY "Anyone can create contact inquiries"
+  ON contact_inquiries FOR INSERT
+  WITH CHECK (true);
+
+-- Only authenticated users (admin) can read and update
+CREATE POLICY "Auth users can read contact inquiries"
+  ON contact_inquiries FOR SELECT
+  USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Auth users can update contact inquiries"
+  ON contact_inquiries FOR UPDATE
+  USING (auth.role() = 'authenticated');

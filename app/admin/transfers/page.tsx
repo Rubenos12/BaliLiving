@@ -1,103 +1,296 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
+import { updateTransferRequestStatus } from "@/lib/actions/transfer-requests";
 import { createClient } from "@/lib/supabase/client";
 
-type Transfer = {
-  id: string; name: string; from_location: string; to_location: string;
-  price: number; vehicle_type: string; max_passengers: number; published: boolean;
+type TransferRequest = {
+  id: string;
+  from_location: string;
+  to_location: string;
+  transfer_date: string;
+  transfer_time: string;
+  passengers: number;
+  tier: "normaal" | "luxe" | "vip";
+  guest_name: string;
+  guest_email: string;
+  guest_phone: string;
+  notes: string;
+  ai_recommendation: string;
+  estimated_travel_time: string;
+  status: "pending" | "confirmed" | "rejected";
+  created_at: string;
 };
 
-const VEHICLE_LABELS: Record<string, string> = { car: "Auto", van: "Busje", minibus: "Minibus" };
+const statusColors: Record<string, string> = {
+  pending: "bg-yellow-400/15 text-yellow-400 border-yellow-400/30",
+  confirmed: "bg-green-400/15 text-green-400 border-green-400/30",
+  rejected: "bg-red-400/15 text-red-400 border-red-400/30",
+};
 
-export default function AdminTransfersPage() {
-  const [items, setItems] = useState<Transfer[]>([]);
+const statusLabels: Record<string, string> = {
+  pending: "In behandeling",
+  confirmed: "Bevestigd",
+  rejected: "Afgewezen",
+};
+
+const tierLabels: Record<string, string> = {
+  normaal: "Normaal",
+  luxe: "Luxe",
+  vip: "VIP",
+};
+
+const tierColors: Record<string, string> = {
+  normaal: "text-[#F5F0E8]/50 border-[#F5F0E8]/20",
+  luxe: "text-[#C9A84C] border-[#C9A84C]/30",
+  vip: "text-purple-400 border-purple-400/30",
+};
+
+function formatDate(dateStr: string) {
+  if (!dateStr) return "—";
+  return new Date(dateStr).toLocaleDateString("nl-NL", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+export default function AdminTransferRequestsPage() {
+  const [requests, setRequests] = useState<TransferRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("all");
+  const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const fetch = useCallback(async () => {
+  const fetchRequests = useCallback(async () => {
     const supabase = createClient();
-    const { data } = await supabase.from("transfers").select("*").order("name");
-    if (data) setItems(data as Transfer[]);
+    const { data } = await supabase
+      .from("transfer_requests")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (data) setRequests(data as TransferRequest[]);
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
 
-  const togglePublish = async (id: string, published: boolean) => {
+  // Real-time subscription
+  useEffect(() => {
     const supabase = createClient();
-    await supabase.from("transfers").update({ published: !published }).eq("id", id);
-    setItems((t) => t.map((i) => i.id === id ? { ...i, published: !published } : i));
+    const channel = supabase
+      .channel("transfer-requests-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "transfer_requests" },
+        async (payload) => {
+          if (payload.eventType === "INSERT") {
+            setRequests((prev) => [payload.new as TransferRequest, ...prev]);
+          } else if (payload.eventType === "UPDATE") {
+            setRequests((prev) =>
+              prev.map((r) =>
+                r.id === (payload.new as TransferRequest).id
+                  ? (payload.new as TransferRequest)
+                  : r
+              )
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const handleStatus = async (id: string, status: "confirmed" | "rejected") => {
+    setLoadingId(id + status);
+    const result = await updateTransferRequestStatus(id, status);
+    if (!result.error) {
+      setRequests((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status } : r))
+      );
+    }
+    setLoadingId(null);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Transfer verwijderen?")) return;
-    const supabase = createClient();
-    await supabase.from("transfers").delete().eq("id", id);
-    setItems((t) => t.filter((i) => i.id !== id));
-  };
+  const filtered =
+    filter === "all" ? requests : requests.filter((r) => r.status === filter);
+  const pending = requests.filter((r) => r.status === "pending").length;
 
   return (
     <div className="p-4 md:p-8">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-light text-[#F5F0E8]" style={{ fontFamily: "var(--font-cormorant)" }}>
-            Transfers
+          <h1
+            className="text-3xl font-light text-[#F5F0E8]"
+            style={{ fontFamily: "var(--font-cormorant)" }}
+          >
+            Transfer Aanvragen
           </h1>
-          <p className="text-[#F5F0E8]/40 text-sm mt-1">{items.length} transfers in het aanbod</p>
+          <p className="text-[#F5F0E8]/40 text-sm mt-1">
+            {requests.length} aanvra{requests.length === 1 ? "ag" : "gen"} in
+            totaal
+            {pending > 0 && (
+              <span className="ml-2 text-yellow-400">
+                · {pending} openstaand
+              </span>
+            )}
+          </p>
         </div>
-        <Link href="/admin/transfers/new" className="px-5 py-2.5 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.25em] uppercase hover:bg-[#E8C96A] transition-all duration-200">
-          + Nieuwe transfer
-        </Link>
       </div>
+
+      {/* Filter tabs */}
+      <div className="flex gap-2 mb-6 flex-wrap">
+        {[
+          { key: "all", label: "Alle" },
+          { key: "pending", label: "Openstaand" },
+          { key: "confirmed", label: "Bevestigd" },
+          { key: "rejected", label: "Afgewezen" },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setFilter(tab.key)}
+            className={`px-4 py-1.5 text-xs tracking-wider uppercase border transition-colors duration-200 ${
+              filter === tab.key
+                ? "bg-[#C9A84C] text-[#1C2B1E] border-[#C9A84C]"
+                : "border-[#C9A84C]/20 text-[#F5F0E8]/40 hover:border-[#C9A84C]/50 hover:text-[#F5F0E8]/70"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {loading ? (
-        <div className="text-[#F5F0E8]/30 text-sm py-20 text-center">Laden...</div>
-      ) : items.length === 0 ? (
+        <div className="text-[#F5F0E8]/30 text-sm py-20 text-center">
+          Laden...
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="bg-[#1C2B1E] border border-[#C9A84C]/15 py-20 text-center">
-          <p className="text-[#F5F0E8]/30 text-sm mb-4">Nog geen transfers toegevoegd</p>
-          <Link href="/admin/transfers/new" className="text-[#C9A84C] text-xs tracking-wider hover:underline">
-            Voeg je eerste transfer toe →
-          </Link>
+          <p className="text-[#F5F0E8]/30 text-sm">
+            {filter === "all"
+              ? "Nog geen transfer aanvragen ontvangen"
+              : "Geen aanvragen met deze status"}
+          </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {items.map((item) => (
-            <div key={item.id} className="bg-[#1C2B1E] border border-[#C9A84C]/15 hover:border-[#C9A84C]/30 transition-all duration-200 flex items-center gap-6 p-5">
-              <div className="w-12 h-12 bg-[#243628] flex items-center justify-center text-2xl shrink-0">🚐</div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-1 flex-wrap">
-                  <h3 className="text-[#F5F0E8] font-light" style={{ fontFamily: "var(--font-cormorant)" }}>
-                    {item.name}
-                  </h3>
-                  <span className={`text-[0.6rem] tracking-wider uppercase px-2 py-0.5 border ${
-                    item.published
-                      ? "text-green-400 bg-green-400/10 border-green-400/25"
-                      : "text-[#F5F0E8]/30 bg-[#F5F0E8]/5 border-[#F5F0E8]/15"
-                  }`}>
-                    {item.published ? "Gepubliceerd" : "Verborgen"}
+        <div className="space-y-4">
+          {filtered.map((req) => (
+            <div
+              key={req.id}
+              className="bg-[#1C2B1E] border border-[#C9A84C]/15 hover:border-[#C9A84C]/25 transition-all duration-200 p-5"
+            >
+              {/* Header row */}
+              <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="text-2xl">🚐</span>
+                  <div>
+                    <p
+                      className="text-[#F5F0E8] font-light text-lg"
+                      style={{ fontFamily: "var(--font-cormorant)" }}
+                    >
+                      {req.from_location}{" "}
+                      <span className="text-[#C9A84C]">→</span>{" "}
+                      {req.to_location}
+                    </p>
+                    <p className="text-[#F5F0E8]/35 text-xs mt-0.5">
+                      {formatDate(req.transfer_date)}
+                      {req.transfer_time && ` · ${req.transfer_time}`}
+                      {" · "}
+                      {req.passengers} passagier
+                      {req.passengers !== 1 ? "s" : ""}
+                      {req.estimated_travel_time &&
+                        ` · ca. ${req.estimated_travel_time}`}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span
+                    className={`text-[0.6rem] tracking-wider uppercase px-2 py-0.5 border ${tierColors[req.tier] ?? ""}`}
+                  >
+                    {tierLabels[req.tier] ?? req.tier}
+                  </span>
+                  <span
+                    className={`text-[0.6rem] tracking-wider uppercase px-2 py-0.5 border ${statusColors[req.status] ?? ""}`}
+                  >
+                    {statusLabels[req.status] ?? req.status}
                   </span>
                 </div>
-                <div className="flex flex-wrap gap-4 text-[#F5F0E8]/40 text-xs">
-                  <span>{item.from_location} → {item.to_location}</span>
-                  <span>{VEHICLE_LABELS[item.vehicle_type] ?? item.vehicle_type}</span>
-                  <span>Max. {item.max_passengers} passagiers</span>
-                  <span className="text-[#C9A84C]">€{item.price}</span>
+              </div>
+
+              {/* Guest info */}
+              <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-[#F5F0E8]/50 mb-4">
+                <span>
+                  <span className="text-[#F5F0E8]/25 mr-1.5">Gast</span>
+                  {req.guest_name}
+                </span>
+                <a
+                  href={`mailto:${req.guest_email}`}
+                  className="hover:text-[#C9A84C] transition-colors"
+                >
+                  {req.guest_email}
+                </a>
+                {req.guest_phone && (
+                  <a
+                    href={`tel:${req.guest_phone}`}
+                    className="hover:text-[#C9A84C] transition-colors"
+                  >
+                    {req.guest_phone}
+                  </a>
+                )}
+              </div>
+
+              {/* AI recommendation */}
+              {req.ai_recommendation && (
+                <div className="bg-[#243628] border border-[#C9A84C]/10 px-4 py-3 mb-4 text-xs text-[#F5F0E8]/55 leading-relaxed">
+                  <span className="text-[#C9A84C] text-[0.6rem] tracking-wider uppercase mr-2">
+                    AI advies
+                  </span>
+                  {req.ai_recommendation}
                 </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <button onClick={() => togglePublish(item.id, item.published)}
-                  className="px-3 py-2 border border-[#C9A84C]/20 text-[#F5F0E8]/50 text-[0.6rem] tracking-wider uppercase hover:border-[#C9A84C]/50 hover:text-[#C9A84C] transition-colors">
-                  {item.published ? "Verberg" : "Publiceer"}
-                </button>
-                <Link href={`/admin/transfers/${item.id}`}
-                  className="px-3 py-2 border border-[#C9A84C]/20 text-[#F5F0E8]/50 text-[0.6rem] tracking-wider uppercase hover:border-[#C9A84C]/50 hover:text-[#C9A84C] transition-colors">
-                  Bewerken
-                </Link>
-                <button onClick={() => handleDelete(item.id)}
-                  className="px-3 py-2 border border-red-400/20 text-red-400/50 text-[0.6rem] tracking-wider uppercase hover:border-red-400/50 hover:text-red-400 transition-colors">
-                  Verwijder
-                </button>
-              </div>
+              )}
+
+              {/* Notes */}
+              {req.notes && (
+                <p className="text-xs text-[#F5F0E8]/40 italic mb-4">
+                  "{req.notes}"
+                </p>
+              )}
+
+              {/* Actions */}
+              {req.status === "pending" && (
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => handleStatus(req.id, "confirmed")}
+                    disabled={loadingId === req.id + "confirmed"}
+                    className="px-4 py-2 bg-green-400/10 border border-green-400/30 text-green-400 text-[0.6rem] tracking-wider uppercase hover:bg-green-400/20 transition-colors disabled:opacity-50"
+                  >
+                    {loadingId === req.id + "confirmed"
+                      ? "..."
+                      : "Bevestigen"}
+                  </button>
+                  <button
+                    onClick={() => handleStatus(req.id, "rejected")}
+                    disabled={loadingId === req.id + "rejected"}
+                    className="px-4 py-2 bg-red-400/10 border border-red-400/30 text-red-400 text-[0.6rem] tracking-wider uppercase hover:bg-red-400/20 transition-colors disabled:opacity-50"
+                  >
+                    {loadingId === req.id + "rejected" ? "..." : "Afwijzen"}
+                  </button>
+                </div>
+              )}
+
+              <p className="text-[#F5F0E8]/20 text-[0.6rem] mt-3">
+                Ontvangen:{" "}
+                {new Date(req.created_at).toLocaleDateString("nl-NL", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
             </div>
           ))}
         </div>

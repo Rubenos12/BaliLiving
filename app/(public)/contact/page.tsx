@@ -2,6 +2,7 @@
 
 import { motion, Variants } from "framer-motion";
 import { useState } from "react";
+import { createContactInquiry } from "@/lib/actions/contact";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -15,6 +16,8 @@ const stagger: Variants = {
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [form, setForm] = useState({
     naam: "",
     email: "",
@@ -28,8 +31,23 @@ export default function ContactPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError("");
+    setSubmitting(true);
+    const result = await createContactInquiry({
+      naam: form.naam,
+      email: form.email,
+      telefoon: form.telefoon,
+      interesse: form.interesse,
+      reisdatum: form.reisdatum,
+      bericht: form.bericht,
+    });
+    setSubmitting(false);
+    if (result.error) {
+      setSubmitError(result.error);
+      return;
+    }
     setSubmitted(true);
   };
 
@@ -215,6 +233,7 @@ export default function ContactPage() {
                     <option value="">Selecteer een dienst</option>
                     <option value="villas">Villa Boeking</option>
                     <option value="tours">Tours & Excursies</option>
+                    <option value="transfers">Transfers</option>
                     <option value="restaurants">Restaurant Reserveringen</option>
                     <option value="alles">Complete reis planning</option>
                   </select>
@@ -235,11 +254,16 @@ export default function ContactPage() {
                   />
                 </div>
 
+                {submitError && (
+                  <p className="text-red-400 text-xs text-center">{submitError}</p>
+                )}
+
                 <button
                   type="submit"
-                  className="w-full py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300"
+                  disabled={submitting}
+                  className="w-full py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300 disabled:opacity-60"
                 >
-                  Verstuur Aanvraag
+                  {submitting ? "Versturen..." : "Verstuur Aanvraag"}
                 </button>
 
                 <p className="text-[#F5F0E8]/30 text-xs text-center leading-relaxed">
