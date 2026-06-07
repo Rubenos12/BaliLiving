@@ -1,7 +1,9 @@
 "use server";
 
 import { createServiceClient } from "@/lib/supabase/server";
+import { requireAdminUser } from "./admin-auth";
 
+// Public — used in booking flow, no auth required
 export async function getVillaIdBySlug(slug: string): Promise<string | null> {
   const supabase = createServiceClient();
   const { data } = await supabase
@@ -12,6 +14,7 @@ export async function getVillaIdBySlug(slug: string): Promise<string | null> {
   return data?.id ?? null;
 }
 
+// Public — used in booking calendar, no auth required
 export async function getBlockedDates(villaId: string): Promise<string[]> {
   const supabase = createServiceClient();
   const { data } = await supabase
@@ -21,6 +24,7 @@ export async function getBlockedDates(villaId: string): Promise<string[]> {
   return (data ?? []).map((d: { blocked_date: string }) => d.blocked_date);
 }
 
+// Admin-only
 export async function saveVilla(formData: {
   slug: string;
   name: string;
@@ -39,10 +43,14 @@ export async function saveVilla(formData: {
   cover_icon: string;
   published: boolean;
 }) {
+  await requireAdminUser();
+
   const supabase = createServiceClient();
   const { data, error } = await supabase
     .from("villas")
-    .upsert([{ ...formData, updated_at: new Date().toISOString() }], { onConflict: "slug" })
+    .upsert([{ ...formData, updated_at: new Date().toISOString() }], {
+      onConflict: "slug",
+    })
     .select()
     .single();
 
@@ -50,11 +58,14 @@ export async function saveVilla(formData: {
   return { data };
 }
 
+// Admin-only
 export async function uploadVillaMedia(
   villaId: string,
   file: File,
   type: "photo" | "video"
 ) {
+  await requireAdminUser();
+
   const supabase = createServiceClient();
   const ext = file.name.split(".").pop();
   const path = `${villaId}/${Date.now()}.${ext}`;
@@ -69,12 +80,14 @@ export async function uploadVillaMedia(
     .from("villa-media")
     .getPublicUrl(path);
 
-  const { error: dbError } = await supabase.from("villa_media").insert([{
-    villa_id: villaId,
-    url: urlData.publicUrl,
-    type,
-    sort_order: 0,
-  }]);
+  const { error: dbError } = await supabase.from("villa_media").insert([
+    {
+      villa_id: villaId,
+      url: urlData.publicUrl,
+      type,
+      sort_order: 0,
+    },
+  ]);
 
   if (dbError) return { error: dbError.message };
   return { url: urlData.publicUrl };

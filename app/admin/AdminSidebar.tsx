@@ -8,6 +8,7 @@ const NAV = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/bookings", label: "Boekingen" },
   { href: "/admin/calendar", label: "Kalender" },
+  { href: "/admin/visums", label: "Visums" },
   { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/villas", label: "Villa's" },
   { href: "/admin/tours", label: "Tours" },
@@ -22,7 +23,8 @@ export default function AdminSidebar() {
     exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <aside className="w-60 shrink-0 bg-[#0F1A10] border-r border-[#C9A84C]/12 flex flex-col">
+    // Hidden on mobile — AdminMobileNav handles navigation there
+    <aside className="hidden md:flex w-60 shrink-0 bg-[#0F1A10] border-r border-[#C9A84C]/12 flex-col">
       {/* Brand */}
       <div className="px-6 pt-8 pb-6 border-b border-[#C9A84C]/10">
         <Link href="/admin" className="block">
@@ -52,7 +54,11 @@ export default function AdminSidebar() {
                   : "text-[#F5F0E8]/50 hover:text-[#F5F0E8]/80 hover:bg-[#1C2B1E]"
               }`}
             >
-              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${active ? "bg-[#C9A84C]" : "bg-[#F5F0E8]/15"}`} />
+              <span
+                className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                  active ? "bg-[#C9A84C]" : "bg-[#F5F0E8]/15"
+                }`}
+              />
               {item.label}
             </Link>
           );

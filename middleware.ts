@@ -5,11 +5,6 @@ import type { NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Login page is always accessible
-  if (pathname === "/admin/login") {
-    return NextResponse.next();
-  }
-
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -33,13 +28,35 @@ export async function middleware(request: NextRequest) {
     }
   );
 
+  // getUser() validates the JWT with Supabase — more secure than getSession()
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return NextResponse.redirect(new URL("/admin/login", request.url));
+  // Already logged in? Redirect away from login page to dashboard
+  if (pathname === "/admin/login") {
+    if (user) {
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }
+    return response;
   }
+
+  // All other /admin routes require authentication
+  if (!user) {
+    const loginUrl = new URL("/admin/login", request.url);
+    // Preserve the intended destination so we can redirect after login
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Add security headers to all admin responses
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=()"
+  );
 
   return response;
 }
