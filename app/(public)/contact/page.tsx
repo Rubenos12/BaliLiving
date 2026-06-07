@@ -36,7 +36,7 @@ export default function ContactPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative pt-40 pb-24 overflow-hidden">
+      <section className="relative pt-56 pb-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0F1A10] to-[#1C2B1E]" />
         <div className="absolute top-20 right-10 w-64 h-64 rounded-full border border-[#C9A84C]/10" />
         <div className="relative max-w-7xl mx-auto px-6">
@@ -61,7 +61,7 @@ export default function ContactPage() {
       </section>
 
       {/* Contact grid */}
-      <section className="py-20 max-w-7xl mx-auto px-6">
+      <section className="py-28 max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-5 gap-16">
           {/* Contact info */}
           <motion.div

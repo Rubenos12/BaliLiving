@@ -27,7 +27,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
   return (
     <>
       {/* Hero */}
-      <section className="relative pt-40 pb-24 bg-[#131E14] overflow-hidden">
+      <section className="relative pt-56 pb-32 bg-[#131E14] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0F1A10] to-[#131E14]" />
         <div className="absolute top-20 right-0 w-80 h-80 rounded-full border border-[#C9A84C]/10" />
         <div className="relative max-w-7xl mx-auto px-6">
@@ -72,7 +72,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
       </section>
 
       {/* Villas grid */}
-      <section className="py-20 max-w-7xl mx-auto px-6">
+      <section className="py-28 max-w-7xl mx-auto px-6">
         {filtered.length === 0 ? (
           <div className="text-center py-20 text-[#F5F0E8]/30 text-sm">
             Geen villa&apos;s gevonden voor {activeFilter}
@@ -83,7 +83,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
             initial="hidden"
             animate="show"
             variants={stagger}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-10"
           >
             {filtered.map((villa) => (
               <motion.div
@@ -106,7 +106,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
                   </div>
                 </div>
 
-                <div className="p-7">
+                <div className="p-9">
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <h3
@@ -156,7 +156,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-[#131E14] text-center">
+      <section className="py-28 bg-[#131E14] text-center">
         <motion.div
           initial="hidden"
           whileInView="show"

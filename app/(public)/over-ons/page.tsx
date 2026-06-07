@@ -55,7 +55,7 @@ export default function OverOnsPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative pt-40 pb-28 overflow-hidden">
+      <section className="relative pt-56 pb-36 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0F1A10] via-[#1C2B1E] to-[#243628]" />
         <div className="absolute top-1/3 right-0 w-[500px] h-[500px] rounded-full border border-[#C9A84C]/8" />
         <div className="relative max-w-7xl mx-auto px-6">
@@ -88,14 +88,17 @@ export default function OverOnsPage() {
           whileInView="show"
           viewport={{ once: true, margin: "-100px" }}
           variants={stagger}
-          className="grid md:grid-cols-2 gap-20 items-center"
+          className="grid md:grid-cols-2 gap-24 items-center"
         >
           <motion.div variants={fadeUp} className="relative">
-            <div className="aspect-square bg-[#1C2B1E] border border-[#C9A84C]/20 flex items-center justify-center">
-              <div className="text-center p-12">
-                <div className="text-[100px] opacity-20">🌿</div>
-                <p className="text-[#F5F0E8]/30 text-sm tracking-widest uppercase mt-4">Edwin & Citty op Bali</p>
-              </div>
+            <div className="aspect-square relative overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://images.unsplash.com/photo-1573790387438-4da905039392?w=900&q=85&auto=format&fit=crop"
+                alt="Bali temple"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0F1A10]/30 to-transparent pointer-events-none" />
             </div>
             <div className="absolute -top-4 -left-4 w-24 h-24 border-t border-l border-[#C9A84C]/40" />
             <div className="absolute -bottom-4 -right-4 w-24 h-24 border-b border-r border-[#C9A84C]/40" />

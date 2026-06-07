@@ -74,7 +74,7 @@ export default function ToursPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative pt-40 pb-24 bg-[#131E14] overflow-hidden">
+      <section className="relative pt-56 pb-32 bg-[#131E14] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0F1A10] to-[#131E14]" />
         <div className="absolute top-20 left-0 w-80 h-80 rounded-full border border-[#C9A84C]/10" />
         <div className="relative max-w-7xl mx-auto px-6">
@@ -100,13 +100,13 @@ export default function ToursPage() {
       </section>
 
       {/* Tours grid */}
-      <section className="py-20 max-w-7xl mx-auto px-6">
+      <section className="py-28 max-w-7xl mx-auto px-6">
         <motion.div
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
           variants={stagger}
-          className="grid md:grid-cols-2 gap-8"
+          className="grid md:grid-cols-2 gap-10"
         >
           {tours.map((tour) => (
             <motion.div
@@ -162,7 +162,7 @@ export default function ToursPage() {
       </section>
 
       {/* Custom tour */}
-      <section className="py-20 bg-[#C9A84C]">
+      <section className="py-24 bg-[#C9A84C]">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <motion.div
             initial="hidden"

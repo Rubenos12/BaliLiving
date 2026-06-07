@@ -202,7 +202,7 @@ export default function VillaDetailClient({ villa }: { villa: Villa }) {
   return (
     <>
       {/* Breadcrumb */}
-      <div className="pt-28 pb-0 max-w-7xl mx-auto px-6">
+      <div className="pt-36 pb-0 max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

@@ -87,7 +87,7 @@ export default function RestaurantsPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative pt-40 pb-24 bg-[#131E14] overflow-hidden">
+      <section className="relative pt-56 pb-32 bg-[#131E14] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0F1A10] to-[#131E14]" />
         <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full border border-[#C9A84C]/10" />
         <div className="relative max-w-7xl mx-auto px-6">
@@ -126,13 +126,13 @@ export default function RestaurantsPage() {
       </section>
 
       {/* Restaurants grid */}
-      <section className="py-20 max-w-7xl mx-auto px-6">
+      <section className="py-28 max-w-7xl mx-auto px-6">
         <motion.div
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
           variants={stagger}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-10"
         >
           {restaurants.map((r) => (
             <motion.div
@@ -186,7 +186,7 @@ export default function RestaurantsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-[#131E14] text-center">
+      <section className="py-24 bg-[#131E14] text-center">
         <motion.div
           initial="hidden"
           whileInView="show"

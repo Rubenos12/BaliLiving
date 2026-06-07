@@ -57,7 +57,7 @@ export default function HomePage() {
         <div className="absolute top-1/3 right-1/3 w-64 h-64 rounded-full border border-[#C9A84C]/5 pointer-events-none" />
         <div className="absolute bottom-1/4 left-1/4 w-80 h-80 rounded-full border border-[#C9A84C]/8 pointer-events-none" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center pt-24">
           <motion.div
             variants={stagger}
             initial="hidden"
@@ -66,14 +66,14 @@ export default function HomePage() {
           >
             <motion.p
               variants={fadeUp}
-              className="text-[#C9A84C] text-xs tracking-[0.4em] uppercase mb-8"
+              className="text-[#C9A84C] text-xs tracking-[0.4em] uppercase mb-12"
             >
               Welkom bij BaliLiving
             </motion.p>
 
             <motion.h1
               variants={fadeUp}
-              className="text-6xl md:text-8xl lg:text-9xl font-light text-[#F5F0E8] leading-none mb-6"
+              className="text-6xl md:text-8xl lg:text-9xl font-light text-[#F5F0E8] leading-none mb-10"
               style={{ fontFamily: "var(--font-cormorant)" }}
             >
               Bali op
@@ -81,7 +81,7 @@ export default function HomePage() {
               <span className="italic text-[#C9A84C]">zijn best</span>
             </motion.h1>
 
-            <motion.div variants={fadeUp} className="flex items-center gap-4 my-8">
+            <motion.div variants={fadeUp} className="flex items-center gap-4 my-12">
               <span className="gold-line" />
               <p className="text-[#F5F0E8]/60 text-sm tracking-[0.2em] uppercase">
                 Volledig ontzorgd reizen naar Bali
@@ -91,7 +91,7 @@ export default function HomePage() {
 
             <motion.p
               variants={fadeUp}
-              className="text-[#F5F0E8]/70 text-lg max-w-2xl leading-relaxed mb-12"
+              className="text-[#F5F0E8]/70 text-lg max-w-2xl leading-relaxed mb-16"
             >
               Van luxe villa&apos;s en privé tours tot de beste restaurantreserveringen —
               wij regelen elk detail van jouw perfecte Bali reis.
@@ -130,7 +130,7 @@ export default function HomePage() {
       </section>
 
       {/* STATS */}
-      <section className="bg-[#C9A84C] py-14">
+      <section className="bg-[#C9A84C] py-20">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div
             initial="hidden"
@@ -157,7 +157,7 @@ export default function HomePage() {
       </section>
 
       {/* INTRO */}
-      <section className="py-28 max-w-7xl mx-auto px-6">
+      <section className="py-36 max-w-7xl mx-auto px-6">
         <motion.div
           initial="hidden"
           whileInView="show"
@@ -199,12 +199,14 @@ export default function HomePage() {
           </motion.div>
 
           <motion.div variants={fadeUp} className="relative">
-            <div className="aspect-[3/4] bg-[#243628] border border-[#C9A84C]/20 flex items-center justify-center">
-              <div className="text-center p-10">
-                <div className="text-[120px] mb-4 opacity-20">🌿</div>
-                <p className="text-[#F5F0E8]/30 text-sm tracking-widest uppercase">Foto plaatshouder</p>
-                <p className="text-[#C9A84C]/40 text-xs mt-2">Voeg hier een sfeervolle Bali foto toe</p>
-              </div>
+            <div className="aspect-[3/4] relative overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://images.unsplash.com/photo-1537953773345-d172ccf13cf4?w=900&q=85&auto=format&fit=crop"
+                alt="Bali rijstterrassen"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0F1A10]/30 to-transparent pointer-events-none" />
             </div>
             <div className="absolute -top-4 -right-4 w-24 h-24 border-t border-r border-[#C9A84C]/40" />
             <div className="absolute -bottom-4 -left-4 w-24 h-24 border-b border-l border-[#C9A84C]/40" />
@@ -213,7 +215,7 @@ export default function HomePage() {
       </section>
 
       {/* SERVICES */}
-      <section className="py-28 bg-[#131E14]">
+      <section className="py-32 bg-[#131E14]">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div
             initial="hidden"
@@ -276,7 +278,7 @@ export default function HomePage() {
       </section>
 
       {/* USPs */}
-      <section className="py-28 max-w-7xl mx-auto px-6">
+      <section className="py-36 max-w-7xl mx-auto px-6">
         <motion.div
           initial="hidden"
           whileInView="show"
@@ -297,7 +299,7 @@ export default function HomePage() {
             <span className="italic text-[#C9A84C]">ontzorgd</span>
           </motion.h2>
 
-          <motion.div variants={stagger} className="grid md:grid-cols-3 gap-12">
+          <motion.div variants={stagger} className="grid md:grid-cols-3 gap-16">
             {[
               {
                 icon: "✦",
@@ -331,7 +333,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-28 bg-[#C9A84C] relative overflow-hidden">
+      <section className="py-32 bg-[#C9A84C] relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full border-2 border-[#1C2B1E]" />
           <div className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full border-2 border-[#1C2B1E]" />
