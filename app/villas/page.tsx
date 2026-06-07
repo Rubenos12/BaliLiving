@@ -76,9 +76,15 @@ export default function VillasPage() {
               variants={fadeUp}
               className="group bg-[#1C2B1E] border border-[#C9A84C]/10 hover:border-[#C9A84C]/40 transition-all duration-500"
             >
-              {/* Image placeholder */}
-              <div className="aspect-[4/3] bg-[#243628] flex items-center justify-center relative overflow-hidden">
-                <div className="text-[80px] opacity-10">{villa.cover_icon}</div>
+              {/* Cover image */}
+              <div className="aspect-[4/3] bg-[#243628] relative overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={villa.images[0]}
+                  alt={villa.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0F1A10]/40 to-transparent pointer-events-none" />
                 <div className="absolute top-4 left-4">
                   <span className="bg-[#C9A84C] text-[#1C2B1E] text-[0.6rem] tracking-[0.2em] uppercase px-3 py-1.5">
                     {villa.tag}

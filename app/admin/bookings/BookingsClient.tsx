@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { updateBookingStatus } from "@/lib/actions/bookings";
+import { createClient } from "@/lib/supabase/client";
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-400/15 text-yellow-400 border-yellow-400/30",
@@ -37,8 +38,37 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
   const [bookings, setBookings] = useState(initial);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState<string | null>(null);
+  const [pulse, setPulse] = useState(false);
+
+  // Real-time subscription
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel("bookings-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "bookings" },
+        async (payload) => {
+          if (payload.eventType === "INSERT") {
+            setBookings((prev) => [payload.new as Booking, ...prev]);
+            setPulse(true);
+            setTimeout(() => setPulse(false), 3000);
+          } else if (payload.eventType === "UPDATE") {
+            setBookings((prev) =>
+              prev.map((b) => b.id === (payload.new as Booking).id ? payload.new as Booking : b)
+            );
+          } else if (payload.eventType === "DELETE") {
+            setBookings((prev) => prev.filter((b) => b.id !== (payload.old as Booking).id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   const filtered = filter === "all" ? bookings : bookings.filter((b) => b.status === filter);
+  const pending = bookings.filter((b) => b.status === "pending").length;
 
   const handle = async (id: string, status: "accepted" | "rejected") => {
     setLoading(id + status);
@@ -48,8 +78,6 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
     }
     setLoading(null);
   };
-
-  const pending = bookings.filter((b) => b.status === "pending").length;
 
   return (
     <div className="p-8">
@@ -64,6 +92,10 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
               <span className="ml-2 text-yellow-400">· {pending} wachten op bevestiging</span>
             )}
           </p>
+        </div>
+        <div className={`flex items-center gap-2 text-xs transition-all duration-500 ${pulse ? "text-green-400" : "text-[#F5F0E8]/20"}`}>
+          <span className={`w-2 h-2 rounded-full ${pulse ? "bg-green-400 animate-pulse" : "bg-[#F5F0E8]/20"}`} />
+          Live
         </div>
       </div>
 
@@ -98,14 +130,12 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
           {filtered.map((b) => (
             <div key={b.id} className="bg-[#1C2B1E] border border-[#C9A84C]/15 hover:border-[#C9A84C]/25 transition-colors">
               <div className="p-5 flex flex-wrap gap-6 items-start">
-                {/* Guest info */}
                 <div className="min-w-[180px]">
                   <p className="text-[#F5F0E8] font-medium text-sm">{b.guest_name}</p>
                   <p className="text-[#F5F0E8]/40 text-xs mt-0.5">{b.guest_email}</p>
                   {b.guest_phone && <p className="text-[#F5F0E8]/40 text-xs">{b.guest_phone}</p>}
                 </div>
 
-                {/* Booking details */}
                 <div className="flex-1 min-w-[200px]">
                   <p className="text-[#C9A84C] text-sm font-light" style={{ fontFamily: "var(--font-cormorant)" }}>
                     {b.villa_name}
@@ -118,7 +148,6 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
                   )}
                 </div>
 
-                {/* Price + status */}
                 <div className="text-right">
                   <p className="text-[#C9A84C] text-lg font-light" style={{ fontFamily: "var(--font-cormorant)" }}>
                     €{b.total_price.toLocaleString("nl-NL")}
@@ -129,7 +158,6 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
                 </div>
               </div>
 
-              {/* Actions — only for pending */}
               {b.status === "pending" && (
                 <div className="border-t border-[#C9A84C]/10 px-5 py-3 flex items-center gap-3">
                   <button
@@ -147,7 +175,7 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
                     {loading === b.id + "rejected" ? "Bezig..." : "✕ Afwijzen"}
                   </button>
                   <span className="text-[#F5F0E8]/25 text-xs ml-auto">
-                    Aangevraagd: {new Date(b.created_at).toLocaleDateString("nl-NL")}
+                    {new Date(b.created_at).toLocaleDateString("nl-NL")}
                   </span>
                 </div>
               )}

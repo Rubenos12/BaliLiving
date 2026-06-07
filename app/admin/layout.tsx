@@ -5,6 +5,16 @@ export const metadata = {
   title: "Admin — BaliLiving",
 };
 
+const NAV = [
+  { href: "/admin", label: "Dashboard", icon: "◈" },
+  { href: "/admin/bookings", label: "Boekingen", icon: "◉" },
+  { href: "/admin/analytics", label: "Analytics", icon: "▦" },
+  { href: "/admin/villas", label: "Villa's", icon: "◎" },
+  { href: "/admin/tours", label: "Tours", icon: "◌" },
+  { href: "/admin/transfers", label: "Transfers", icon: "◍" },
+  { href: "/admin/restaurants", label: "Restaurants", icon: "◐" },
+];
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#0F1A10] flex">
@@ -27,11 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-6 space-y-1">
-          {[
-            { href: "/admin", label: "Dashboard", icon: "◈" },
-            { href: "/admin/bookings", label: "Boekingen", icon: "◉" },
-            { href: "/admin/villas", label: "Villa's", icon: "◎" },
-          ].map((item) => (
+          {NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}

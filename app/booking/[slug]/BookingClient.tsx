@@ -71,11 +71,13 @@ function StepIndicator({ current }: { current: Step }) {
 
 export default function BookingClient({
   villa,
+  villaId,
   initialCheckIn,
   initialCheckOut,
   initialGuests,
 }: {
   villa: Villa;
+  villaId: string;
   initialCheckIn: string;
   initialCheckOut: string;
   initialGuests: number;
@@ -119,7 +121,7 @@ export default function BookingClient({
     setSubmitError("");
 
     const result = await createBooking({
-      villa_id: villa.slug, // will be resolved to real UUID after Supabase seed
+      villa_id: villaId,
       villa_name: villa.name,
       guest_name: form.naam,
       guest_email: form.email,

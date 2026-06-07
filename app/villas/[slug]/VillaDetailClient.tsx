@@ -15,32 +15,34 @@ const stagger: Variants = {
   show: { transition: { staggerChildren: 0.1 } },
 };
 
-// Placeholder gallery items — will be replaced with real media from Supabase
-function GalleryPlaceholder({ icon, count }: { icon: string; count: number }) {
+function Gallery({ images, name }: { images: string[]; name: string }) {
   const [active, setActive] = useState(0);
-  const items = Array.from({ length: count }, (_, i) => i);
+  const count = images.length;
 
   return (
     <div className="relative">
       {/* Main image */}
       <div className="aspect-[16/9] md:aspect-[2/1] bg-[#243628] relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-[120px] opacity-10">{icon}</div>
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={images[active]}
+          alt={`${name} — foto ${active + 1}`}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F1A10]/30 to-transparent pointer-events-none" />
         <div className="absolute bottom-4 right-4 bg-[#1C2B1E]/80 px-3 py-1.5 text-[#C9A84C] text-xs tracking-wider">
           {active + 1} / {count}
         </div>
-        {/* Navigation arrows */}
         <button
           onClick={() => setActive((a) => (a - 1 + count) % count)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] transition-all duration-200"
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] text-xl transition-all duration-200"
           aria-label="Vorige foto"
         >
           ‹
         </button>
         <button
           onClick={() => setActive((a) => (a + 1) % count)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] transition-all duration-200"
+          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] text-xl transition-all duration-200"
           aria-label="Volgende foto"
         >
           ›
@@ -48,15 +50,16 @@ function GalleryPlaceholder({ icon, count }: { icon: string; count: number }) {
       </div>
       {/* Thumbnails */}
       <div className="flex gap-2 mt-2">
-        {items.map((i) => (
+        {images.map((src, i) => (
           <button
             key={i}
             onClick={() => setActive(i)}
-            className={`flex-1 aspect-video bg-[#243628] transition-all duration-200 ${
-              active === i ? "ring-2 ring-[#C9A84C]" : "opacity-50 hover:opacity-75"
+            className={`flex-1 aspect-video overflow-hidden transition-all duration-200 ${
+              active === i ? "ring-2 ring-[#C9A84C]" : "opacity-50 hover:opacity-80"
             }`}
           >
-            <div className="h-full flex items-center justify-center text-2xl opacity-20">{icon}</div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={src} alt="" className="w-full h-full object-cover" />
           </button>
         ))}
       </div>
@@ -216,7 +219,7 @@ export default function VillaDetailClient({ villa }: { villa: Villa }) {
 
       {/* Gallery */}
       <section className="pt-6 max-w-7xl mx-auto px-6">
-        <GalleryPlaceholder icon={villa.cover_icon} count={5} />
+        <Gallery images={villa.images} name={villa.name} />
       </section>
 
       {/* Content + Booking widget */}

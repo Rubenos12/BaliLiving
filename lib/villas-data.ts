@@ -14,6 +14,7 @@ export type Villa = {
   amenities: string[];
   highlights: string[];
   cover_icon: string;
+  images: string[];
 };
 
 export const villas: Villa[] = [
@@ -53,6 +54,12 @@ Een toegewijde butler regelt alles: van het dagelijks ontbijt op het terras tot 
       "Dagelijks schoonmaak inbegrepen",
     ],
     cover_icon: "🌾",
+    images: [
+      "https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1558005137-d9619a5c539f?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&q=80&auto=format&fit=crop",
+    ],
   },
   {
     slug: "villa-samudra",
@@ -90,6 +97,12 @@ Alle spa-behandelingen kunnen op aanvraag in de villa plaatsvinden — van een B
       "Spa op aanvraag direct in de villa",
     ],
     cover_icon: "🌊",
+    images: [
+      "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1566438480900-0609be27a4be?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=1200&q=80&auto=format&fit=crop",
+    ],
   },
   {
     slug: "villa-puri-agung",
@@ -127,6 +140,12 @@ Het volledig personeel — butler, kok, huishoudelijk medewerkers en beveiliger 
       "Op loopafstand van Canggu's surf beaches",
     ],
     cover_icon: "🏛️",
+    images: [
+      "https://images.unsplash.com/photo-1582610116397-edb72f9b8d14?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1540541338537-71cf5d2e2b5e?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1596436756869-e0a5af6e6fa6?w=1200&q=80&auto=format&fit=crop",
+    ],
   },
   {
     slug: "villa-hijau",
@@ -164,6 +183,12 @@ De jungle-omgeving biedt de ideale achtergrond voor meditatie, stilte en herstel
       "Volledig omgeven door jungle — absolute rust",
     ],
     cover_icon: "🌿",
+    images: [
+      "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1559737558-2f5a35f4523b?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80&auto=format&fit=crop",
+    ],
   },
   {
     slug: "villa-karang",
@@ -201,6 +226,12 @@ Uluwatu is het domein van de surfer, de yogi en de zoeker van stilte. Edwin en C
       "Nabij Uluwatu tempel en surfers paradise",
     ],
     cover_icon: "🌅",
+    images: [
+      "https://images.unsplash.com/photo-1580541832626-2a7131ee809f?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1483683804023-6ccdb62f86ef?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1544550581-5f7ceaf7f992?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1568568479311-9b54c83a7b59?w=1200&q=80&auto=format&fit=crop",
+    ],
   },
   {
     slug: "villa-lotus",
@@ -238,6 +269,12 @@ Edwin en Citty werken samen met kindercoaches en lokale activiteitenpartners die
       "Kinderactiviteiten en workshops op aanvraag",
     ],
     cover_icon: "🏖️",
+    images: [
+      "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80&auto=format&fit=crop",
+    ],
   },
 ];
 

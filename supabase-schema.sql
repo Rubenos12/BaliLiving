@@ -194,3 +194,86 @@ Begin elke ochtend met een yogasessie in het open-air paviljoen, gevolgd door ee
  '🏖️', true)
 
 ON CONFLICT (slug) DO NOTHING;
+
+-- ============================================================
+-- Tours table
+-- ============================================================
+CREATE TABLE IF NOT EXISTS tours (
+  id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name              text NOT NULL,
+  location          text NOT NULL DEFAULT '',
+  short_description text NOT NULL DEFAULT '',
+  long_description  text NOT NULL DEFAULT '',
+  price_per_person  integer NOT NULL DEFAULT 0,
+  duration_hours    numeric NOT NULL DEFAULT 0,
+  max_guests        integer NOT NULL DEFAULT 10,
+  published         boolean NOT NULL DEFAULT true,
+  created_at        timestamptz NOT NULL DEFAULT now(),
+  updated_at        timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE tours ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read published tours"
+  ON tours FOR SELECT
+  USING (published = true);
+
+CREATE POLICY "Auth users can manage tours"
+  ON tours FOR ALL
+  USING (auth.role() = 'authenticated');
+
+-- ============================================================
+-- Transfers table
+-- ============================================================
+CREATE TABLE IF NOT EXISTS transfers (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name            text NOT NULL,
+  from_location   text NOT NULL DEFAULT '',
+  to_location     text NOT NULL DEFAULT '',
+  description     text NOT NULL DEFAULT '',
+  price           integer NOT NULL DEFAULT 0,
+  vehicle_type    text NOT NULL DEFAULT 'car' CHECK (vehicle_type IN ('car', 'van', 'minibus')),
+  max_passengers  integer NOT NULL DEFAULT 4,
+  published       boolean NOT NULL DEFAULT true,
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  updated_at      timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE transfers ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read published transfers"
+  ON transfers FOR SELECT
+  USING (published = true);
+
+CREATE POLICY "Auth users can manage transfers"
+  ON transfers FOR ALL
+  USING (auth.role() = 'authenticated');
+
+-- ============================================================
+-- Restaurants table
+-- ============================================================
+CREATE TABLE IF NOT EXISTS restaurants (
+  id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name              text NOT NULL,
+  location          text NOT NULL DEFAULT '',
+  cuisine           text NOT NULL DEFAULT '',
+  price_range       text NOT NULL DEFAULT '€€',
+  short_description text NOT NULL DEFAULT '',
+  long_description  text NOT NULL DEFAULT '',
+  opening_hours     text NOT NULL DEFAULT '',
+  phone             text NOT NULL DEFAULT '',
+  website           text NOT NULL DEFAULT '',
+  published         boolean NOT NULL DEFAULT true,
+  created_at        timestamptz NOT NULL DEFAULT now(),
+  updated_at        timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE restaurants ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read published restaurants"
+  ON restaurants FOR SELECT
+  USING (published = true);
+
+CREATE POLICY "Auth users can manage restaurants"
+  ON restaurants FOR ALL
+  USING (auth.role() = 'authenticated');
