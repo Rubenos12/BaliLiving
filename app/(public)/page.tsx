@@ -57,7 +57,7 @@ export default function HomePage() {
         <div className="absolute top-1/3 right-1/3 w-64 h-64 rounded-full border border-[#C9A84C]/5 pointer-events-none" />
         <div className="absolute bottom-1/4 left-1/4 w-80 h-80 rounded-full border border-[#C9A84C]/8 pointer-events-none" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center pt-24">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
           <motion.div
             variants={stagger}
             initial="hidden"

@@ -74,7 +74,7 @@ export default function ToursPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative pt-56 pb-32 bg-[#131E14] overflow-hidden">
+      <section className="relative pt-44 pb-24 bg-[#131E14] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0F1A10] to-[#131E14]" />
         <div className="absolute top-20 left-0 w-80 h-80 rounded-full border border-[#C9A84C]/10" />
         <div className="relative max-w-7xl mx-auto px-6">
