@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const links = [
   { href: "/villas", label: "Villa's" },
   { href: "/tours", label: "Tours" },
+  { href: "/transfers", label: "Transfers" },
   { href: "/restaurants", label: "Restaurants" },
   { href: "/over-ons", label: "Over Ons" },
   { href: "/contact", label: "Contact" },
