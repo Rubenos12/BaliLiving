@@ -79,9 +79,9 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
           </div>
         ) : (
           <motion.div
+            key={activeFilter}
             initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
+            animate="show"
             variants={stagger}
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
