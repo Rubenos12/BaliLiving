@@ -665,7 +665,7 @@ export default function TransfersPage() {
                 >
                   {/* Badges */}
                   <div className="absolute -top-3 left-4 flex gap-2">
-                    {tier.popular && !isRecommended && (
+                    {"popular" in tier && tier.popular && !isRecommended && (
                       <span className="bg-[#243628] border border-[#C9A84C]/30 text-[#C9A84C] text-[0.55rem] tracking-[0.2em] uppercase px-2 py-0.5">
                         {tier.badge}
                       </span>
