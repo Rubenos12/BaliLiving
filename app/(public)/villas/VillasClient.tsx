@@ -27,7 +27,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
   return (
     <>
       {/* Hero */}
-      <section className="relative pt-44 pb-24 bg-[#131E14] overflow-hidden">
+      <section className="relative pt-28 sm:pt-40 md:pt-44 pb-16 sm:pb-24 bg-[#131E14] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0F1A10] to-[#131E14]" />
         <div className="absolute top-20 right-0 w-80 h-80 rounded-full border border-[#C9A84C]/10" />
         <div className="relative max-w-7xl mx-auto px-6">
@@ -37,7 +37,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
             </motion.p>
             <motion.h1
               variants={fadeUp}
-              className="text-6xl md:text-8xl font-light text-[#F5F0E8] leading-none mb-6"
+              className="text-4xl sm:text-5xl md:text-8xl font-light text-[#F5F0E8] leading-none mb-6"
               style={{ fontFamily: "var(--font-cormorant)" }}
             >
               Luxe
@@ -59,7 +59,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
             <button
               key={f}
               onClick={() => setActiveFilter(f)}
-              className={`text-xs tracking-[0.2em] uppercase px-5 py-2 transition-all duration-300 ${
+              className={`text-xs tracking-[0.2em] uppercase px-5 py-2.5 md:py-2 transition-all duration-300 ${
                 activeFilter === f
                   ? "bg-[#C9A84C] text-[#1C2B1E]"
                   : "text-[#F5F0E8]/50 border border-[#F5F0E8]/10 hover:border-[#C9A84C]/50 hover:text-[#C9A84C]"

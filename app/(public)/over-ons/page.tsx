@@ -55,7 +55,7 @@ export default function OverOnsPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative pt-44 pb-28 overflow-hidden">
+      <section className="relative pt-28 sm:pt-40 md:pt-44 pb-16 sm:pb-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0F1A10] via-[#1C2B1E] to-[#243628]" />
         <div className="absolute top-1/3 right-0 w-[500px] h-[500px] rounded-full border border-[#C9A84C]/8" />
         <div className="relative max-w-7xl mx-auto px-6">
@@ -65,7 +65,7 @@ export default function OverOnsPage() {
             </motion.p>
             <motion.h1
               variants={fadeUp}
-              className="text-6xl md:text-8xl font-light text-[#F5F0E8] leading-none mb-8"
+              className="text-4xl sm:text-5xl md:text-8xl font-light text-[#F5F0E8] leading-none mb-8"
               style={{ fontFamily: "var(--font-cormorant)" }}
             >
               Gemaakt door
@@ -88,7 +88,7 @@ export default function OverOnsPage() {
           whileInView="show"
           viewport={{ once: true, margin: "-100px" }}
           variants={stagger}
-          className="grid md:grid-cols-2 gap-24 items-center"
+          className="grid md:grid-cols-2 gap-12 md:gap-24 items-center"
         >
           <motion.div variants={fadeUp} className="relative">
             <div className="aspect-square relative overflow-hidden">
@@ -151,7 +151,7 @@ export default function OverOnsPage() {
             whileInView="show"
             viewport={{ once: true }}
             variants={stagger}
-            className="grid md:grid-cols-2 gap-16 items-center"
+            className="grid md:grid-cols-2 gap-10 md:gap-16 items-center"
           >
             <motion.div variants={fadeUp}>
               <p className="text-[#C9A84C] text-xs tracking-[0.4em] uppercase mb-4">De Connectie</p>

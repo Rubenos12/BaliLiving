@@ -118,7 +118,7 @@ export default function EditVillaPage({ params }: { params: Promise<{ slug: stri
               </select>
             </div>
           </div>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Field label="SLPK" value={form.bedrooms} onChange={(v) => setForm(f => ({ ...f, bedrooms: v }))} type="number" />
             <Field label="BADK" value={form.bathrooms} onChange={(v) => setForm(f => ({ ...f, bathrooms: v }))} type="number" />
             <Field label="MIN GASTEN" value={form.guests_min} onChange={(v) => setForm(f => ({ ...f, guests_min: v }))} type="number" />

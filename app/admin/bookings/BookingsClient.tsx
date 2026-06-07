@@ -80,7 +80,7 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-light text-[#F5F0E8]" style={{ fontFamily: "var(--font-cormorant)" }}>
@@ -100,7 +100,7 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0">
         {[
           { key: "all", label: "Alle" },
           { key: "pending", label: "In behandeling" },
@@ -163,14 +163,14 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
                   <button
                     onClick={() => handle(b.id, "accepted")}
                     disabled={loading === b.id + "accepted"}
-                    className="px-5 py-2 bg-green-500/15 text-green-400 border border-green-400/30 text-[0.6rem] tracking-wider uppercase hover:bg-green-500/25 transition-colors disabled:opacity-50"
+                    className="px-4 py-2.5 bg-green-500/15 text-green-400 border border-green-400/30 text-[0.6rem] tracking-wider uppercase hover:bg-green-500/25 transition-colors disabled:opacity-50 whitespace-nowrap"
                   >
                     {loading === b.id + "accepted" ? "Bezig..." : "✓ Accepteren"}
                   </button>
                   <button
                     onClick={() => handle(b.id, "rejected")}
                     disabled={loading === b.id + "rejected"}
-                    className="px-5 py-2 bg-red-500/15 text-red-400 border border-red-400/30 text-[0.6rem] tracking-wider uppercase hover:bg-red-500/25 transition-colors disabled:opacity-50"
+                    className="px-4 py-2.5 bg-red-500/15 text-red-400 border border-red-400/30 text-[0.6rem] tracking-wider uppercase hover:bg-red-500/25 transition-colors disabled:opacity-50 whitespace-nowrap"
                   >
                     {loading === b.id + "rejected" ? "Bezig..." : "✕ Afwijzen"}
                   </button>

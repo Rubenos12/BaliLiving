@@ -164,7 +164,7 @@ export default function NewVillaPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
               <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">
                 Slaapkamers

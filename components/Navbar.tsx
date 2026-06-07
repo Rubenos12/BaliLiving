@@ -47,7 +47,7 @@ export default function Navbar() {
               >
                 Bali<span className="text-[#C9A84C]">Living</span>
               </span>
-              <span className="text-[0.55rem] tracking-[0.35em] text-[#C9A84C] uppercase">
+              <span className="text-[0.65rem] tracking-[0.35em] text-[#C9A84C] uppercase">
                 Exclusieve Ervaringen
               </span>
             </div>
@@ -78,7 +78,7 @@ export default function Navbar() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden flex flex-col gap-1.5 p-2"
+            className="md:hidden flex flex-col gap-1.5 p-3"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Menu"
           >
@@ -103,7 +103,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-[#1C2B1E] flex flex-col items-center justify-center gap-10"
+            className="fixed inset-0 z-40 bg-[#1C2B1E] flex flex-col items-center justify-center gap-6 sm:gap-10"
           >
             {links.map((link, i) => (
               <motion.div

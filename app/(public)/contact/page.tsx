@@ -36,7 +36,7 @@ export default function ContactPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative pt-44 pb-24 overflow-hidden">
+      <section className="relative pt-28 sm:pt-40 md:pt-44 pb-16 sm:pb-24 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0F1A10] to-[#1C2B1E]" />
         <div className="absolute top-20 right-10 w-64 h-64 rounded-full border border-[#C9A84C]/10" />
         <div className="relative max-w-7xl mx-auto px-6">
@@ -46,7 +46,7 @@ export default function ContactPage() {
             </motion.p>
             <motion.h1
               variants={fadeUp}
-              className="text-6xl md:text-8xl font-light text-[#F5F0E8] leading-none mb-6"
+              className="text-4xl sm:text-5xl md:text-8xl font-light text-[#F5F0E8] leading-none mb-6"
               style={{ fontFamily: "var(--font-cormorant)" }}
             >
               Jouw reis
@@ -142,9 +142,9 @@ export default function ContactPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-2">
+                    <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">
                       Naam *
                     </label>
                     <input
@@ -158,7 +158,7 @@ export default function ContactPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-2">
+                    <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">
                       E-mailadres *
                     </label>
                     <input
@@ -173,9 +173,9 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-2">
+                    <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">
                       Telefoonnummer
                     </label>
                     <input
@@ -188,7 +188,7 @@ export default function ContactPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-2">
+                    <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">
                       Reisdatum
                     </label>
                     <input
@@ -203,7 +203,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-2">
+                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">
                     Interesse in
                   </label>
                   <select
@@ -221,7 +221,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-2">
+                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">
                     Jouw bericht *
                   </label>
                   <textarea

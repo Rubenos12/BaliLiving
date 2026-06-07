@@ -88,7 +88,7 @@ export default async function AnalyticsPage() {
   const maxVilla = Math.max(...data.villaRevenue.map((v) => v.revenue), 1);
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-light text-[#F5F0E8]" style={{ fontFamily: "var(--font-cormorant)" }}>
           Analytics
@@ -133,7 +133,8 @@ export default async function AnalyticsPage() {
       {/* Monthly revenue chart */}
       <div className="bg-[#1C2B1E] border border-[#C9A84C]/15 p-6 mb-6">
         <h2 className="text-[#C9A84C] text-xs tracking-[0.3em] uppercase mb-6">Omzet per maand (12 mnd)</h2>
-        <div className="flex items-end gap-3 h-40">
+        <div className="overflow-x-auto">
+        <div className="flex items-end gap-3 h-40 min-w-[500px]">
           {data.monthly.map((m) => {
             const pct = (m.revenue / maxMonthly) * 100;
             return (
@@ -154,6 +155,7 @@ export default async function AnalyticsPage() {
             );
           })}
         </div>
+        </div>{/* end overflow-x-auto */}
       </div>
 
       {/* Top villas */}

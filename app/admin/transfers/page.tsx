@@ -38,7 +38,7 @@ export default function AdminTransfersPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-light text-[#F5F0E8]" style={{ fontFamily: "var(--font-cormorant)" }}>
@@ -84,7 +84,7 @@ export default function AdminTransfersPage() {
                   <span className="text-[#C9A84C]">€{item.price}</span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
                 <button onClick={() => togglePublish(item.id, item.published)}
                   className="px-3 py-2 border border-[#C9A84C]/20 text-[#F5F0E8]/50 text-[0.6rem] tracking-wider uppercase hover:border-[#C9A84C]/50 hover:text-[#C9A84C] transition-colors">
                   {item.published ? "Verberg" : "Publiceer"}

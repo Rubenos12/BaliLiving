@@ -22,7 +22,7 @@ function Gallery({ images, name }: { images: string[]; name: string }) {
   return (
     <div className="relative">
       {/* Main image */}
-      <div className="aspect-[16/9] md:aspect-[2/1] bg-[#243628] relative overflow-hidden">
+      <div className="aspect-[4/3] md:aspect-[16/9] lg:aspect-[2/1] bg-[#243628] relative overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={images[active]}

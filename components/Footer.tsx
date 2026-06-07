@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="bg-[#131E14] border-t border-[#C9A84C]/20">
       <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex flex-col mb-6">
@@ -14,7 +14,7 @@ export default function Footer() {
               >
                 Bali<span className="text-[#C9A84C]">Living</span>
               </span>
-              <span className="text-[0.55rem] tracking-[0.35em] text-[#C9A84C] uppercase">
+              <span className="text-[0.65rem] tracking-[0.35em] text-[#C9A84C] uppercase">
                 Exclusieve Ervaringen
               </span>
             </div>

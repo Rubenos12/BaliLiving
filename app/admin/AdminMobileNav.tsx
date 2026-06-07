@@ -168,14 +168,14 @@ export default function AdminMobileNav() {
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`flex flex-col items-center gap-1 px-3 py-1 min-w-[56px] rounded-xl transition-all duration-150 active:scale-95 ${
+                className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-xl transition-all duration-150 active:scale-95 ${
                   active
                     ? "text-[#C9A84C]"
                     : "text-[#F5F0E8]/35 hover:text-[#F5F0E8]/70"
                 }`}
               >
                 {tab.icon}
-                <span className="text-[0.55rem] tracking-wider">{tab.label}</span>
+                <span className="text-[0.6rem] tracking-wider">{tab.label}</span>
                 {active && (
                   <span className="w-1 h-1 rounded-full bg-[#C9A84C] -mt-0.5" />
                 )}
@@ -186,14 +186,14 @@ export default function AdminMobileNav() {
           {/* More button */}
           <button
             onClick={() => setMoreOpen(!moreOpen)}
-            className={`flex flex-col items-center gap-1 px-3 py-1 min-w-[56px] rounded-xl transition-all duration-150 active:scale-95 ${
+            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-xl transition-all duration-150 active:scale-95 ${
               isMoreActive || moreOpen
                 ? "text-[#C9A84C]"
                 : "text-[#F5F0E8]/35 hover:text-[#F5F0E8]/70"
             }`}
           >
             {moreOpen ? <IconClose /> : <IconDots />}
-            <span className="text-[0.55rem] tracking-wider">Meer</span>
+            <span className="text-[0.6rem] tracking-wider">Meer</span>
             {(isMoreActive && !moreOpen) && (
               <span className="w-1 h-1 rounded-full bg-[#C9A84C] -mt-0.5" />
             )}

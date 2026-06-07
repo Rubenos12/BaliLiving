@@ -53,11 +53,11 @@ export default function HomePage() {
       {/* HERO */}
       <section className="relative min-h-screen overflow-hidden flex flex-col">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0F1A10] via-[#1C2B1E] to-[#243628]" />
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full border border-[#C9A84C]/10 pointer-events-none" />
-        <div className="absolute top-1/3 right-1/3 w-64 h-64 rounded-full border border-[#C9A84C]/5 pointer-events-none" />
-        <div className="absolute bottom-1/4 left-1/4 w-80 h-80 rounded-full border border-[#C9A84C]/8 pointer-events-none" />
+        <div className="absolute top-1/4 right-1/4 w-48 md:w-64 lg:w-96 h-48 md:h-64 lg:h-96 rounded-full border border-[#C9A84C]/10 pointer-events-none" />
+        <div className="absolute top-1/3 right-1/3 w-32 md:w-48 lg:w-64 h-32 md:h-48 lg:h-64 rounded-full border border-[#C9A84C]/5 pointer-events-none" />
+        <div className="absolute bottom-1/4 left-1/4 w-40 md:w-56 lg:w-80 h-40 md:h-56 lg:h-80 rounded-full border border-[#C9A84C]/8 pointer-events-none" />
 
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 text-center pt-32 pb-24">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 text-center pt-24 sm:pt-32 pb-16 sm:pb-24">
           <div className="max-w-7xl mx-auto w-full">
           <motion.div
             variants={stagger}
@@ -74,7 +74,7 @@ export default function HomePage() {
 
             <motion.h1
               variants={fadeUp}
-              className="text-6xl md:text-8xl lg:text-9xl font-light text-[#F5F0E8] leading-none mb-10"
+              className="text-4xl sm:text-5xl md:text-8xl lg:text-9xl font-light text-[#F5F0E8] leading-none mb-10"
               style={{ fontFamily: "var(--font-cormorant)" }}
             >
               Bali op
@@ -139,7 +139,7 @@ export default function HomePage() {
             whileInView="show"
             viewport={{ once: true }}
             variants={stagger}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 text-center"
           >
             {highlights.map((h) => (
               <motion.div key={h.label} variants={fadeUp}>

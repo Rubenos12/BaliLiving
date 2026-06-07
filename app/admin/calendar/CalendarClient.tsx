@@ -199,7 +199,7 @@ export default function CalendarClient({ bookings: initial }: { bookings: Bookin
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
@@ -248,7 +248,7 @@ export default function CalendarClient({ bookings: initial }: { bookings: Bookin
       </div>
 
       {/* Legend */}
-      <div className="flex gap-6 mb-5">
+      <div className="flex flex-wrap gap-4 md:gap-6 mb-5">
         {Object.entries(STATUS_LABELS).map(([key, label]) => (
           <div key={key} className="flex items-center gap-2">
             <span className={`w-2 h-2 rounded-full ${STATUS_STYLES[key]?.dot ?? "bg-white/20"}`} />
@@ -257,14 +257,18 @@ export default function CalendarClient({ bookings: initial }: { bookings: Bookin
         ))}
       </div>
 
-      {/* Calendar grid */}
-      <div className="border border-[#C9A84C]/15 overflow-hidden">
+      {/* Scroll hint on mobile */}
+      <p className="md:hidden text-[#F5F0E8]/30 text-xs mb-2">← Scroll om de kalender te bekijken</p>
+
+      {/* Calendar grid — horizontally scrollable on mobile */}
+      <div className="overflow-x-auto">
+      <div className="min-w-[600px] border border-[#C9A84C]/15 overflow-hidden">
         {/* Day headers */}
         <div className="grid grid-cols-7 bg-[#0F1A10] border-b border-[#C9A84C]/10">
           {DAYS_NL.map((d) => (
             <div
               key={d}
-              className="py-3 text-center text-[#C9A84C] text-[0.6rem] tracking-[0.35em] uppercase"
+              className="py-3 text-center text-[#C9A84C] text-[0.65rem] tracking-[0.35em] uppercase"
             >
               {d}
             </div>
@@ -345,6 +349,7 @@ export default function CalendarClient({ bookings: initial }: { bookings: Bookin
           );
         })}
       </div>
+      </div>{/* end overflow-x-auto */}
 
       {/* Selected booking detail panel */}
       {selected && (

@@ -37,7 +37,7 @@ function StepIndicator({ current }: { current: Step }) {
         <div key={s.n} className="flex items-center">
           <div className="flex flex-col items-center">
             <div
-              className={`w-8 h-8 flex items-center justify-center text-sm transition-all duration-300 ${
+              className={`w-10 h-10 flex items-center justify-center text-sm transition-all duration-300 ${
                 current > s.n
                   ? "bg-[#C9A84C] text-[#1C2B1E]"
                   : current === s.n
@@ -49,7 +49,7 @@ function StepIndicator({ current }: { current: Step }) {
               {current > s.n ? "✓" : s.n}
             </div>
             <span
-              className={`text-[0.6rem] tracking-wider mt-1.5 uppercase ${
+              className={`text-[0.65rem] tracking-wider mt-1.5 uppercase ${
                 current >= s.n ? "text-[#C9A84C]" : "text-[#F5F0E8]/25"
               }`}
             >
@@ -243,7 +243,7 @@ export default function BookingClient({
               </h2>
               <div className="grid grid-cols-2 gap-4 mb-5">
                 <div>
-                  <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">
+                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
                     Check-in
                   </label>
                   <input
@@ -255,7 +255,7 @@ export default function BookingClient({
                   />
                 </div>
                 <div>
-                  <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">
+                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
                     Check-out
                   </label>
                   <input
@@ -268,7 +268,7 @@ export default function BookingClient({
                 </div>
               </div>
               <div>
-                <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">
+                <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
                   Aantal gasten
                 </label>
                 <div className="flex items-center border border-[#C9A84C]/20 bg-[#243628] w-40">
@@ -339,7 +339,7 @@ export default function BookingClient({
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">
+                    <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
                       Naam *
                     </label>
                     <input
@@ -352,7 +352,7 @@ export default function BookingClient({
                     />
                   </div>
                   <div>
-                    <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">
+                    <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
                       E-mailadres *
                     </label>
                     <input
@@ -366,7 +366,7 @@ export default function BookingClient({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">
+                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
                     Telefoonnummer
                   </label>
                   <input
@@ -378,7 +378,7 @@ export default function BookingClient({
                   />
                 </div>
                 <div>
-                  <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">
+                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
                     Bijzonderheden / verzoeken
                   </label>
                   <textarea
