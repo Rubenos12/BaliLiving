@@ -48,7 +48,45 @@ export async function createBooking(payload: BookingPayload) {
     return { error: "Er is iets misgegaan. Probeer het opnieuw of neem contact op." };
   }
 
+  // Send push notification to all registered admin devices (fire and forget)
+  void sendPushToAdminDevices(supabase, {
+    title: "Nieuwe boekingsaanvraag",
+    body: `${payload.guest_name} wil ${payload.villa_name} boeken (${payload.total_nights} nachten)`,
+    data: { bookingId: data.id },
+  });
+
   return { data };
+}
+
+async function sendPushToAdminDevices(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  notification: { title: string; body: string; data?: Record<string, string> }
+) {
+  const { data: devices } = await supabase
+    .from("admin_devices")
+    .select("push_token");
+
+  if (!devices || devices.length === 0) return;
+
+  const messages = devices.map((device: { push_token: string }) => ({
+    to: device.push_token,
+    sound: "default",
+    title: notification.title,
+    body: notification.body,
+    data: notification.data ?? {},
+  }));
+
+  await fetch("https://exp.host/--/api/v2/push/send", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(messages),
+  }).catch(() => {
+    // Push notification failure must not affect booking creation
+  });
 }
 
 export async function getBookings(status?: string) {

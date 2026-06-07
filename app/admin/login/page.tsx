@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -15,14 +16,20 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError("");
 
-    // TODO: replace with Supabase auth
-    // Temporary hardcoded check for development
-    if (email === "admin@baliliving.nl" && password === "baliliving2024") {
-      router.push("/admin");
-    } else {
+    const supabase = createClient();
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) {
       setError("Onjuist e-mailadres of wachtwoord.");
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    router.push("/admin");
+    router.refresh();
   };
 
   return (
