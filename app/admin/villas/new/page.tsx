@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import MediaUploader from "@/components/admin/MediaUploader";
+import { saveVilla } from "@/lib/actions/villas";
 
 export default function NewVillaPage() {
   const [form, setForm] = useState({
@@ -20,10 +22,44 @@ export default function NewVillaPage() {
   const [amenities, setAmenities] = useState<string[]>([""]);
   const [highlights, setHighlights] = useState<string[]>([""]);
   const [saved, setSaved] = useState(false);
+  const [savedId, setSavedId] = useState<string | undefined>();
+  const [saveError, setSaveError] = useState("");
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: connect to Supabase
+    setSaveError("");
+
+    const slug = form.name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, "")
+      .trim()
+      .replace(/\s+/g, "-");
+
+    const result = await saveVilla({
+      slug,
+      name: form.name,
+      location: form.location,
+      region: form.region,
+      tag: form.tag,
+      short_description: form.short_description,
+      long_description: form.long_description,
+      guests_min: parseInt(form.guests_min) || 1,
+      guests_max: parseInt(form.guests_max) || 2,
+      bedrooms: parseInt(form.bedrooms) || 1,
+      bathrooms: parseInt(form.bathrooms) || 1,
+      price_per_night: parseInt(form.price_per_night) || 0,
+      amenities: amenities.filter(Boolean),
+      highlights: highlights.filter(Boolean),
+      cover_icon: "🏡",
+      published: true,
+    });
+
+    if (result.error) {
+      setSaveError(result.error);
+      return;
+    }
+
+    setSavedId(result.data?.id);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
@@ -291,23 +327,21 @@ export default function NewVillaPage() {
           </button>
         </div>
 
-        {/* Media upload placeholder */}
+        {/* Media upload */}
         <div className="bg-[#1C2B1E] border border-[#C9A84C]/15 p-6">
           <h2 className="text-[#C9A84C] text-xs tracking-[0.3em] uppercase mb-4">
             Foto&apos;s & Video&apos;s
           </h2>
-          <div className="border-2 border-dashed border-[#C9A84C]/20 p-10 text-center hover:border-[#C9A84C]/40 transition-colors cursor-pointer">
-            <div className="text-4xl mb-3 opacity-30">📷</div>
-            <p className="text-[#F5F0E8]/40 text-sm mb-2">
-              Sleep foto&apos;s en video&apos;s hierheen
+          {!savedId && (
+            <p className="text-[#F5F0E8]/35 text-xs mb-4">
+              Sla de villa eerst op, daarna kun je media uploaden.
             </p>
-            <p className="text-[#F5F0E8]/25 text-xs">
-              Koppel eerst Supabase Storage om uploads te activeren
-            </p>
-          </div>
+          )}
+          <MediaUploader villaId={savedId} />
         </div>
 
         {/* Save */}
+        {saveError && <p className="text-red-400 text-xs">{saveError}</p>}
         <div className="flex gap-3">
           <Link
             href="/admin/villas"
@@ -319,7 +353,7 @@ export default function NewVillaPage() {
             type="submit"
             className="flex-1 py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300"
           >
-            {saved ? "✓ Opgeslagen!" : "Villa opslaan"}
+            {saved ? "✓ Opgeslagen! Nu media uploaden ↑" : "Villa opslaan"}
           </button>
         </div>
       </form>

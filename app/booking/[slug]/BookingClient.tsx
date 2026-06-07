@@ -4,6 +4,7 @@ import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import type { Villa } from "@/lib/villas-data";
+import { createBooking } from "@/lib/actions/bookings";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -90,6 +91,7 @@ export default function BookingClient({
     bericht: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const nights =
     checkIn && checkOut
@@ -114,7 +116,27 @@ export default function BookingClient({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: connect to Supabase booking insertion
+    setSubmitError("");
+
+    const result = await createBooking({
+      villa_id: villa.slug, // will be resolved to real UUID after Supabase seed
+      villa_name: villa.name,
+      guest_name: form.naam,
+      guest_email: form.email,
+      guest_phone: form.telefoon,
+      guest_count: guests,
+      check_in: checkIn,
+      check_out: checkOut,
+      total_nights: nights,
+      total_price: total,
+      notes: form.bericht,
+    });
+
+    if (result.error) {
+      setSubmitError(result.error);
+      return;
+    }
+
     setSubmitted(true);
     setStep(3);
   };
@@ -366,6 +388,9 @@ export default function BookingClient({
                   />
                 </div>
 
+                {submitError && (
+                  <p className="text-red-400 text-xs text-center py-2">{submitError}</p>
+                )}
                 <div className="flex gap-3 pt-2">
                   <button
                     type="button"
