@@ -3,6 +3,8 @@ import { createServiceClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
+type BookingStat = { status: string; total_price: number | null; created_at: string };
+
 async function getStats() {
   try {
     const supabase = createServiceClient();
@@ -14,7 +16,7 @@ async function getStats() {
       supabase.from("restaurants").select("id", { count: "exact", head: true }),
     ]);
 
-    const allBookings = bookings.data ?? [];
+    const allBookings: BookingStat[] = bookings.data ?? [];
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
