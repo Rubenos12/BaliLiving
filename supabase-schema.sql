@@ -66,6 +66,13 @@ CREATE TABLE IF NOT EXISTS bookings (
   updated_at    timestamptz NOT NULL DEFAULT now()
 );
 
+-- Admin devices (push tokens for mobile app notifications)
+CREATE TABLE IF NOT EXISTS admin_devices (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  push_token  text NOT NULL UNIQUE,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+
 -- ============================================================
 -- Row Level Security
 -- ============================================================
@@ -100,6 +107,13 @@ CREATE POLICY "Public read blocked dates"
 
 CREATE POLICY "Auth users can manage blocked dates"
   ON blocked_dates FOR ALL
+  USING (auth.role() = 'authenticated');
+
+-- Admin devices: only authenticated users can manage
+ALTER TABLE admin_devices ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Auth users can manage admin devices"
+  ON admin_devices FOR ALL
   USING (auth.role() = 'authenticated');
 
 -- Bookings: anyone can insert (guests booking); only auth users can read/update

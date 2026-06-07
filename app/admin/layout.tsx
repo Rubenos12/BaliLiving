@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { signOut } from "./_actions/signOut";
 
 export const metadata = {
   title: "Admin — BaliLiving",
@@ -51,12 +52,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             ↗ Bekijk website
           </Link>
-          <Link
-            href="/admin/login"
-            className="block text-xs text-[#F5F0E8]/35 hover:text-[#C9A84C] transition-colors tracking-wider"
-          >
-            Uitloggen
-          </Link>
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="block text-xs text-[#F5F0E8]/35 hover:text-[#C9A84C] transition-colors tracking-wider w-full text-left"
+            >
+              Uitloggen
+            </button>
+          </form>
         </div>
       </aside>
 
