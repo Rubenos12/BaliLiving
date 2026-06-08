@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import MediaUploader from "@/components/admin/MediaUploader";
 import { saveVilla } from "@/lib/actions/villas";
+import { BALI_REGIONS } from "@/lib/constants/bali-locations";
 
 export default function NewVillaPage() {
   const [form, setForm] = useState({
@@ -151,16 +152,16 @@ export default function NewVillaPage() {
               <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">
                 Regio (voor filter)
               </label>
-              <select
+              <input
+                list="bali-regions-list"
                 value={form.region}
                 onChange={(e) => setForm({ ...form, region: e.target.value })}
-                className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8]/80 px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
-              >
-                <option value="">Selecteer regio</option>
-                {["Ubud", "Seminyak", "Canggu", "Uluwatu", "Nusa Dua", "Jimbaran", "Kuta"].map((r) => (
-                  <option key={r} value={r}>{r}</option>
-                ))}
-              </select>
+                placeholder="Typ of selecteer regio..."
+                className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8]/80 px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/30"
+              />
+              <datalist id="bali-regions-list">
+                {BALI_REGIONS.map((r) => <option key={r} value={r} />)}
+              </datalist>
             </div>
           </div>
 

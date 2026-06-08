@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { saveVilla } from "@/lib/actions/villas";
-
-const REGIONS = ["Ubud", "Seminyak", "Canggu", "Uluwatu", "Nusa Dua", "Jimbaran", "Kuta"];
+import { BALI_REGIONS } from "@/lib/constants/bali-locations";
 
 export default function EditVillaPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -114,11 +113,16 @@ export default function EditVillaPage({ params }: { params: Promise<{ slug: stri
             <Field label="LOCATIE" value={form.location} onChange={(v) => setForm(f => ({ ...f, location: v }))} placeholder="Ubud, Bali" />
             <div>
               <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">REGIO</label>
-              <select value={form.region} onChange={(e) => setForm(f => ({ ...f, region: e.target.value }))}
-                className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8]/80 px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors">
-                <option value="">Selecteer regio</option>
-                {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
-              </select>
+              <input
+                list="bali-regions-list"
+                value={form.region}
+                onChange={(e) => setForm(f => ({ ...f, region: e.target.value }))}
+                placeholder="Typ of selecteer regio..."
+                className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8]/80 px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/30"
+              />
+              <datalist id="bali-regions-list">
+                {BALI_REGIONS.map((r) => <option key={r} value={r} />)}
+              </datalist>
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

@@ -3,30 +3,16 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createTransferRequest } from "@/lib/actions/transfers";
+import { BALI_REGIONS } from "@/lib/constants/bali-locations";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
+// Airport is pinned at the top; all other Bali areas follow from the central list.
+// The autocomplete shows suggestions only — any custom location can be typed freely.
 const BALI_LOCATIONS = [
   "Ngurah Rai Luchthaven (DPS)",
-  "Kuta",
-  "Seminyak",
-  "Canggu",
-  "Ubud",
-  "Uluwatu",
-  "Nusa Dua",
-  "Jimbaran",
-  "Sanur",
   "Denpasar Centrum",
-  "Amed",
-  "Lovina",
-  "Padang Bai",
-  "Candidasa",
-  "Munduk",
-  "Tanah Lot",
-  "Bedugul",
-  "Tegallalang",
-  "Tirta Gangga",
-  "Pemuteran",
+  ...BALI_REGIONS,
 ];
 
 const TIERS = [
