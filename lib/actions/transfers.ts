@@ -19,6 +19,8 @@ export type TransferRequestPayload = {
   occasion?: string;
 };
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function createTransferRequest(payload: TransferRequestPayload) {
   const supabase = await createClient();
 
@@ -30,6 +32,15 @@ export async function createTransferRequest(payload: TransferRequestPayload) {
   }
   if (!payload.guest_name || !payload.guest_email || !payload.guest_phone) {
     return { error: "Naam, e-mail en telefoonnummer zijn verplicht." };
+  }
+  if (!EMAIL_REGEX.test(payload.guest_email)) {
+    return { error: "Ongeldig e-mailadres." };
+  }
+  if (payload.guest_name.length > 100) {
+    return { error: "Naam mag maximaal 100 tekens bevatten." };
+  }
+  if ((payload.notes ?? "").length > 1000) {
+    return { error: "Opmerkingen mogen maximaal 1000 tekens bevatten." };
   }
 
   const { data, error } = await supabase

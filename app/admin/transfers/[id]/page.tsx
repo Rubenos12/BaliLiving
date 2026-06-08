@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { updateStaticTransfer } from "@/lib/actions/static-transfers";
 
 const VEHICLE_OPTIONS = [
   { value: "car", label: "Auto" },
@@ -49,8 +50,7 @@ export default function EditTransferPage({ params }: { params: Promise<{ id: str
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    const supabase = createClient();
-    await supabase.from("transfers").update({
+    await updateStaticTransfer(id, {
       name: form.name,
       from_location: form.from_location,
       to_location: form.to_location,
@@ -59,7 +59,7 @@ export default function EditTransferPage({ params }: { params: Promise<{ id: str
       max_passengers: parseInt(form.max_passengers) || 4,
       description: form.description,
       published: form.published,
-    }).eq("id", id);
+    });
     setSaving(false);
     router.push("/admin/transfers");
   };

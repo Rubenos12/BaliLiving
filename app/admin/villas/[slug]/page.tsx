@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { saveVilla } from "@/lib/actions/villas";
 
 const REGIONS = ["Ubud", "Seminyak", "Canggu", "Uluwatu", "Nusa Dua", "Jimbaran", "Kuta"];
 
@@ -21,6 +22,7 @@ export default function EditVillaPage({ params }: { params: Promise<{ slug: stri
   });
   const [amenities, setAmenities] = useState<string[]>([""]);
   const [highlights, setHighlights] = useState<string[]>([""]);
+  const [coverIcon, setCoverIcon] = useState<string>("");
 
   useEffect(() => {
     const load = async () => {
@@ -32,6 +34,7 @@ export default function EditVillaPage({ params }: { params: Promise<{ slug: stri
         .single();
       if (data) {
         setVillaId(data.id);
+        setCoverIcon(data.cover_icon ?? "");
         setForm({
           name: data.name ?? "",
           location: data.location ?? "",
@@ -57,8 +60,8 @@ export default function EditVillaPage({ params }: { params: Promise<{ slug: stri
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    const supabase = createClient();
-    await supabase.from("villas").update({
+    await saveVilla({
+      slug,
       name: form.name,
       location: form.location,
       region: form.region,
@@ -72,9 +75,9 @@ export default function EditVillaPage({ params }: { params: Promise<{ slug: stri
       price_per_night: parseInt(form.price_per_night) || 0,
       amenities: amenities.filter(Boolean),
       highlights: highlights.filter(Boolean),
+      cover_icon: coverIcon,
       published: form.published,
-      updated_at: new Date().toISOString(),
-    }).eq("id", villaId);
+    });
     setSaving(false);
     router.push("/admin/villas");
   };

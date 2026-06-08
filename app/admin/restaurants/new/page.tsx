@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { createRestaurant } from "@/lib/actions/restaurants";
 
 const PRICE_RANGES = ["€", "€€", "€€€", "€€€€"];
 
@@ -22,8 +22,7 @@ export default function NewRestaurantPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    const supabase = createClient();
-    const { error } = await supabase.from("restaurants").insert([{
+    const result = await createRestaurant({
       name: form.name,
       location: form.location,
       cuisine: form.cuisine,
@@ -34,9 +33,9 @@ export default function NewRestaurantPage() {
       phone: form.phone,
       website: form.website,
       published: form.published,
-    }]);
+    });
     setSaving(false);
-    if (!error) router.push("/admin/restaurants");
+    if (!result.error) router.push("/admin/restaurants");
   };
 
   return (

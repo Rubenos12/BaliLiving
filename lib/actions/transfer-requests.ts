@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requireAdminUser } from "@/lib/actions/admin-auth";
 
 export async function updateTransferRequestStatus(
   id: string,
@@ -8,6 +9,7 @@ export async function updateTransferRequestStatus(
   priceQuoted?: number,
   priceType?: "per_person" | "total"
 ) {
+  await requireAdminUser();
   const supabase = await createClient();
   const updates: Record<string, unknown> = { status };
   if (priceQuoted !== undefined && priceType !== undefined) {

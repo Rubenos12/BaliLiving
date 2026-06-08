@@ -1,4 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+
+// Simple in-memory rate limiter: max 10 requests per IP per minute
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + 60_000 });
+    return true;
+  }
+  if (entry.count >= 10) return false;
+  entry.count++;
+  return true;
+}
+
+const requestSchema = z.object({
+  from: z.string().min(1).max(100),
+  to: z.string().min(1).max(100),
+  passengers: z.number().int().min(1).max(20),
+  date: z.string().max(20).optional(),
+  time: z.string().regex(/^\d{2}:\d{2}$/).optional().or(z.literal("")).optional(),
+  luggage: z.enum(["geen", "1-2", "3-4", "5+"]).optional().default("geen"),
+  occasion: z.enum(["luchthaventransfer", "dagtocht", "speciale-gelegenheid", "overig", ""]).optional().default(""),
+});
 
 const OCCASION_TONE: Record<string, string> = {
   "luchthaventransfer":
@@ -27,12 +52,23 @@ const OCCASION_LABELS: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { from, to, passengers, date, time, luggage, occasion } = await req.json();
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json({ error: "Te veel verzoeken. Probeer het over een minuut opnieuw." }, { status: 429 });
+    }
+
+    const body = await req.json();
+    const inputValidation = requestSchema.safeParse(body);
+    if (!inputValidation.success) {
+      return NextResponse.json({ error: "Ongeldige invoer." }, { status: 400 });
+    }
+    const { from, to, passengers, date, time, luggage, occasion } = inputValidation.data;
+    const safeTime = time ?? "";
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
 
     if (!apiKey) {
-      return NextResponse.json(buildFallback(from, to, passengers, time, luggage, occasion));
+      return NextResponse.json(buildFallback(from, to, passengers, safeTime, luggage, occasion));
     }
 
     const luggageLabel = LUGGAGE_LABELS[luggage] ?? "niet opgegeven";
@@ -45,7 +81,7 @@ Analyseer deze transfer aanvraag en geef een persoonlijk advies:
 - Van: ${from}
 - Naar: ${to}
 - Datum: ${date || "niet opgegeven"}
-- Tijdstip: ${time || "niet opgegeven"}
+- Tijdstip: ${safeTime || "niet opgegeven"}
 - Aantal reizigers: ${passengers}
 - Bagage: ${luggageLabel}
 - Aanleiding: ${occasionLabel}
@@ -91,17 +127,28 @@ Geef exact dit JSON-formaat terug (geen andere tekst):
     });
 
     if (!response.ok) {
-      return NextResponse.json(buildFallback(from, to, passengers, time, luggage, occasion));
+      return NextResponse.json(buildFallback(from, to, passengers, safeTime, luggage, occasion));
     }
 
-    const result = await response.json();
+    const claudeResult = await response.json();
     const text =
-      result.content?.[0]?.type === "text" ? result.content[0].text : "";
+      claudeResult.content?.[0]?.type === "text" ? claudeResult.content[0].text : "";
 
     const clean = text.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(clean);
+    const claudeJson = JSON.parse(clean);
 
-    return NextResponse.json(parsed);
+    const responseSchema = z.object({
+      tier: z.enum(["normaal", "luxe", "vip"]),
+      reistijd: z.string().max(100),
+      redenKeuze: z.string().max(500),
+      reistip: z.string().max(300),
+    });
+    const validated = responseSchema.safeParse(claudeJson);
+    if (!validated.success) {
+      return NextResponse.json(buildFallback(from, to, passengers, safeTime, luggage, occasion));
+    }
+
+    return NextResponse.json(validated.data);
   } catch {
     return NextResponse.json({
       tier: "luxe",

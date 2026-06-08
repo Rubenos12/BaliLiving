@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { updateTour } from "@/lib/actions/tours";
 
 export default function EditTourPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -42,8 +43,7 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    const supabase = createClient();
-    await supabase.from("tours").update({
+    await updateTour(id, {
       name: form.name,
       location: form.location,
       short_description: form.short_description,
@@ -52,7 +52,7 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
       duration_hours: parseFloat(form.duration_hours) || 0,
       max_guests: parseInt(form.max_guests) || 10,
       published: form.published,
-    }).eq("id", id);
+    });
     setSaving(false);
     router.push("/admin/tours");
   };

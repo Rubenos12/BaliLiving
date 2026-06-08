@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { createTour } from "@/lib/actions/tours";
 
 export default function NewTourPage() {
   const router = useRouter();
@@ -19,17 +19,16 @@ export default function NewTourPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    const supabase = createClient();
-    const { error } = await supabase.from("tours").insert([{
+    const result = await createTour({
       name: form.name, location: form.location,
       short_description: form.short_description, long_description: form.long_description,
       price_per_person: parseInt(form.price_per_person) || 0,
       duration_hours: parseFloat(form.duration_hours) || 0,
       max_guests: parseInt(form.max_guests) || 10,
       published: form.published,
-    }]);
+    });
     setSaving(false);
-    if (!error) router.push("/admin/tours");
+    if (!result.error) router.push("/admin/tours");
   };
 
   return (

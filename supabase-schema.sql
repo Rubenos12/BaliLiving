@@ -87,47 +87,47 @@ CREATE POLICY "Public read published villas"
   ON villas FOR SELECT
   USING (published = true);
 
-CREATE POLICY "Auth users can manage villas"
+CREATE POLICY "Admins can manage villas"
   ON villas FOR ALL
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- Villa media: public can read; only auth users can write
 CREATE POLICY "Public read villa media"
   ON villa_media FOR SELECT
   USING (true);
 
-CREATE POLICY "Auth users can manage villa media"
+CREATE POLICY "Admins can manage villa media"
   ON villa_media FOR ALL
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- Blocked dates: public can read; only auth users can write
 CREATE POLICY "Public read blocked dates"
   ON blocked_dates FOR SELECT
   USING (true);
 
-CREATE POLICY "Auth users can manage blocked dates"
+CREATE POLICY "Admins can manage blocked dates"
   ON blocked_dates FOR ALL
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- Admin devices: only authenticated users can manage
 ALTER TABLE admin_devices ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Auth users can manage admin devices"
+CREATE POLICY "Admins can manage admin devices"
   ON admin_devices FOR ALL
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- Bookings: anyone can insert (guests booking); only auth users can read/update
 CREATE POLICY "Anyone can create bookings"
   ON bookings FOR INSERT
   WITH CHECK (true);
 
-CREATE POLICY "Auth users can read all bookings"
+CREATE POLICY "Admins can read all bookings"
   ON bookings FOR SELECT
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
-CREATE POLICY "Auth users can update bookings"
+CREATE POLICY "Admins can update bookings"
   ON bookings FOR UPDATE
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- ============================================================
 -- Seed villas from existing static data
@@ -218,9 +218,9 @@ CREATE POLICY "Public read published tours"
   ON tours FOR SELECT
   USING (published = true);
 
-CREATE POLICY "Auth users can manage tours"
+CREATE POLICY "Admins can manage tours"
   ON tours FOR ALL
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- ============================================================
 -- Transfers table
@@ -245,9 +245,9 @@ CREATE POLICY "Public read published transfers"
   ON transfers FOR SELECT
   USING (published = true);
 
-CREATE POLICY "Auth users can manage transfers"
+CREATE POLICY "Admins can manage transfers"
   ON transfers FOR ALL
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- ============================================================
 -- Restaurants table
@@ -274,9 +274,9 @@ CREATE POLICY "Public read published restaurants"
   ON restaurants FOR SELECT
   USING (published = true);
 
-CREATE POLICY "Auth users can manage restaurants"
+CREATE POLICY "Admins can manage restaurants"
   ON restaurants FOR ALL
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- ============================================================
 -- Transfer Requests table (customer-submitted on-demand transfers)
@@ -311,13 +311,13 @@ CREATE POLICY "Anyone can create transfer requests"
   WITH CHECK (true);
 
 -- Only authenticated users (admin) can read and update
-CREATE POLICY "Auth users can read transfer requests"
+CREATE POLICY "Admins can read transfer requests"
   ON transfer_requests FOR SELECT
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
-CREATE POLICY "Auth users can update transfer requests"
+CREATE POLICY "Admins can update transfer requests"
   ON transfer_requests FOR UPDATE
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- ============================================================
 -- Contact Inquiries table (contact form submissions)
@@ -342,13 +342,13 @@ CREATE POLICY "Anyone can create contact inquiries"
   WITH CHECK (true);
 
 -- Only authenticated users (admin) can read and update
-CREATE POLICY "Auth users can read contact inquiries"
+CREATE POLICY "Admins can read contact inquiries"
   ON contact_inquiries FOR SELECT
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
-CREATE POLICY "Auth users can update contact inquiries"
+CREATE POLICY "Admins can update contact inquiries"
   ON contact_inquiries FOR UPDATE
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- ============================================================
 -- Villa Reviews table (guest reviews per villa)
@@ -380,10 +380,10 @@ CREATE POLICY "Anyone can create review"
   WITH CHECK (true);
 
 -- Only authenticated users (admin) can update/publish reviews
-CREATE POLICY "Auth users can update reviews"
+CREATE POLICY "Admins can update reviews"
   ON villa_reviews FOR UPDATE
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
-CREATE POLICY "Auth users can delete reviews"
+CREATE POLICY "Admins can delete reviews"
   ON villa_reviews FOR DELETE
-  USING (auth.role() = 'authenticated');
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');

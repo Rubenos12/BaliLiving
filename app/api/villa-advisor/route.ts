@@ -1,6 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { fetchVillas } from "@/lib/actions/villas-fetch";
+import { z } from "zod";
+
+// Simple in-memory rate limiter: max 10 requests per IP per minute
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + 60_000 });
+    return true;
+  }
+  if (entry.count >= 10) return false;
+  entry.count++;
+  return true;
+}
+
+const VALID_PREFERENCES = [
+  "pool", "strand", "romantisch", "natuur", "wellness",
+  "wifi", "chef", "kinderen", "afgelegen", "modern",
+] as const;
+
+const requestSchema = z.object({
+  trip_type: z.enum(["huwelijksreis", "gezinsreis", "vrienden", "avontuur", "zakelijk"]),
+  budget: z.enum(["onder-300", "300-500", "500-800", "800+"]),
+  guests: z.number().int().min(1).max(30),
+  location: z.string().max(50),
+  preferences: z.array(z.enum(VALID_PREFERENCES)),
+});
 
 export type AdvisorPreferences = {
   trip_type: string;    // e.g. "huwelijksreis", "gezinsreis", "vrienden", "avontuur", "zakelijk"
@@ -50,8 +78,17 @@ const TRIP_TYPE_INSTRUCTIONS: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
-    const body: AdvisorPreferences = await req.json();
-    const { trip_type, budget, guests, location, preferences } = body;
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json({ error: "Te veel verzoeken. Probeer het over een minuut opnieuw." }, { status: 429 });
+    }
+
+    const rawBody = await req.json();
+    const parsed = requestSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Ongeldige invoer." }, { status: 400 });
+    }
+    const { trip_type, budget, guests, location, preferences } = parsed.data;
 
     const villas = await fetchVillas();
 
@@ -143,9 +180,18 @@ Geef ALLEEN het JSON object terug, geen extra tekst.`,
     const responseText =
       message.content[0].type === "text" ? message.content[0].text : "";
 
+    const claudeResponseSchema = z.object({
+      primary: z.object({ slug: z.string(), reason: z.string().max(600) }),
+      alternatives: z.array(z.object({ slug: z.string(), reason: z.string().max(400) })),
+    });
+
     let result: AdvisorResult;
     try {
-      result = JSON.parse(responseText.trim());
+      const parsed = JSON.parse(responseText.trim());
+      const validated = claudeResponseSchema.safeParse(parsed);
+      result = validated.success
+        ? validated.data
+        : { primary: { slug: eligible[0].slug, reason: eligible[0].short_description }, alternatives: [] };
     } catch {
       const match = responseText.match(/\{[\s\S]*\}/);
       if (!match) {
@@ -154,7 +200,15 @@ Geef ALLEEN het JSON object terug, geen extra tekst.`,
           { status: 500 }
         );
       }
-      result = JSON.parse(match[0]);
+      try {
+        const fallbackParsed = JSON.parse(match[0]);
+        const validated = claudeResponseSchema.safeParse(fallbackParsed);
+        result = validated.success
+          ? validated.data
+          : { primary: { slug: eligible[0].slug, reason: eligible[0].short_description }, alternatives: [] };
+      } catch {
+        result = { primary: { slug: eligible[0].slug, reason: eligible[0].short_description }, alternatives: [] };
+      }
     }
 
     // Ensure result has the expected shape

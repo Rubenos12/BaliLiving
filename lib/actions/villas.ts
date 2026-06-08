@@ -66,8 +66,18 @@ export async function uploadVillaMedia(
 ) {
   await requireAdminUser();
 
+  const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4", "video/quicktime"];
+  const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
+
+  if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+    return { error: "Bestandstype niet toegestaan. Gebruik JPEG, PNG, WebP of MP4." };
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    return { error: "Bestand is te groot. Maximum is 50 MB." };
+  }
+
   const supabase = createServiceClient();
-  const ext = file.name.split(".").pop();
+  const ext = file.name.split(".").pop()?.replace(/[^a-zA-Z0-9]/g, "") ?? "bin";
   const path = `${villaId}/${Date.now()}.${ext}`;
 
   const { error: uploadError } = await supabase.storage

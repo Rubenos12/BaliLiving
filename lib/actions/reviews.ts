@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { requireAdminUser } from "@/lib/actions/admin-auth";
 
 export type ReviewPayload = {
   villa_slug: string;
@@ -75,6 +76,7 @@ export async function getVillaAverageRating(
 }
 
 export async function publishReview(id: string, published: boolean) {
+  await requireAdminUser();
   const supabase = createServiceClient();
   const { error } = await supabase
     .from("villa_reviews")
@@ -85,6 +87,7 @@ export async function publishReview(id: string, published: boolean) {
 }
 
 export async function deleteReview(id: string) {
+  await requireAdminUser();
   const supabase = createServiceClient();
   const { error } = await supabase.from("villa_reviews").delete().eq("id", id);
   if (error) return { error: error.message };

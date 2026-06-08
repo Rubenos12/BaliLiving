@@ -3,10 +3,10 @@
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * Verifies the caller is an authenticated Supabase user.
- * Call this at the top of every admin-only server action.
- * Throws if not authenticated — Next.js will surface this as a 500,
- * which is the correct behaviour for unauthenticated server action calls.
+ * Verifies the caller is an authenticated admin user.
+ * Checks app_metadata.role === "admin" — set this in the Supabase dashboard
+ * on every admin account (Authentication → Users → Edit user → app_metadata).
+ * Throws if not authenticated or not an admin.
  */
 export async function requireAdminUser() {
   const supabase = await createClient();
@@ -17,6 +17,11 @@ export async function requireAdminUser() {
 
   if (error || !user) {
     throw new Error("Unauthorized");
+  }
+
+  const isAdmin = user.app_metadata?.role === "admin";
+  if (!isAdmin) {
+    throw new Error("Forbidden");
   }
 
   return user;

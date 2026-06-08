@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { updateRestaurant } from "@/lib/actions/restaurants";
 
 const PRICE_RANGES = ["€", "€€", "€€€", "€€€€"];
 
@@ -47,8 +48,7 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    const supabase = createClient();
-    await supabase.from("restaurants").update({
+    await updateRestaurant(id, {
       name: form.name,
       location: form.location,
       cuisine: form.cuisine,
@@ -59,7 +59,7 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
       phone: form.phone,
       website: form.website,
       published: form.published,
-    }).eq("id", id);
+    });
     setSaving(false);
     router.push("/admin/restaurants");
   };
