@@ -15,6 +15,8 @@ export type TransferRequestPayload = {
   notes?: string;
   ai_recommendation?: string;
   estimated_travel_time?: string;
+  luggage?: string;
+  occasion?: string;
 };
 
 export async function createTransferRequest(payload: TransferRequestPayload) {
@@ -46,6 +48,8 @@ export async function createTransferRequest(payload: TransferRequestPayload) {
         notes: payload.notes || "",
         ai_recommendation: payload.ai_recommendation || "",
         estimated_travel_time: payload.estimated_travel_time || "",
+        luggage: payload.luggage || "",
+        occasion: payload.occasion || "",
         status: "pending",
       },
     ])

@@ -254,6 +254,14 @@ export default function TransfersPage() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [passengers, setPassengers] = useState(2);
+  const [luggage, setLuggage] = useState("geen");
+  const [occasion, setOccasion] = useState("");
+
+  // Return trip
+  const [returnTrip, setReturnTrip] = useState(false);
+  const [returnDate, setReturnDate] = useState("");
+  const [returnTime, setReturnTime] = useState("");
+  const [returnBookingRef, setReturnBookingRef] = useState("");
 
   // AI state
   const [analyzing, setAnalyzing] = useState(false);
@@ -291,7 +299,7 @@ export default function TransfersPage() {
       const res = await fetch("/api/transfer-recommendation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ from, to, passengers, date, time }),
+        body: JSON.stringify({ from, to, passengers, date, time, luggage, occasion }),
       });
       const data: AIResult = await res.json();
       setAiResult(data);
@@ -327,10 +335,16 @@ export default function TransfersPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedTier) return;
+
+    if (returnTrip && !returnDate) {
+      setError("Vul een datum in voor de terugreis.");
+      return;
+    }
+
     setSubmitting(true);
     setError("");
 
-    const result = await createTransferRequest({
+    const basePayload = {
       from_location: from,
       to_location: to,
       transfer_date: date,
@@ -343,12 +357,15 @@ export default function TransfersPage() {
       notes,
       ai_recommendation: aiResult?.redenKeuze,
       estimated_travel_time: aiResult?.reistijd,
-    });
+      luggage,
+      occasion,
+    };
 
-    setSubmitting(false);
+    const result = await createTransferRequest(basePayload);
 
     if (result.error) {
       setError(result.error);
+      setSubmitting(false);
       return;
     }
 
@@ -356,6 +373,24 @@ export default function TransfersPage() {
       result.data?.id?.slice(0, 8).toUpperCase() ??
         Math.random().toString(36).slice(2, 10).toUpperCase()
     );
+
+    if (returnTrip && returnDate) {
+      const returnResult = await createTransferRequest({
+        ...basePayload,
+        from_location: to,
+        to_location: from,
+        transfer_date: returnDate,
+        transfer_time: returnTime,
+        notes: notes ? `[Terugreis] ${notes}` : "[Terugreis]",
+      });
+      if (returnResult.data) {
+        setReturnBookingRef(
+          returnResult.data.id?.slice(0, 8).toUpperCase() ?? ""
+        );
+      }
+    }
+
+    setSubmitting(false);
     setSuccess(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -386,7 +421,11 @@ export default function TransfersPage() {
             Uw transfer is aangevraagd. Wij nemen binnen 2 uur contact met u op
             ter bevestiging.
           </p>
-          <div className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-6 mb-8 text-left space-y-3">
+          {/* Outward booking */}
+          <div className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-6 mb-4 text-left space-y-3">
+            {returnBookingRef && (
+              <p className="text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-1">Heenreis</p>
+            )}
             <div className="flex justify-between text-sm gap-4">
               <span className="text-[#F5F0E8]/40 uppercase tracking-wider text-[0.65rem] shrink-0">
                 Referentie
@@ -420,6 +459,45 @@ export default function TransfersPage() {
               </span>
             </div>
           </div>
+
+          {/* Return booking */}
+          {returnBookingRef ? (
+            <div className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-6 mb-4 text-left space-y-3">
+              <p className="text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-1">Terugreis</p>
+              <div className="flex justify-between text-sm gap-4">
+                <span className="text-[#F5F0E8]/40 uppercase tracking-wider text-[0.65rem] shrink-0">
+                  Referentie
+                </span>
+                <span className="text-[#C9A84C] font-mono tracking-wider">
+                  #{returnBookingRef}
+                </span>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-0.5 sm:gap-4">
+                <span className="text-[#F5F0E8]/40 uppercase tracking-wider text-[0.65rem] shrink-0">
+                  Route
+                </span>
+                <span className="text-[#F5F0E8]/80 sm:text-right break-words text-xs">
+                  {to} → {from}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm gap-4">
+                <span className="text-[#F5F0E8]/40 uppercase tracking-wider text-[0.65rem] shrink-0">
+                  Datum & Tijd
+                </span>
+                <span className="text-[#F5F0E8]/80 text-right text-xs">
+                  {returnDate} {returnTime && `om ${returnTime}`}
+                </span>
+              </div>
+            </div>
+          ) : returnTrip ? (
+            <div className="bg-[#1C2B1E] border border-[#C9A84C]/10 p-4 mb-4 text-left">
+              <p className="text-[#F5F0E8]/40 text-xs">
+                Terugreis kon niet worden aangemaakt — neem contact op met Edwin &amp; Citty.
+              </p>
+            </div>
+          ) : null}
+
+          <div className="mb-8" />
           <a
             href="/"
             className="inline-block px-8 py-3.5 border border-[#C9A84C]/30 text-[#C9A84C] text-xs tracking-[0.25em] uppercase hover:bg-[#C9A84C]/10 transition-colors"
@@ -531,6 +609,124 @@ export default function TransfersPage() {
                   <PassengerCounter value={passengers} onChange={setPassengers} />
                 </div>
               </div>
+
+              {/* Luggage */}
+              <div>
+                <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
+                  Bagage
+                </label>
+                <div className="flex border border-[#C9A84C]/20">
+                  {(["geen", "1-2", "3-4", "5+"] as const).map((opt, i) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setLuggage(opt)}
+                      className={`flex-1 min-h-[48px] py-3 text-xs tracking-[0.1em] uppercase transition-all duration-200 ${
+                        i > 0 ? "border-l border-[#C9A84C]/20" : ""
+                      } ${
+                        luggage === opt
+                          ? "bg-[#C9A84C] text-[#1C2B1E]"
+                          : "bg-[#243628] text-[#F5F0E8]/50 hover:text-[#F5F0E8]/80"
+                      }`}
+                    >
+                      {opt === "geen" ? "Geen" : `${opt} koffers`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Occasion */}
+              <div>
+                <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
+                  Aanleiding{" "}
+                  <span className="text-[#F5F0E8]/25 normal-case tracking-normal lowercase ml-1">
+                    optioneel
+                  </span>
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: "luchthaventransfer",    label: "Luchthaventransfer" },
+                    { value: "dagtocht",               label: "Dagtocht" },
+                    { value: "speciale-gelegenheid",   label: "Speciale gelegenheid" },
+                    { value: "overig",                 label: "Overig" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setOccasion((prev) => prev === opt.value ? "" : opt.value)}
+                      className={`min-h-[48px] px-3 py-3 text-xs tracking-[0.1em] uppercase border transition-all duration-200 ${
+                        occasion === opt.value
+                          ? "bg-[#C9A84C]/15 text-[#C9A84C] border-[#C9A84C]/50"
+                          : "border-[#C9A84C]/15 text-[#F5F0E8]/45 hover:border-[#C9A84C]/35 hover:text-[#F5F0E8]/70"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Return trip toggle */}
+              <div className="flex items-center justify-between py-3 border border-[#C9A84C]/15 px-4">
+                <div>
+                  <p className="text-[#F5F0E8]/70 text-sm">Heen &amp; terug?</p>
+                  <p className="text-[#F5F0E8]/30 text-[0.65rem]">Boek retour in één aanvraag</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setReturnTrip((prev) => !prev)}
+                  className={`relative w-12 h-6 rounded-full transition-colors duration-300 shrink-0 ${
+                    returnTrip ? "bg-[#C9A84C]" : "bg-[#243628] border border-[#C9A84C]/25"
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#F5F0E8] shadow transition-transform duration-300 ${
+                      returnTrip ? "translate-x-6" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Return date/time */}
+              <AnimatePresence>
+                {returnTrip && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="grid grid-cols-2 gap-4 pt-1">
+                      <div>
+                        <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
+                          Terugreis datum
+                        </label>
+                        <input
+                          type="date"
+                          value={returnDate}
+                          min={date || new Date().toISOString().split("T")[0]}
+                          onChange={(e) => setReturnDate(e.target.value)}
+                          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-3.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                          style={{ colorScheme: "dark" }}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
+                          Terugreis tijdstip
+                        </label>
+                        <input
+                          type="time"
+                          value={returnTime}
+                          onChange={(e) => setReturnTime(e.target.value)}
+                          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-3.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                          style={{ colorScheme: "dark" }}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <button
                 type="button"
@@ -827,6 +1023,36 @@ export default function TransfersPage() {
                       </span>
                       <span className="text-[#F5F0E8]/80 text-right text-xs">
                         {aiResult.reistijd}
+                      </span>
+                    </div>
+                  )}
+                  {luggage && luggage !== "geen" && (
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-[#F5F0E8]/35 text-[0.65rem] uppercase tracking-wider shrink-0">
+                        Bagage
+                      </span>
+                      <span className="text-[#F5F0E8]/80 text-right text-xs">
+                        {luggage === "5+" ? "5+ koffers" : `${luggage} koffers`}
+                      </span>
+                    </div>
+                  )}
+                  {occasion && (
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-[#F5F0E8]/35 text-[0.65rem] uppercase tracking-wider shrink-0">
+                        Aanleiding
+                      </span>
+                      <span className="text-[#F5F0E8]/80 text-right text-xs capitalize">
+                        {occasion.replace(/-/g, " ")}
+                      </span>
+                    </div>
+                  )}
+                  {returnTrip && returnDate && (
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-[#F5F0E8]/35 text-[0.65rem] uppercase tracking-wider shrink-0">
+                        Terugreis
+                      </span>
+                      <span className="text-[#F5F0E8]/80 text-right text-xs">
+                        {returnDate} {returnTime && `om ${returnTime}`}
                       </span>
                     </div>
                   )}

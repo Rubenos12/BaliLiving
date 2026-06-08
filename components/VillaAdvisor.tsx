@@ -11,6 +11,14 @@ const fadeUp: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
 };
 
+const TRIP_TYPE_OPTIONS = [
+  { value: "huwelijksreis", label: "Huwelijksreis", icon: "💍" },
+  { value: "gezinsreis",    label: "Gezinsreis",    icon: "👨‍👩‍👧" },
+  { value: "vrienden",      label: "Vrienden / Groep", icon: "🥂" },
+  { value: "avontuur",      label: "Avontuur",      icon: "🌿" },
+  { value: "zakelijk",      label: "Zakelijk",      icon: "💼" },
+];
+
 const BUDGET_OPTIONS = [
   { value: "onder-300", label: "Onder €300" },
   { value: "300-500", label: "€300 – €500" },
@@ -47,7 +55,7 @@ const PREFERENCE_OPTIONS = [
   { value: "yoga en wellness", label: "Yoga & wellness" },
 ];
 
-type Step = 1 | 2 | 3 | 4;
+type Step = 1 | 2 | 3 | 4 | 5;
 
 // Full-width tap-friendly option button
 function OptionButton({
@@ -94,6 +102,7 @@ function StepIndicator({ step, total }: { step: Step; total: number }) {
 
 export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
   const [step, setStep] = useState<Step>(1);
+  const [tripType, setTripType] = useState("");
   const [budget, setBudget] = useState("");
   const [guests, setGuests] = useState<number | null>(null);
   const [location, setLocation] = useState("");
@@ -112,6 +121,7 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
     setLoading(true);
     setError("");
     const payload: AdvisorPreferences = {
+      trip_type: tripType,
       budget,
       guests: guests!,
       location,
@@ -138,6 +148,7 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
 
   const reset = () => {
     setStep(1);
+    setTripType("");
     setBudget("");
     setGuests(null);
     setLocation("");
@@ -146,7 +157,7 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
     setError("");
   };
 
-  const recommendedVilla = result ? villas.find((v) => v.slug === result.slug) : null;
+  const recommendedVilla = result ? villas.find((v) => v.slug === result.primary.slug) : null;
 
   return (
     <section className="py-16 md:py-20 bg-[#131E14] border-y border-[#C9A84C]/10">
@@ -165,12 +176,12 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
               <span className="italic text-[#C9A84C]">bij jou?</span>
             </h2>
             <p className="text-[#F5F0E8]/45 text-sm max-w-xs leading-relaxed sm:text-right hidden sm:block">
-              Beantwoord 4 korte vragen en onze AI-adviseur vindt de perfecte villa voor jouw reis.
+              Beantwoord 5 korte vragen en onze AI-adviseur vindt de perfecte villa voor jouw reis.
             </p>
           </div>
         </div>
 
-        {/* Card — full width on mobile, max-2xl on larger */}
+        {/* Card */}
         <div className="bg-[#1C2B1E] border border-[#C9A84C]/15 p-5 sm:p-8 md:p-10 max-w-2xl">
           <AnimatePresence mode="wait">
             {/* Result */}
@@ -212,7 +223,7 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                       <span className="text-[#C9A84C] not-italic text-[0.6rem] tracking-wider uppercase block mb-1">
                         AI advies
                       </span>
-                      {result.reason}
+                      {result.primary.reason}
                     </div>
 
                     {/* Stacked buttons on mobile */}
@@ -232,6 +243,56 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                     </div>
                   </div>
                 </div>
+
+                {/* Alternatives */}
+                {result.alternatives.length > 0 && (
+                  <>
+                    <p className="text-[#F5F0E8]/35 text-[0.65rem] tracking-[0.25em] uppercase mb-3">
+                      Andere suggesties
+                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                      {result.alternatives.map((alt) => {
+                        const altVilla = villas.find((v) => v.slug === alt.slug);
+                        if (!altVilla) return null;
+                        return (
+                          <div
+                            key={alt.slug}
+                            className="border border-[#C9A84C]/12 hover:border-[#C9A84C]/35 transition-all duration-200"
+                          >
+                            <div className="aspect-[4/3] bg-[#243628] overflow-hidden">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={altVilla.images[0]}
+                                alt={altVilla.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="p-3">
+                              <p
+                                className="text-[#F5F0E8] text-sm font-light leading-tight mb-0.5"
+                                style={{ fontFamily: "var(--font-cormorant)" }}
+                              >
+                                {altVilla.name}
+                              </p>
+                              <p className="text-[#C9A84C]/60 text-[0.6rem] tracking-wider mb-2">
+                                {altVilla.location} · €{altVilla.price_per_night.toLocaleString("nl-NL")}/nacht
+                              </p>
+                              <p className="text-[#F5F0E8]/40 text-[0.65rem] leading-relaxed mb-3 line-clamp-2">
+                                {alt.reason}
+                              </p>
+                              <Link
+                                href={`/villas/${altVilla.slug}`}
+                                className="block text-center py-2 border border-[#C9A84C]/25 text-[#C9A84C] text-[0.6rem] tracking-[0.2em] uppercase hover:border-[#C9A84C]/60 hover:bg-[#C9A84C]/8 transition-colors"
+                              >
+                                Bekijk
+                              </Link>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
               </motion.div>
             ) : loading ? (
               <motion.div key="loading" variants={fadeUp} initial="hidden" animate="show" className="py-14 text-center">
@@ -240,8 +301,9 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
               </motion.div>
             ) : (
               <motion.div key={`step-${step}`} variants={fadeUp} initial="hidden" animate="show">
-                <StepIndicator step={step} total={4} />
+                <StepIndicator step={step} total={5} />
 
+                {/* Step 1: Trip type */}
                 {step === 1 && (
                   <>
                     <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-1">Stap 1</p>
@@ -249,9 +311,41 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                       className="text-xl sm:text-2xl font-light text-[#F5F0E8] mb-5"
                       style={{ fontFamily: "var(--font-cormorant)" }}
                     >
+                      Wat voor reis is dit?
+                    </h3>
+                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
+                      {TRIP_TYPE_OPTIONS.map((opt) => (
+                        <OptionButton
+                          key={opt.value}
+                          selected={tripType === opt.value}
+                          onClick={() => setTripType(opt.value)}
+                        >
+                          <span className="mr-2">{opt.icon}</span>{opt.label}
+                        </OptionButton>
+                      ))}
+                    </div>
+                    <div className="mt-6">
+                      <button
+                        onClick={() => setStep(2)}
+                        disabled={!tripType}
+                        className="w-full sm:w-auto px-8 py-3.5 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
+                      >
+                        Volgende →
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {/* Step 2: Budget */}
+                {step === 2 && (
+                  <>
+                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-1">Stap 2</p>
+                    <h3
+                      className="text-xl sm:text-2xl font-light text-[#F5F0E8] mb-5"
+                      style={{ fontFamily: "var(--font-cormorant)" }}
+                    >
                       Wat is jouw budget per nacht?
                     </h3>
-                    {/* 2-col grid on mobile, flex-wrap on sm+ */}
                     <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
                       {BUDGET_OPTIONS.map((opt) => (
                         <OptionButton
@@ -263,11 +357,17 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                         </OptionButton>
                       ))}
                     </div>
-                    <div className="mt-6">
+                    <div className="mt-6 flex gap-3">
                       <button
-                        onClick={() => setStep(2)}
+                        onClick={() => setStep(1)}
+                        className="flex-1 sm:flex-none px-5 py-3.5 border border-[#C9A84C]/25 text-[#F5F0E8]/55 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/50 transition-colors duration-300"
+                      >
+                        ← Terug
+                      </button>
+                      <button
+                        onClick={() => setStep(3)}
                         disabled={!budget}
-                        className="w-full sm:w-auto px-8 py-3.5 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
+                        className="flex-1 sm:flex-none px-8 py-3.5 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
                       >
                         Volgende →
                       </button>
@@ -275,9 +375,10 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                   </>
                 )}
 
-                {step === 2 && (
+                {/* Step 3: Guests */}
+                {step === 3 && (
                   <>
-                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-1">Stap 2</p>
+                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-1">Stap 3</p>
                     <h3
                       className="text-xl sm:text-2xl font-light text-[#F5F0E8] mb-5"
                       style={{ fontFamily: "var(--font-cormorant)" }}
@@ -297,13 +398,13 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                     </div>
                     <div className="mt-6 flex gap-3">
                       <button
-                        onClick={() => setStep(1)}
+                        onClick={() => setStep(2)}
                         className="flex-1 sm:flex-none px-5 py-3.5 border border-[#C9A84C]/25 text-[#F5F0E8]/55 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/50 transition-colors duration-300"
                       >
                         ← Terug
                       </button>
                       <button
-                        onClick={() => setStep(3)}
+                        onClick={() => setStep(4)}
                         disabled={guests === null}
                         className="flex-1 sm:flex-none px-8 py-3.5 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
                       >
@@ -313,9 +414,10 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                   </>
                 )}
 
-                {step === 3 && (
+                {/* Step 4: Location */}
+                {step === 4 && (
                   <>
-                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-1">Stap 3</p>
+                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-1">Stap 4</p>
                     <h3
                       className="text-xl sm:text-2xl font-light text-[#F5F0E8] mb-5"
                       style={{ fontFamily: "var(--font-cormorant)" }}
@@ -335,13 +437,13 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                     </div>
                     <div className="mt-6 flex gap-3">
                       <button
-                        onClick={() => setStep(2)}
+                        onClick={() => setStep(3)}
                         className="flex-1 sm:flex-none px-5 py-3.5 border border-[#C9A84C]/25 text-[#F5F0E8]/55 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/50 transition-colors duration-300"
                       >
                         ← Terug
                       </button>
                       <button
-                        onClick={() => setStep(4)}
+                        onClick={() => setStep(5)}
                         disabled={!location}
                         className="flex-1 sm:flex-none px-8 py-3.5 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
                       >
@@ -351,9 +453,10 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                   </>
                 )}
 
-                {step === 4 && (
+                {/* Step 5: Preferences */}
+                {step === 5 && (
                   <>
-                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-1">Stap 4</p>
+                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-1">Stap 5</p>
                     <h3
                       className="text-xl sm:text-2xl font-light text-[#F5F0E8] mb-1"
                       style={{ fontFamily: "var(--font-cormorant)" }}
@@ -361,7 +464,6 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                       Wat zijn jouw wensen?
                     </h3>
                     <p className="text-[#F5F0E8]/35 text-xs mb-5">Selecteer alles wat van toepassing is (optioneel)</p>
-                    {/* 2-col grid keeps preference chips readable on mobile */}
                     <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
                       {PREFERENCE_OPTIONS.map((opt) => (
                         <OptionButton
@@ -380,7 +482,7 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
 
                     <div className="mt-6 flex gap-3">
                       <button
-                        onClick={() => setStep(3)}
+                        onClick={() => setStep(4)}
                         className="flex-1 sm:flex-none px-5 py-3.5 border border-[#C9A84C]/25 text-[#F5F0E8]/55 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/50 transition-colors duration-300"
                       >
                         ← Terug

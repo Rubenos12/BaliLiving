@@ -3,15 +3,21 @@ import Anthropic from "@anthropic-ai/sdk";
 import { fetchVillas } from "@/lib/actions/villas-fetch";
 
 export type AdvisorPreferences = {
-  budget: string;         // e.g. "onder-300", "300-500", "500-800", "800+"
+  trip_type: string;    // e.g. "huwelijksreis", "gezinsreis", "vrienden", "avontuur", "zakelijk"
+  budget: string;       // e.g. "onder-300", "300-500", "500-800", "800+"
   guests: number;
-  location: string;       // e.g. "Ubud", "Seminyak", or "geen-voorkeur"
-  preferences: string[];  // e.g. ["pool", "strand", "romantisch"]
+  location: string;     // e.g. "Ubud", "Seminyak", or "geen-voorkeur"
+  preferences: string[]; // e.g. ["pool", "strand", "romantisch"]
+};
+
+export type VillaRecommendation = {
+  slug: string;
+  reason: string;
 };
 
 export type AdvisorResult = {
-  slug: string;
-  reason: string;
+  primary: VillaRecommendation;
+  alternatives: VillaRecommendation[];
 };
 
 const BUDGET_MAP: Record<string, { min: number; max: number }> = {
@@ -21,10 +27,31 @@ const BUDGET_MAP: Record<string, { min: number; max: number }> = {
   "800+": { min: 800, max: 999999 },
 };
 
+const TRIP_TYPE_LABELS: Record<string, string> = {
+  huwelijksreis: "Huwelijksreis / Romantische Reis",
+  gezinsreis: "Gezinsreis",
+  vrienden: "Vrienden / Groepsreis",
+  avontuur: "Avontuurlijke Reis",
+  zakelijk: "Zakelijke Reis",
+};
+
+const TRIP_TYPE_INSTRUCTIONS: Record<string, string> = {
+  huwelijksreis:
+    "PRIORITEIT: Romantiek, privacy en bijzondere sfeer staan voorop. Kies villa's met privé pool, afgelegen ligging, romantisch interieur en eventueel spa. Budget is secundair — de beleving telt. Vermijd villa's die primair gericht zijn op grote groepen.",
+  gezinsreis:
+    "PRIORITEIT: Veiligheid, ruimte en kindvriendelijkheid zijn doorslaggevend. Kies villa's met meerdere slaapkamers, tuinruimte en beveiligde omgeving. Gezinsactiviteiten in de buurt zijn een pluspunt.",
+  vrienden:
+    "PRIORITEIT: Ruimte voor de groep en sociale voorzieningen tellen zwaar. Kies villa's met grote zwembaden, gemeenschappelijke terrassen, entertainment-ruimte en een eigen chef. Prijs per persoon moet aantrekkelijk zijn.",
+  avontuur:
+    "PRIORITEIT: Ligging en nabijheid van activiteiten zijn bepalend. Surf spots, jungle treks, rijstterras-wandelingen of duiklocaties in de buurt verhogen de score. Comfort is aanwezig maar hoeft niet maximaal te zijn.",
+  zakelijk:
+    "PRIORITEIT: Rust, professionaliteit en goede WiFi zijn essentieel. Kies villa's met een werkplek, betrouwbare verbinding en discrete service. Nabijheid van Denpasar of andere zakelijke centra is een pluspunt.",
+};
+
 export async function POST(req: NextRequest) {
   try {
     const body: AdvisorPreferences = await req.json();
-    const { budget, guests, location, preferences } = body;
+    const { trip_type, budget, guests, location, preferences } = body;
 
     const villas = await fetchVillas();
 
@@ -60,29 +87,54 @@ export async function POST(req: NextRequest) {
 
     const client = new Anthropic();
 
+    const tripTypeLabel = TRIP_TYPE_LABELS[trip_type] ?? trip_type ?? "Niet opgegeven";
+    const tripTypeInstruction = TRIP_TYPE_INSTRUCTIONS[trip_type] ?? "";
+    const formattedBudget = budget
+      .replace("onder-", "onder €")
+      .replace("800+", "€800+")
+      .replace(/^(\d+)-(\d+)$/, "€$1–€$2");
+
     const message = await client.messages.create({
       model: "claude-opus-4-6",
-      max_tokens: 512,
+      max_tokens: 768,
       messages: [
         {
           role: "user",
-          content: `Je bent de persoonlijke villa-adviseur van BaliLiving — een luxe reisadviseur op Bali gerund door Edwin & Citty.
+          content: `Je bent de persoonlijke villa-adviseur van BaliLiving — een exclusief reisbedrijf op Bali van Edwin & Citty. Jouw taak is om de drie beste villa's te selecteren uit de beschikbare lijst.
 
-Een klant heeft de volgende wensen opgegeven:
-- Budget per nacht: ${budget.replace("onder-", "onder €").replace("+", "+").replace("-", "–€")}
+REISTYPE: ${tripTypeLabel}
+${tripTypeInstruction}
+
+Klantenwensen:
+- Budget per nacht: ${formattedBudget}
 - Aantal gasten: ${guests}
 - Locatievoorkeur: ${location === "geen-voorkeur" ? "Geen voorkeur" : location}
 - Sfeer & voorkeuren: ${preferences.length > 0 ? preferences.join(", ") : "geen specifieke voorkeur"}
 
-Hier zijn de beschikbare villa's die al gefilterd zijn op budget en capaciteit:
+Beschikbare villa's (al gefilterd op budget en capaciteit):
 ${JSON.stringify(villasSummary, null, 2)}
 
-Kies de BESTE villa uit de lijst hierboven voor deze klant. Geef je antwoord als geldig JSON met exact deze structuur:
+Selecteer de DRIE beste villa's in volgorde van prioriteit. Eerste keuze is de absolute beste match.
+
+Geef je antwoord als geldig JSON met exact deze structuur:
 {
-  "slug": "<slug van de aanbevolen villa>",
-  "reason": "<persoonlijke toelichting in 2-3 zinnen in het Nederlands waarom deze villa perfect past bij de wensen van de klant. Spreek de klant direct aan met 'je/jouw'.>"
+  "primary": {
+    "slug": "<slug van de beste villa>",
+    "reason": "<persoonlijke toelichting in 2-3 zinnen in het Nederlands. Spreek de klant aan met 'je/jouw'. Begin met waarom dit de perfecte keuze is voor hun specifieke reistype.>"
+  },
+  "alternatives": [
+    {
+      "slug": "<slug van tweede keuze>",
+      "reason": "<korte toelichting in 1-2 zinnen waarom dit een goed alternatief is>"
+    },
+    {
+      "slug": "<slug van derde keuze>",
+      "reason": "<korte toelichting in 1-2 zinnen waarom dit een goed alternatief is>"
+    }
+  ]
 }
 
+Als er minder dan 3 villa's beschikbaar zijn, geef je alleen de beschikbare villa's terug (primary altijd aanwezig, alternatives kan leeg zijn).
 Geef ALLEEN het JSON object terug, geen extra tekst.`,
         },
       ],
@@ -95,7 +147,6 @@ Geef ALLEEN het JSON object terug, geen extra tekst.`,
     try {
       result = JSON.parse(responseText.trim());
     } catch {
-      // Try extracting JSON from response if there's surrounding text
       const match = responseText.match(/\{[\s\S]*\}/);
       if (!match) {
         return NextResponse.json(
@@ -106,12 +157,38 @@ Geef ALLEEN het JSON object terug, geen extra tekst.`,
       result = JSON.parse(match[0]);
     }
 
-    // Validate slug is in our eligible list
-    const recommendedVilla = eligible.find((v) => v.slug === result.slug);
-    if (!recommendedVilla) {
-      // Fall back to first eligible villa
-      result.slug = eligible[0].slug;
+    // Ensure result has the expected shape
+    if (!result.primary) {
+      result = { primary: { slug: eligible[0].slug, reason: eligible[0].short_description }, alternatives: [] };
     }
+    if (!Array.isArray(result.alternatives)) {
+      result.alternatives = [];
+    }
+
+    // Validate and patch slugs
+    const eligibleSlugs = new Set(eligible.map((v) => v.slug));
+
+    if (!eligibleSlugs.has(result.primary.slug)) {
+      result.primary.slug = eligible[0].slug;
+    }
+
+    const usedSlugs = new Set([result.primary.slug]);
+    const validAlts = result.alternatives
+      .filter((a) => eligibleSlugs.has(a.slug) && !usedSlugs.has(a.slug))
+      .slice(0, 2);
+
+    validAlts.forEach((a) => usedSlugs.add(a.slug));
+
+    // Pad alternatives with remaining eligible villas if Claude returned fewer than 2
+    const remaining = eligible.filter(
+      (v) => !usedSlugs.has(v.slug)
+    );
+    while (validAlts.length < 2 && remaining.length > 0) {
+      const filler = remaining.shift()!;
+      validAlts.push({ slug: filler.slug, reason: filler.short_description });
+    }
+
+    result.alternatives = validAlts;
 
     return NextResponse.json(result);
   } catch (err) {

@@ -1,15 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const OCCASION_TONE: Record<string, string> = {
+  "luchthaventransfer":
+    "Professionele, betrouwbare toon. Benadruk punctualiteit en vluchttracking.",
+  "dagtocht":
+    "Ontspannen, vriendelijke toon. Benadruk het gemak en de vrijheid van de dag.",
+  "speciale-gelegenheid":
+    "Warme, feestelijke en elegante toon. Maak de klant enthousiast over de beleving. VIP is hier de logische keuze.",
+  "overig":
+    "Neutrale, behulpzame toon.",
+};
+
+const LUGGAGE_LABELS: Record<string, string> = {
+  "geen": "geen bagage",
+  "1-2": "1-2 koffers",
+  "3-4": "3-4 koffers",
+  "5+": "5 of meer koffers",
+};
+
+const OCCASION_LABELS: Record<string, string> = {
+  "luchthaventransfer": "Luchthaventransfer",
+  "dagtocht": "Dagtocht",
+  "speciale-gelegenheid": "Speciale gelegenheid",
+  "overig": "Overig",
+};
+
 export async function POST(req: NextRequest) {
   try {
-    const { from, to, passengers, date, time } = await req.json();
+    const { from, to, passengers, date, time, luggage, occasion } = await req.json();
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
 
     if (!apiKey) {
-      // Intelligent client-side fallback when no API key is configured
-      return NextResponse.json(buildFallback(from, to, passengers, time));
+      return NextResponse.json(buildFallback(from, to, passengers, time, luggage, occasion));
     }
+
+    const luggageLabel = LUGGAGE_LABELS[luggage] ?? "niet opgegeven";
+    const occasionLabel = OCCASION_LABELS[occasion] ?? "niet opgegeven";
+    const toneTip = OCCASION_TONE[occasion] ?? "Neutrale, professionele toon.";
 
     const prompt = `Je bent een premium vervoersadviseur voor BaliLiving, een exclusief reisbedrijf op Bali, Indonesië.
 
@@ -19,26 +47,33 @@ Analyseer deze transfer aanvraag en geef een persoonlijk advies:
 - Datum: ${date || "niet opgegeven"}
 - Tijdstip: ${time || "niet opgegeven"}
 - Aantal reizigers: ${passengers}
+- Bagage: ${luggageLabel}
+- Aanleiding: ${occasionLabel}
 
 Beschikbare tiers:
-- normaal: Sedan/MPV, AC, betrouwbaar, tot 4 reizigers
-- luxe: Premium SUV, leer, koelwater, USB-lader, tot 6 reizigers
-- vip: Executive voertuig, champagne, conciërge, Wi-Fi, onbeperkt wachten, tot 8 reizigers
+- normaal: Sedan/MPV, AC, betrouwbaar, max 4 reizigers, tot 2 middelgrote koffers
+- luxe: Premium SUV, leer, koelwater, USB-lader, max 6 reizigers, tot 4 koffers
+- vip: Executive voertuig, champagne, conciërge, Wi-Fi, onbeperkt wachten, max 8 reizigers, altijd voldoende bagageruimte
 
 Regels voor aanbeveling:
 - Airport route → minimaal luxe (meet & greet belangrijk)
 - 5+ reizigers → minimaal luxe
 - 7+ reizigers → vip
-- Avond/nacht (19:00-23:59) → upgrade één niveau (veiliger en comfortabeler)
-- Huwelijksreis of bijzondere gelegenheid (hint in locaties) → vip
-- Korte rit binnen dezelfde wijk → normaal volstaat
+- 3-4 koffers → minimaal luxe (ruimte in bagageruimte)
+- 5+ koffers → vip (executive voertuig biedt maximale bagageruimte)
+- Avond/nacht (19:00–23:59) → upgrade één niveau
+- Speciale gelegenheid → vip
+- Dagtocht → normaal volstaat tenzij groep groot of bagage aanwezig
+- Korte rit binnen dezelfde wijk → normaal
+
+Tone instructie: ${toneTip}
 
 Geef exact dit JSON-formaat terug (geen andere tekst):
 {
   "tier": "normaal" | "luxe" | "vip",
   "reistijd": "bijv. 45-60 minuten",
-  "redenKeuze": "Persoonlijke aanbeveling in 1-2 zinnen, spreek de klant aan met 'u'",
-  "reistip": "Één praktische tip specifiek voor deze route of dit tijdstip"
+  "redenKeuze": "Persoonlijke aanbeveling in 1-2 zinnen, spreek de klant aan met 'u'. Verwijs specifiek naar bagage en aanleiding als die zijn opgegeven.",
+  "reistip": "Één praktische tip specifiek voor deze route, dit tijdstip of deze aanleiding"
 }`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -50,20 +85,19 @@ Geef exact dit JSON-formaat terug (geen andere tekst):
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 350,
+        max_tokens: 400,
         messages: [{ role: "user", content: prompt }],
       }),
     });
 
     if (!response.ok) {
-      return NextResponse.json(buildFallback(from, to, passengers, time));
+      return NextResponse.json(buildFallback(from, to, passengers, time, luggage, occasion));
     }
 
     const result = await response.json();
     const text =
       result.content?.[0]?.type === "text" ? result.content[0].text : "";
 
-    // Parse the JSON from Claude's response (strip any markdown fences)
     const clean = text.replace(/```json|```/g, "").trim();
     const parsed = JSON.parse(clean);
 
@@ -84,7 +118,9 @@ function buildFallback(
   from: string,
   to: string,
   passengers: number,
-  time: string
+  time: string,
+  luggage?: string,
+  occasion?: string
 ): object {
   const fromLower = (from || "").toLowerCase();
   const toLower = (to || "").toLowerCase();
@@ -99,6 +135,7 @@ function buildFallback(
     toLower.includes("dps");
 
   const isEvening = hour >= 19 && hour <= 23;
+  const isSpecial = occasion === "speciale-gelegenheid";
 
   let tier: "normaal" | "luxe" | "vip" = "normaal";
   let redenKeuze =
@@ -106,16 +143,34 @@ function buildFallback(
   let reistip =
     "Houd rekening met drukte op de weg — Bali's wegen zijn het rustigst vroeg in de ochtend.";
 
-  if (passengers >= 7) {
+  if (passengers >= 7 || isSpecial || luggage === "5+") {
     tier = "vip";
-    redenKeuze = `Met ${passengers} reizigers biedt onze VIP-service de ruimste en meest comfortabele oplossing, met een executive voertuig en persoonlijke service.`;
-    reistip =
-      "Wij adviseren vooraf te melden of er bagage meegaat, zodat uw chauffeur het juiste voertuig inzet.";
-  } else if (passengers >= 5) {
+    if (isSpecial) {
+      redenKeuze =
+        "Voor uw speciale gelegenheid is VIP-vervoer de perfecte keuze — verwelkom uzelf in stijl met champagne en een persoonlijke conciërge.";
+      reistip =
+        "Laat ons weten om welke bijzondere gelegenheid het gaat — we zorgen voor een onvergetelijke aankomst.";
+    } else if (luggage === "5+") {
+      redenKeuze = `Met ${passengers} reizigers en veel bagage biedt VIP-vervoer de ruimste oplossing — een executive voertuig met maximale bagageruimte.`;
+      reistip =
+        "Wij adviseren vooraf te melden hoeveel stuks bagage u meeneemt, zodat uw chauffeur het juiste voertuig inzet.";
+    } else {
+      redenKeuze = `Met ${passengers} reizigers biedt onze VIP-service de ruimste en meest comfortabele oplossing, met een executive voertuig en persoonlijke service.`;
+      reistip =
+        "Wij adviseren vooraf te melden of er bagage meegaat, zodat uw chauffeur het juiste voertuig inzet.";
+    }
+  } else if (passengers >= 5 || luggage === "3-4") {
     tier = "luxe";
-    redenKeuze = `Voor ${passengers} reizigers is Luxe vervoer ideaal — voldoende ruimte, premium comfort en een attente chauffeur.`;
-    reistip =
-      "Combineer de rit met een welkomstdrankje en geniet van een stijlvolle aankomst op uw bestemming.";
+    if (luggage === "3-4") {
+      redenKeuze =
+        "Met 3-4 koffers is Luxe vervoer ideaal — de premium SUV biedt voldoende bagageruimte naast comfortabele zitplaatsen.";
+      reistip =
+        "Zorg dat uw koffers bij aankomst direct in de auto passen — bij twijfel over ruimte upgraden wij graag naar VIP.";
+    } else {
+      redenKeuze = `Voor ${passengers} reizigers is Luxe vervoer ideaal — voldoende ruimte, premium comfort en een attente chauffeur.`;
+      reistip =
+        "Combineer de rit met een welkomstdrankje en geniet van een stijlvolle aankomst op uw bestemming.";
+    }
   } else if (isAirport) {
     tier = "luxe";
     redenKeuze =

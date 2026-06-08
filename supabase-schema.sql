@@ -295,6 +295,8 @@ CREATE TABLE IF NOT EXISTS transfer_requests (
   notes                 text NOT NULL DEFAULT '',
   ai_recommendation     text NOT NULL DEFAULT '',
   estimated_travel_time text NOT NULL DEFAULT '',
+  luggage               text NOT NULL DEFAULT '',
+  occasion              text NOT NULL DEFAULT '',
   status                text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'rejected')),
   price_quoted          integer,
   price_type            text CHECK (price_type IN ('per_person', 'total')),
