@@ -171,3 +171,13 @@ a, button {
   0%   { transform: scale(1); }
   100% { transform: scale(1.06); }
 }
+
+/* Hero entrance — fade up with fill-mode both */
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes hero-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
