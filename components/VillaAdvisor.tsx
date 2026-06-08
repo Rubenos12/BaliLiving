@@ -1,0 +1,403 @@
+"use client";
+
+import { useState } from "react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import Link from "next/link";
+import type { Villa } from "@/lib/villas-data";
+import type { AdvisorPreferences, AdvisorResult } from "@/app/api/villa-advisor/route";
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
+};
+
+const BUDGET_OPTIONS = [
+  { value: "onder-300", label: "Onder €300" },
+  { value: "300-500", label: "€300 – €500" },
+  { value: "500-800", label: "€500 – €800" },
+  { value: "800+", label: "€800+" },
+];
+
+const GUEST_OPTIONS = [
+  { value: 1, label: "1–2" },
+  { value: 3, label: "3–4" },
+  { value: 5, label: "5–8" },
+  { value: 9, label: "9+" },
+];
+
+const LOCATION_OPTIONS = [
+  { value: "geen-voorkeur", label: "Geen voorkeur" },
+  { value: "Ubud", label: "Ubud" },
+  { value: "Seminyak", label: "Seminyak" },
+  { value: "Canggu", label: "Canggu" },
+  { value: "Uluwatu", label: "Uluwatu" },
+  { value: "Nusa Dua", label: "Nusa Dua" },
+];
+
+const PREFERENCE_OPTIONS = [
+  { value: "privé zwembad", label: "Privé zwembad" },
+  { value: "strand en oceaan", label: "Strand & oceaan" },
+  { value: "natuur en jungle", label: "Natuur & jungle" },
+  { value: "romantisch voor twee", label: "Romantisch" },
+  { value: "gezinsvriendelijk", label: "Gezin" },
+  { value: "surfen", label: "Surfen" },
+  { value: "eco en duurzaam", label: "Eco & duurzaam" },
+  { value: "eigen chef", label: "Eigen chef" },
+  { value: "grote groep of feest", label: "Grote groep" },
+  { value: "yoga en wellness", label: "Yoga & wellness" },
+];
+
+type Step = 1 | 2 | 3 | 4;
+
+function OptionButton({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`px-5 py-2.5 text-xs tracking-[0.2em] uppercase border transition-all duration-200 ${
+        selected
+          ? "bg-[#C9A84C] text-[#1C2B1E] border-[#C9A84C]"
+          : "border-[#C9A84C]/25 text-[#F5F0E8]/60 hover:border-[#C9A84C]/60 hover:text-[#F5F0E8]/90"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function StepIndicator({ step, total }: { step: Step; total: number }) {
+  return (
+    <div className="flex items-center gap-2 mb-8">
+      {Array.from({ length: total }, (_, i) => (
+        <div
+          key={i}
+          className={`h-px flex-1 transition-all duration-300 ${
+            i < step ? "bg-[#C9A84C]" : "bg-[#C9A84C]/20"
+          }`}
+        />
+      ))}
+      <span className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase shrink-0">
+        {step}/{total}
+      </span>
+    </div>
+  );
+}
+
+export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [step, setStep] = useState<Step>(1);
+  const [budget, setBudget] = useState("");
+  const [guests, setGuests] = useState<number | null>(null);
+  const [location, setLocation] = useState("");
+  const [preferences, setPreferences] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<AdvisorResult | null>(null);
+  const [error, setError] = useState("");
+
+  const togglePreference = (pref: string) => {
+    setPreferences((prev) =>
+      prev.includes(pref) ? prev.filter((p) => p !== pref) : [...prev, pref]
+    );
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    setError("");
+    const payload: AdvisorPreferences = {
+      budget,
+      guests: guests!,
+      location,
+      preferences,
+    };
+    try {
+      const res = await fetch("/api/villa-advisor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setError(data.error ?? "Er ging iets mis. Probeer het opnieuw.");
+        setLoading(false);
+        return;
+      }
+      setResult(data as AdvisorResult);
+    } catch {
+      setError("Er ging iets mis. Probeer het opnieuw.");
+    }
+    setLoading(false);
+  };
+
+  const reset = () => {
+    setStep(1);
+    setBudget("");
+    setGuests(null);
+    setLocation("");
+    setPreferences([]);
+    setResult(null);
+    setError("");
+  };
+
+  const recommendedVilla = result
+    ? villas.find((v) => v.slug === result.slug)
+    : null;
+
+  return (
+    <section className="py-20 bg-[#131E14] border-y border-[#C9A84C]/10">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8">
+          <div>
+            <p className="text-[#C9A84C] text-xs tracking-[0.4em] uppercase mb-3">
+              Persoonlijk Advies
+            </p>
+            <h2
+              className="text-3xl md:text-5xl font-light text-[#F5F0E8] leading-tight"
+              style={{ fontFamily: "var(--font-cormorant)" }}
+            >
+              Welke villa past
+              <br />
+              <span className="italic text-[#C9A84C]">bij jou?</span>
+            </h2>
+          </div>
+          <p className="text-[#F5F0E8]/50 text-sm max-w-xs leading-relaxed md:text-right">
+            Beantwoord 4 korte vragen en onze AI-adviseur vindt de perfecte villa voor jouw reis.
+          </p>
+        </div>
+
+        {/* Card */}
+        <div className="bg-[#1C2B1E] border border-[#C9A84C]/15 p-8 md:p-12 max-w-2xl">
+          <AnimatePresence mode="wait">
+            {/* Result view */}
+            {result && recommendedVilla ? (
+              <motion.div key="result" variants={fadeUp} initial="hidden" animate="show">
+                <div className="flex items-center gap-2 mb-6">
+                  <span className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase">Jouw perfecte villa</span>
+                </div>
+
+                {/* Villa card */}
+                <div className="group border border-[#C9A84C]/20 hover:border-[#C9A84C]/50 transition-all duration-300 mb-6">
+                  <div className="aspect-[16/7] bg-[#243628] overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={recommendedVilla.images[0]}
+                      alt={recommendedVilla.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3
+                        className="text-2xl font-light text-[#F5F0E8]"
+                        style={{ fontFamily: "var(--font-cormorant)" }}
+                      >
+                        {recommendedVilla.name}
+                      </h3>
+                      <span className="text-[#C9A84C] text-sm font-light shrink-0 ml-4" style={{ fontFamily: "var(--font-cormorant)" }}>
+                        €{recommendedVilla.price_per_night.toLocaleString("nl-NL")}/nacht
+                      </span>
+                    </div>
+                    <p className="text-[#C9A84C]/70 text-xs tracking-wider mb-4">
+                      {recommendedVilla.location} · {recommendedVilla.bedrooms} slaapkamers · max {recommendedVilla.guests_max} gasten
+                    </p>
+
+                    {/* AI reason */}
+                    <div className="bg-[#243628] border border-[#C9A84C]/10 px-4 py-3 mb-5 text-xs text-[#F5F0E8]/60 leading-relaxed italic">
+                      <span className="text-[#C9A84C] not-italic text-[0.6rem] tracking-wider uppercase mr-2 block mb-1">
+                        AI advies
+                      </span>
+                      {result.reason}
+                    </div>
+
+                    <div className="flex gap-3 flex-wrap">
+                      <Link
+                        href={`/villas/${recommendedVilla.slug}`}
+                        className="px-6 py-2.5 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase hover:bg-[#E8C96A] transition-colors duration-300"
+                      >
+                        Bekijk villa
+                      </Link>
+                      <button
+                        onClick={reset}
+                        className="px-6 py-2.5 border border-[#C9A84C]/30 text-[#F5F0E8]/50 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/60 hover:text-[#F5F0E8]/80 transition-colors duration-300"
+                      >
+                        Opnieuw
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ) : loading ? (
+              <motion.div key="loading" variants={fadeUp} initial="hidden" animate="show" className="py-12 text-center">
+                <div className="text-[#C9A84C] text-3xl mb-4">✦</div>
+                <p className="text-[#F5F0E8]/50 text-sm">Jouw perfecte villa wordt gezocht...</p>
+              </motion.div>
+            ) : (
+              <motion.div key={`step-${step}`} variants={fadeUp} initial="hidden" animate="show">
+                <StepIndicator step={step} total={4} />
+
+                {step === 1 && (
+                  <>
+                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">Stap 1</p>
+                    <h3
+                      className="text-2xl font-light text-[#F5F0E8] mb-6"
+                      style={{ fontFamily: "var(--font-cormorant)" }}
+                    >
+                      Wat is jouw budget per nacht?
+                    </h3>
+                    <div className="flex flex-wrap gap-3">
+                      {BUDGET_OPTIONS.map((opt) => (
+                        <OptionButton
+                          key={opt.value}
+                          selected={budget === opt.value}
+                          onClick={() => setBudget(opt.value)}
+                        >
+                          {opt.label}
+                        </OptionButton>
+                      ))}
+                    </div>
+                    <div className="mt-8">
+                      <button
+                        onClick={() => setStep(2)}
+                        disabled={!budget}
+                        className="px-8 py-3 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
+                      >
+                        Volgende
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {step === 2 && (
+                  <>
+                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">Stap 2</p>
+                    <h3
+                      className="text-2xl font-light text-[#F5F0E8] mb-6"
+                      style={{ fontFamily: "var(--font-cormorant)" }}
+                    >
+                      Hoeveel gasten zijn jullie?
+                    </h3>
+                    <div className="flex flex-wrap gap-3">
+                      {GUEST_OPTIONS.map((opt) => (
+                        <OptionButton
+                          key={opt.value}
+                          selected={guests === opt.value}
+                          onClick={() => setGuests(opt.value)}
+                        >
+                          {opt.label} personen
+                        </OptionButton>
+                      ))}
+                    </div>
+                    <div className="mt-8 flex gap-3">
+                      <button
+                        onClick={() => setStep(1)}
+                        className="px-6 py-3 border border-[#C9A84C]/25 text-[#F5F0E8]/50 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/50 transition-colors duration-300"
+                      >
+                        Terug
+                      </button>
+                      <button
+                        onClick={() => setStep(3)}
+                        disabled={guests === null}
+                        className="px-8 py-3 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
+                      >
+                        Volgende
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {step === 3 && (
+                  <>
+                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">Stap 3</p>
+                    <h3
+                      className="text-2xl font-light text-[#F5F0E8] mb-6"
+                      style={{ fontFamily: "var(--font-cormorant)" }}
+                    >
+                      Heb je een locatievoorkeur?
+                    </h3>
+                    <div className="flex flex-wrap gap-3">
+                      {LOCATION_OPTIONS.map((opt) => (
+                        <OptionButton
+                          key={opt.value}
+                          selected={location === opt.value}
+                          onClick={() => setLocation(opt.value)}
+                        >
+                          {opt.label}
+                        </OptionButton>
+                      ))}
+                    </div>
+                    <div className="mt-8 flex gap-3">
+                      <button
+                        onClick={() => setStep(2)}
+                        className="px-6 py-3 border border-[#C9A84C]/25 text-[#F5F0E8]/50 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/50 transition-colors duration-300"
+                      >
+                        Terug
+                      </button>
+                      <button
+                        onClick={() => setStep(4)}
+                        disabled={!location}
+                        className="px-8 py-3 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
+                      >
+                        Volgende
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {step === 4 && (
+                  <>
+                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">Stap 4</p>
+                    <h3
+                      className="text-2xl font-light text-[#F5F0E8] mb-2"
+                      style={{ fontFamily: "var(--font-cormorant)" }}
+                    >
+                      Wat zijn jouw wensen?
+                    </h3>
+                    <p className="text-[#F5F0E8]/35 text-xs mb-6">Selecteer alles wat van toepassing is (optioneel)</p>
+                    <div className="flex flex-wrap gap-3">
+                      {PREFERENCE_OPTIONS.map((opt) => (
+                        <OptionButton
+                          key={opt.value}
+                          selected={preferences.includes(opt.value)}
+                          onClick={() => togglePreference(opt.value)}
+                        >
+                          {opt.label}
+                        </OptionButton>
+                      ))}
+                    </div>
+
+                    {error && (
+                      <p className="mt-4 text-red-400 text-xs">{error}</p>
+                    )}
+
+                    <div className="mt-8 flex gap-3">
+                      <button
+                        onClick={() => setStep(3)}
+                        className="px-6 py-3 border border-[#C9A84C]/25 text-[#F5F0E8]/50 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/50 transition-colors duration-300"
+                      >
+                        Terug
+                      </button>
+                      <button
+                        onClick={handleSubmit}
+                        className="px-8 py-3 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase hover:bg-[#E8C96A] transition-colors duration-300"
+                      >
+                        Zoek mijn villa ✦
+                      </button>
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </section>
+  );
+}

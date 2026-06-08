@@ -4,6 +4,7 @@ import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import type { Villa } from "@/lib/villas-data";
+import VillaAdvisor from "@/components/VillaAdvisor";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -70,6 +71,9 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
           ))}
         </div>
       </section>
+
+      {/* AI Advisor */}
+      <VillaAdvisor villas={villas} />
 
       {/* Villas grid */}
       <section className="py-28 max-w-7xl mx-auto px-6">
