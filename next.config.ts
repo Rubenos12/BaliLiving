@@ -9,6 +9,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  transpilePackages: ["gsap", "lucide-react"],
   async headers() {
     return [
       {
