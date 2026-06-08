@@ -16,14 +16,56 @@ const stagger: Variants = {
   show: { transition: { staggerChildren: 0.12 } },
 };
 
-const FILTERS = ["Alle Villa's", "Ubud", "Seminyak", "Canggu", "Uluwatu", "Nusa Dua"];
+const REGION_FILTERS = ["Alle Villa's", "Ubud", "Seminyak", "Canggu", "Uluwatu", "Nusa Dua"];
+
+// Mood-based filters mapped to amenity keywords or tags
+const EXPERIENCE_FILTERS: { label: string; match: (v: Villa) => boolean }[] = [
+  {
+    label: "Privé zwembad",
+    match: (v) => v.amenities.some((a) => /zwembad|pool/i.test(a)),
+  },
+  {
+    label: "Beachfront",
+    match: (v) => v.amenities.some((a) => /strand|beach|oceaan/i.test(a)) || /strand|beach/i.test(v.tag),
+  },
+  {
+    label: "Romantisch",
+    match: (v) =>
+      /romantisch|koppel|romantic/i.test(v.tag) ||
+      v.amenities.some((a) => /champagne|spa|bad|romantisch/i.test(a)),
+  },
+  {
+    label: "Gezin",
+    match: (v) =>
+      /gezin|family/i.test(v.tag) ||
+      v.amenities.some((a) => /kind|baby|gezin|child/i.test(a)),
+  },
+  {
+    label: "Eco & natuur",
+    match: (v) =>
+      /eco|natuur|jungle|duurzaam/i.test(v.tag) ||
+      v.amenities.some((a) => /jungle|yoga|eco|organic|organisch|bamboe/i.test(a)),
+  },
+  {
+    label: "Grote groep",
+    match: (v) => v.guests_max >= 8,
+  },
+];
 
 export default function VillasClient({ villas }: { villas: Villa[] }) {
-  const [activeFilter, setActiveFilter] = useState("Alle Villa's");
+  const [activeRegion, setActiveRegion] = useState("Alle Villa's");
+  const [activeExperience, setActiveExperience] = useState("");
 
-  const filtered = activeFilter === "Alle Villa's"
-    ? villas
-    : villas.filter((v) => v.region === activeFilter);
+  const filtered = villas.filter((v) => {
+    const regionMatch =
+      activeRegion === "Alle Villa's" || v.region === activeRegion;
+    const expFilter = EXPERIENCE_FILTERS.find((f) => f.label === activeExperience);
+    const expMatch = !activeExperience || (expFilter ? expFilter.match(v) : true);
+    return regionMatch && expMatch;
+  });
+
+  // Keep a single active filter alias for display
+  const activeFilter = activeExperience || activeRegion;
 
   return (
     <>
@@ -54,19 +96,41 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
       </section>
 
       {/* Filter bar */}
-      <section className="bg-[#1C2B1E] border-y border-[#C9A84C]/15 py-5">
-        <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-3">
-          {FILTERS.map((f) => (
+      <section className="bg-[#1C2B1E] border-y border-[#C9A84C]/15 py-5 space-y-3">
+        {/* Region filters */}
+        <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-2">
+          {REGION_FILTERS.map((f) => (
             <button
               key={f}
-              onClick={() => setActiveFilter(f)}
-              className={`text-xs tracking-[0.2em] uppercase px-5 py-2.5 md:py-2 transition-all duration-300 ${
-                activeFilter === f
+              onClick={() => { setActiveRegion(f); setActiveExperience(""); }}
+              className={`text-xs tracking-[0.2em] uppercase px-5 py-2 transition-all duration-300 ${
+                activeRegion === f && !activeExperience
                   ? "bg-[#C9A84C] text-[#1C2B1E]"
                   : "text-[#F5F0E8]/50 border border-[#F5F0E8]/10 hover:border-[#C9A84C]/50 hover:text-[#C9A84C]"
               }`}
             >
               {f}
+            </button>
+          ))}
+        </div>
+        {/* Experience / mood filters */}
+        <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-2 border-t border-[#C9A84C]/10 pt-3">
+          <span className="text-[#F5F0E8]/25 text-[0.6rem] tracking-[0.25em] uppercase self-center mr-1 shrink-0">
+            Sfeer
+          </span>
+          {EXPERIENCE_FILTERS.map((f) => (
+            <button
+              key={f.label}
+              onClick={() =>
+                setActiveExperience((prev) => (prev === f.label ? "" : f.label))
+              }
+              className={`text-xs tracking-[0.15em] uppercase px-4 py-1.5 transition-all duration-300 border ${
+                activeExperience === f.label
+                  ? "bg-[#C9A84C]/20 border-[#C9A84C]/60 text-[#C9A84C]"
+                  : "border-[#C9A84C]/15 text-[#F5F0E8]/40 hover:border-[#C9A84C]/40 hover:text-[#C9A84C]/80"
+              }`}
+            >
+              {f.label}
             </button>
           ))}
         </div>
@@ -79,11 +143,11 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
       <section className="py-28 max-w-7xl mx-auto px-6">
         {filtered.length === 0 ? (
           <div className="text-center py-20 text-[#F5F0E8]/30 text-sm">
-            Geen villa&apos;s gevonden voor {activeFilter}
+            Geen villa&apos;s gevonden voor {activeExperience || activeRegion}
           </div>
         ) : (
           <motion.div
-            key={activeFilter}
+            key={`${activeRegion}-${activeExperience}`}
             initial="hidden"
             animate="show"
             variants={stagger}

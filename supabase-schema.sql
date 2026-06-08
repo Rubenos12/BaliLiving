@@ -296,6 +296,8 @@ CREATE TABLE IF NOT EXISTS transfer_requests (
   ai_recommendation     text NOT NULL DEFAULT '',
   estimated_travel_time text NOT NULL DEFAULT '',
   status                text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'rejected')),
+  price_quoted          integer,
+  price_type            text CHECK (price_type IN ('per_person', 'total')),
   created_at            timestamptz NOT NULL DEFAULT now()
 );
 
@@ -344,4 +346,42 @@ CREATE POLICY "Auth users can read contact inquiries"
 
 CREATE POLICY "Auth users can update contact inquiries"
   ON contact_inquiries FOR UPDATE
+  USING (auth.role() = 'authenticated');
+
+-- ============================================================
+-- Villa Reviews table (guest reviews per villa)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS villa_reviews (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  villa_slug      text NOT NULL,
+  booking_id      uuid REFERENCES bookings(id) ON DELETE SET NULL,
+  reviewer_name   text NOT NULL,
+  reviewer_email  text NOT NULL,
+  rating          smallint NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  review_text     text NOT NULL,
+  published       boolean NOT NULL DEFAULT false,
+  created_at      timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS villa_reviews_slug_idx ON villa_reviews (villa_slug);
+
+ALTER TABLE villa_reviews ENABLE ROW LEVEL SECURITY;
+
+-- Anyone can read published reviews
+CREATE POLICY "Public read published reviews"
+  ON villa_reviews FOR SELECT
+  USING (published = true);
+
+-- Anyone can submit a review
+CREATE POLICY "Anyone can create review"
+  ON villa_reviews FOR INSERT
+  WITH CHECK (true);
+
+-- Only authenticated users (admin) can update/publish reviews
+CREATE POLICY "Auth users can update reviews"
+  ON villa_reviews FOR UPDATE
+  USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Auth users can delete reviews"
+  ON villa_reviews FOR DELETE
   USING (auth.role() = 'authenticated');

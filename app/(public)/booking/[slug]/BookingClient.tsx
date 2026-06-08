@@ -292,21 +292,35 @@ export default function BookingClient({
               </div>
             </motion.div>
 
-            {/* Price summary */}
+            {/* Price breakdown — Airbnb-style transparency */}
             {nights > 0 && (
               <motion.div variants={fadeUp} className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-6 mb-6">
-                <div className="flex justify-between text-sm text-[#F5F0E8]/60 mb-2">
-                  <span>€{villa.price_per_night} × {nights} nachten</span>
-                  <span>€{total.toLocaleString("nl-NL")}</span>
+                <p className="text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-4">
+                  Prijsoverzicht
+                </p>
+                <div className="space-y-2.5 mb-4">
+                  <div className="flex justify-between text-sm text-[#F5F0E8]/65">
+                    <span>
+                      €{villa.price_per_night.toLocaleString("nl-NL")} × {nights} {nights === 1 ? "nacht" : "nachten"}
+                    </span>
+                    <span>€{total.toLocaleString("nl-NL")}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-[#F5F0E8]/65">
+                    <span>Servicekosten</span>
+                    <span className="text-[#F5F0E8]/35 italic text-xs self-center">Na bevestiging</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm font-medium text-[#F5F0E8] border-t border-[#C9A84C]/15 pt-3 mt-3">
-                  <span>Totaalbedrag</span>
-                  <span className="text-[#C9A84C] text-lg" style={{ fontFamily: "var(--font-cormorant)" }}>
+                <div className="flex justify-between text-sm font-medium text-[#F5F0E8] border-t border-[#C9A84C]/15 pt-3">
+                  <span>Totaal accommodatie</span>
+                  <span
+                    className="text-[#C9A84C] text-xl font-light"
+                    style={{ fontFamily: "var(--font-cormorant)" }}
+                  >
                     €{total.toLocaleString("nl-NL")}
                   </span>
                 </div>
-                <p className="text-[#F5F0E8]/30 text-xs mt-2">
-                  Je wordt nog niets in rekening gebracht. Betaling na bevestiging.
+                <p className="text-[#F5F0E8]/30 text-[0.65rem] mt-3 leading-relaxed">
+                  Geen betaling nu — Edwin & Citty bevestigen jouw aanvraag binnen 24 uur.
                 </p>
               </motion.div>
             )}

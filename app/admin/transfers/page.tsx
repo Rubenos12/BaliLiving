@@ -19,6 +19,8 @@ type TransferRequest = {
   ai_recommendation: string;
   estimated_travel_time: string;
   status: "pending" | "confirmed" | "rejected";
+  price_quoted: number | null;
+  price_type: "per_person" | "total" | null;
   created_at: string;
 };
 
@@ -60,6 +62,7 @@ export default function AdminTransferRequestsPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [prices, setPrices] = useState<Record<string, { amount: string; type: "per_person" | "total" }>>({});
 
   const fetchRequests = useCallback(async () => {
     const supabase = createClient();
@@ -104,12 +107,39 @@ export default function AdminTransferRequestsPage() {
     };
   }, []);
 
+  const getPriceForRequest = (id: string) =>
+    prices[id] ?? { amount: "", type: "total" as const };
+
+  const setPriceField = (id: string, field: "amount" | "type", value: string) => {
+    setPrices((prev) => ({
+      ...prev,
+      [id]: { ...getPriceForRequest(id), [field]: value },
+    }));
+  };
+
   const handleStatus = async (id: string, status: "confirmed" | "rejected") => {
     setLoadingId(id + status);
-    const result = await updateTransferRequestStatus(id, status);
+    const priceData = prices[id];
+    const priceQuoted = priceData?.amount ? parseInt(priceData.amount, 10) : undefined;
+    const priceType = priceData?.type;
+    const result = await updateTransferRequestStatus(
+      id,
+      status,
+      status === "confirmed" && priceQuoted ? priceQuoted : undefined,
+      status === "confirmed" && priceType ? priceType : undefined
+    );
     if (!result.error) {
       setRequests((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, status } : r))
+        prev.map((r) =>
+          r.id === id
+            ? {
+                ...r,
+                status,
+                price_quoted: status === "confirmed" && priceQuoted ? priceQuoted : r.price_quoted,
+                price_type: status === "confirmed" && priceType ? priceType : r.price_type,
+              }
+            : r
+        )
       );
     }
     setLoadingId(null);
@@ -261,23 +291,71 @@ export default function AdminTransferRequestsPage() {
 
               {/* Actions */}
               {req.status === "pending" && (
-                <div className="flex gap-2 flex-wrap">
-                  <button
-                    onClick={() => handleStatus(req.id, "confirmed")}
-                    disabled={loadingId === req.id + "confirmed"}
-                    className="px-4 py-2 bg-green-400/10 border border-green-400/30 text-green-400 text-[0.6rem] tracking-wider uppercase hover:bg-green-400/20 transition-colors disabled:opacity-50"
-                  >
-                    {loadingId === req.id + "confirmed"
-                      ? "..."
-                      : "Bevestigen"}
-                  </button>
-                  <button
-                    onClick={() => handleStatus(req.id, "rejected")}
-                    disabled={loadingId === req.id + "rejected"}
-                    className="px-4 py-2 bg-red-400/10 border border-red-400/30 text-red-400 text-[0.6rem] tracking-wider uppercase hover:bg-red-400/20 transition-colors disabled:opacity-50"
-                  >
-                    {loadingId === req.id + "rejected" ? "..." : "Afwijzen"}
-                  </button>
+                <div className="space-y-3">
+                  {/* Price input */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[#F5F0E8]/30 text-[0.6rem] tracking-wider uppercase shrink-0">Prijs</span>
+                    <div className="flex items-center gap-1 bg-[#243628] border border-[#C9A84C]/15 px-3 py-1.5">
+                      <span className="text-[#C9A84C] text-xs">€</span>
+                      <input
+                        type="number"
+                        min="0"
+                        value={getPriceForRequest(req.id).amount}
+                        onChange={(e) => setPriceField(req.id, "amount", e.target.value)}
+                        placeholder="0"
+                        className="w-20 bg-transparent text-[#F5F0E8] text-xs focus:outline-none"
+                      />
+                    </div>
+                    {/* Type toggle */}
+                    <div className="flex">
+                      {(["per_person", "total"] as const).map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setPriceField(req.id, "type", t)}
+                          className={`px-3 py-1.5 text-[0.6rem] tracking-wider uppercase border transition-colors ${
+                            getPriceForRequest(req.id).type === t
+                              ? "bg-[#C9A84C]/20 border-[#C9A84C]/50 text-[#C9A84C]"
+                              : "border-[#C9A84C]/15 text-[#F5F0E8]/35 hover:text-[#F5F0E8]/60"
+                          }`}
+                        >
+                          {t === "per_person" ? "p.p." : "totaal"}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Calculated total */}
+                    {getPriceForRequest(req.id).amount && getPriceForRequest(req.id).type === "per_person" && (
+                      <span className="text-[#C9A84C] text-xs">
+                        = €{(parseInt(getPriceForRequest(req.id).amount || "0", 10) * req.passengers).toLocaleString("nl-NL")} totaal
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    <button
+                      onClick={() => handleStatus(req.id, "confirmed")}
+                      disabled={loadingId === req.id + "confirmed"}
+                      className="px-4 py-2 bg-green-400/10 border border-green-400/30 text-green-400 text-[0.6rem] tracking-wider uppercase hover:bg-green-400/20 transition-colors disabled:opacity-50"
+                    >
+                      {loadingId === req.id + "confirmed" ? "..." : "Bevestigen"}
+                    </button>
+                    <button
+                      onClick={() => handleStatus(req.id, "rejected")}
+                      disabled={loadingId === req.id + "rejected"}
+                      className="px-4 py-2 bg-red-400/10 border border-red-400/30 text-red-400 text-[0.6rem] tracking-wider uppercase hover:bg-red-400/20 transition-colors disabled:opacity-50"
+                    >
+                      {loadingId === req.id + "rejected" ? "..." : "Afwijzen"}
+                    </button>
+                  </div>
+                </div>
+              )}
+              {/* Show quoted price for confirmed requests */}
+              {req.status === "confirmed" && req.price_quoted && (
+                <div className="text-xs text-[#F5F0E8]/40 mt-1">
+                  Gecalculeerde prijs: <span className="text-[#C9A84C]">€{req.price_quoted.toLocaleString("nl-NL")}</span>
+                  {req.price_type === "per_person" && (
+                    <span className="ml-1">p.p. (= €{(req.price_quoted * req.passengers).toLocaleString("nl-NL")} totaal)</span>
+                  )}
+                  {req.price_type === "total" && <span className="ml-1">totaal</span>}
                 </div>
               )}
 

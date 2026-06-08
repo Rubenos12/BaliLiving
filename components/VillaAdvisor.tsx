@@ -7,8 +7,8 @@ import type { Villa } from "@/lib/villas-data";
 import type { AdvisorPreferences, AdvisorResult } from "@/app/api/villa-advisor/route";
 
 const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
 };
 
 const BUDGET_OPTIONS = [
@@ -19,10 +19,10 @@ const BUDGET_OPTIONS = [
 ];
 
 const GUEST_OPTIONS = [
-  { value: 1, label: "1–2" },
-  { value: 3, label: "3–4" },
-  { value: 5, label: "5–8" },
-  { value: 9, label: "9+" },
+  { value: 1, label: "1–2 personen" },
+  { value: 3, label: "3–4 personen" },
+  { value: 5, label: "5–8 personen" },
+  { value: 9, label: "9+ personen" },
 ];
 
 const LOCATION_OPTIONS = [
@@ -49,6 +49,7 @@ const PREFERENCE_OPTIONS = [
 
 type Step = 1 | 2 | 3 | 4;
 
+// Full-width tap-friendly option button
 function OptionButton({
   selected,
   onClick,
@@ -62,10 +63,10 @@ function OptionButton({
     <button
       type="button"
       onClick={onClick}
-      className={`px-5 py-2.5 text-xs tracking-[0.2em] uppercase border transition-all duration-200 ${
+      className={`min-h-[48px] px-4 py-3 text-sm tracking-[0.15em] uppercase border transition-all duration-200 text-left ${
         selected
           ? "bg-[#C9A84C] text-[#1C2B1E] border-[#C9A84C]"
-          : "border-[#C9A84C]/25 text-[#F5F0E8]/60 hover:border-[#C9A84C]/60 hover:text-[#F5F0E8]/90"
+          : "border-[#C9A84C]/25 text-[#F5F0E8]/70 hover:border-[#C9A84C]/60 hover:text-[#F5F0E8]/90"
       }`}
     >
       {children}
@@ -75,24 +76,23 @@ function OptionButton({
 
 function StepIndicator({ step, total }: { step: Step; total: number }) {
   return (
-    <div className="flex items-center gap-2 mb-8">
+    <div className="flex items-center gap-2 mb-7">
       {Array.from({ length: total }, (_, i) => (
         <div
           key={i}
-          className={`h-px flex-1 transition-all duration-300 ${
+          className={`h-0.5 flex-1 transition-all duration-300 ${
             i < step ? "bg-[#C9A84C]" : "bg-[#C9A84C]/20"
           }`}
         />
       ))}
       <span className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase shrink-0">
-        {step}/{total}
+        {step} / {total}
       </span>
     </div>
   );
 }
 
 export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
-  const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<Step>(1);
   const [budget, setBudget] = useState("");
   const [guests, setGuests] = useState<number | null>(null);
@@ -146,46 +146,42 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
     setError("");
   };
 
-  const recommendedVilla = result
-    ? villas.find((v) => v.slug === result.slug)
-    : null;
+  const recommendedVilla = result ? villas.find((v) => v.slug === result.slug) : null;
 
   return (
-    <section className="py-20 bg-[#131E14] border-y border-[#C9A84C]/10">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8">
-          <div>
-            <p className="text-[#C9A84C] text-xs tracking-[0.4em] uppercase mb-3">
-              Persoonlijk Advies
-            </p>
+    <section className="py-16 md:py-20 bg-[#131E14] border-y border-[#C9A84C]/10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        {/* Header — compact on mobile */}
+        <div className="mb-6 md:mb-8">
+          <p className="text-[#C9A84C] text-xs tracking-[0.4em] uppercase mb-2">
+            Persoonlijk Advies
+          </p>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
             <h2
               className="text-3xl md:text-5xl font-light text-[#F5F0E8] leading-tight"
               style={{ fontFamily: "var(--font-cormorant)" }}
             >
-              Welke villa past
-              <br />
+              Welke villa past{" "}
               <span className="italic text-[#C9A84C]">bij jou?</span>
             </h2>
+            <p className="text-[#F5F0E8]/45 text-sm max-w-xs leading-relaxed sm:text-right hidden sm:block">
+              Beantwoord 4 korte vragen en onze AI-adviseur vindt de perfecte villa voor jouw reis.
+            </p>
           </div>
-          <p className="text-[#F5F0E8]/50 text-sm max-w-xs leading-relaxed md:text-right">
-            Beantwoord 4 korte vragen en onze AI-adviseur vindt de perfecte villa voor jouw reis.
-          </p>
         </div>
 
-        {/* Card */}
-        <div className="bg-[#1C2B1E] border border-[#C9A84C]/15 p-8 md:p-12 max-w-2xl">
+        {/* Card — full width on mobile, max-2xl on larger */}
+        <div className="bg-[#1C2B1E] border border-[#C9A84C]/15 p-5 sm:p-8 md:p-10 max-w-2xl">
           <AnimatePresence mode="wait">
-            {/* Result view */}
+            {/* Result */}
             {result && recommendedVilla ? (
               <motion.div key="result" variants={fadeUp} initial="hidden" animate="show">
-                <div className="flex items-center gap-2 mb-6">
-                  <span className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase">Jouw perfecte villa</span>
-                </div>
+                <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-5">
+                  Jouw perfecte villa
+                </p>
 
-                {/* Villa card */}
-                <div className="group border border-[#C9A84C]/20 hover:border-[#C9A84C]/50 transition-all duration-300 mb-6">
-                  <div className="aspect-[16/7] bg-[#243628] overflow-hidden">
+                <div className="group border border-[#C9A84C]/20 hover:border-[#C9A84C]/50 transition-all duration-300 mb-5">
+                  <div className="aspect-[16/9] bg-[#243628] overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={recommendedVilla.images[0]}
@@ -193,15 +189,18 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                   </div>
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-2">
+                  <div className="p-4 sm:p-6">
+                    <div className="flex items-start justify-between gap-2 mb-1">
                       <h3
-                        className="text-2xl font-light text-[#F5F0E8]"
+                        className="text-xl sm:text-2xl font-light text-[#F5F0E8]"
                         style={{ fontFamily: "var(--font-cormorant)" }}
                       >
                         {recommendedVilla.name}
                       </h3>
-                      <span className="text-[#C9A84C] text-sm font-light shrink-0 ml-4" style={{ fontFamily: "var(--font-cormorant)" }}>
+                      <span
+                        className="text-[#C9A84C] text-sm font-light shrink-0"
+                        style={{ fontFamily: "var(--font-cormorant)" }}
+                      >
                         €{recommendedVilla.price_per_night.toLocaleString("nl-NL")}/nacht
                       </span>
                     </div>
@@ -209,34 +208,34 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                       {recommendedVilla.location} · {recommendedVilla.bedrooms} slaapkamers · max {recommendedVilla.guests_max} gasten
                     </p>
 
-                    {/* AI reason */}
-                    <div className="bg-[#243628] border border-[#C9A84C]/10 px-4 py-3 mb-5 text-xs text-[#F5F0E8]/60 leading-relaxed italic">
-                      <span className="text-[#C9A84C] not-italic text-[0.6rem] tracking-wider uppercase mr-2 block mb-1">
+                    <div className="bg-[#243628] border border-[#C9A84C]/10 px-4 py-3 mb-5 text-sm text-[#F5F0E8]/60 leading-relaxed italic">
+                      <span className="text-[#C9A84C] not-italic text-[0.6rem] tracking-wider uppercase block mb-1">
                         AI advies
                       </span>
                       {result.reason}
                     </div>
 
-                    <div className="flex gap-3 flex-wrap">
+                    {/* Stacked buttons on mobile */}
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <Link
                         href={`/villas/${recommendedVilla.slug}`}
-                        className="px-6 py-2.5 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase hover:bg-[#E8C96A] transition-colors duration-300"
+                        className="w-full sm:w-auto text-center px-6 py-3 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase hover:bg-[#E8C96A] transition-colors duration-300"
                       >
                         Bekijk villa
                       </Link>
                       <button
                         onClick={reset}
-                        className="px-6 py-2.5 border border-[#C9A84C]/30 text-[#F5F0E8]/50 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/60 hover:text-[#F5F0E8]/80 transition-colors duration-300"
+                        className="w-full sm:w-auto px-6 py-3 border border-[#C9A84C]/30 text-[#F5F0E8]/55 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/60 hover:text-[#F5F0E8]/80 transition-colors duration-300"
                       >
-                        Opnieuw
+                        Opnieuw zoeken
                       </button>
                     </div>
                   </div>
                 </div>
               </motion.div>
             ) : loading ? (
-              <motion.div key="loading" variants={fadeUp} initial="hidden" animate="show" className="py-12 text-center">
-                <div className="text-[#C9A84C] text-3xl mb-4">✦</div>
+              <motion.div key="loading" variants={fadeUp} initial="hidden" animate="show" className="py-14 text-center">
+                <div className="text-[#C9A84C] text-4xl mb-4 animate-pulse">✦</div>
                 <p className="text-[#F5F0E8]/50 text-sm">Jouw perfecte villa wordt gezocht...</p>
               </motion.div>
             ) : (
@@ -245,14 +244,15 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
 
                 {step === 1 && (
                   <>
-                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">Stap 1</p>
+                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-1">Stap 1</p>
                     <h3
-                      className="text-2xl font-light text-[#F5F0E8] mb-6"
+                      className="text-xl sm:text-2xl font-light text-[#F5F0E8] mb-5"
                       style={{ fontFamily: "var(--font-cormorant)" }}
                     >
                       Wat is jouw budget per nacht?
                     </h3>
-                    <div className="flex flex-wrap gap-3">
+                    {/* 2-col grid on mobile, flex-wrap on sm+ */}
+                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
                       {BUDGET_OPTIONS.map((opt) => (
                         <OptionButton
                           key={opt.value}
@@ -263,13 +263,13 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                         </OptionButton>
                       ))}
                     </div>
-                    <div className="mt-8">
+                    <div className="mt-6">
                       <button
                         onClick={() => setStep(2)}
                         disabled={!budget}
-                        className="px-8 py-3 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
+                        className="w-full sm:w-auto px-8 py-3.5 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
                       >
-                        Volgende
+                        Volgende →
                       </button>
                     </div>
                   </>
@@ -277,37 +277,37 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
 
                 {step === 2 && (
                   <>
-                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">Stap 2</p>
+                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-1">Stap 2</p>
                     <h3
-                      className="text-2xl font-light text-[#F5F0E8] mb-6"
+                      className="text-xl sm:text-2xl font-light text-[#F5F0E8] mb-5"
                       style={{ fontFamily: "var(--font-cormorant)" }}
                     >
                       Hoeveel gasten zijn jullie?
                     </h3>
-                    <div className="flex flex-wrap gap-3">
+                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
                       {GUEST_OPTIONS.map((opt) => (
                         <OptionButton
                           key={opt.value}
                           selected={guests === opt.value}
                           onClick={() => setGuests(opt.value)}
                         >
-                          {opt.label} personen
+                          {opt.label}
                         </OptionButton>
                       ))}
                     </div>
-                    <div className="mt-8 flex gap-3">
+                    <div className="mt-6 flex gap-3">
                       <button
                         onClick={() => setStep(1)}
-                        className="px-6 py-3 border border-[#C9A84C]/25 text-[#F5F0E8]/50 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/50 transition-colors duration-300"
+                        className="flex-1 sm:flex-none px-5 py-3.5 border border-[#C9A84C]/25 text-[#F5F0E8]/55 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/50 transition-colors duration-300"
                       >
-                        Terug
+                        ← Terug
                       </button>
                       <button
                         onClick={() => setStep(3)}
                         disabled={guests === null}
-                        className="px-8 py-3 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
+                        className="flex-1 sm:flex-none px-8 py-3.5 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
                       >
-                        Volgende
+                        Volgende →
                       </button>
                     </div>
                   </>
@@ -315,14 +315,14 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
 
                 {step === 3 && (
                   <>
-                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">Stap 3</p>
+                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-1">Stap 3</p>
                     <h3
-                      className="text-2xl font-light text-[#F5F0E8] mb-6"
+                      className="text-xl sm:text-2xl font-light text-[#F5F0E8] mb-5"
                       style={{ fontFamily: "var(--font-cormorant)" }}
                     >
                       Heb je een locatievoorkeur?
                     </h3>
-                    <div className="flex flex-wrap gap-3">
+                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
                       {LOCATION_OPTIONS.map((opt) => (
                         <OptionButton
                           key={opt.value}
@@ -333,19 +333,19 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                         </OptionButton>
                       ))}
                     </div>
-                    <div className="mt-8 flex gap-3">
+                    <div className="mt-6 flex gap-3">
                       <button
                         onClick={() => setStep(2)}
-                        className="px-6 py-3 border border-[#C9A84C]/25 text-[#F5F0E8]/50 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/50 transition-colors duration-300"
+                        className="flex-1 sm:flex-none px-5 py-3.5 border border-[#C9A84C]/25 text-[#F5F0E8]/55 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/50 transition-colors duration-300"
                       >
-                        Terug
+                        ← Terug
                       </button>
                       <button
                         onClick={() => setStep(4)}
                         disabled={!location}
-                        className="px-8 py-3 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
+                        className="flex-1 sm:flex-none px-8 py-3.5 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase disabled:opacity-30 hover:bg-[#E8C96A] transition-colors duration-300"
                       >
-                        Volgende
+                        Volgende →
                       </button>
                     </div>
                   </>
@@ -353,15 +353,16 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
 
                 {step === 4 && (
                   <>
-                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-2">Stap 4</p>
+                    <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.3em] uppercase mb-1">Stap 4</p>
                     <h3
-                      className="text-2xl font-light text-[#F5F0E8] mb-2"
+                      className="text-xl sm:text-2xl font-light text-[#F5F0E8] mb-1"
                       style={{ fontFamily: "var(--font-cormorant)" }}
                     >
                       Wat zijn jouw wensen?
                     </h3>
-                    <p className="text-[#F5F0E8]/35 text-xs mb-6">Selecteer alles wat van toepassing is (optioneel)</p>
-                    <div className="flex flex-wrap gap-3">
+                    <p className="text-[#F5F0E8]/35 text-xs mb-5">Selecteer alles wat van toepassing is (optioneel)</p>
+                    {/* 2-col grid keeps preference chips readable on mobile */}
+                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
                       {PREFERENCE_OPTIONS.map((opt) => (
                         <OptionButton
                           key={opt.value}
@@ -377,18 +378,18 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                       <p className="mt-4 text-red-400 text-xs">{error}</p>
                     )}
 
-                    <div className="mt-8 flex gap-3">
+                    <div className="mt-6 flex gap-3">
                       <button
                         onClick={() => setStep(3)}
-                        className="px-6 py-3 border border-[#C9A84C]/25 text-[#F5F0E8]/50 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/50 transition-colors duration-300"
+                        className="flex-1 sm:flex-none px-5 py-3.5 border border-[#C9A84C]/25 text-[#F5F0E8]/55 text-xs tracking-[0.2em] uppercase hover:border-[#C9A84C]/50 transition-colors duration-300"
                       >
-                        Terug
+                        ← Terug
                       </button>
                       <button
                         onClick={handleSubmit}
-                        className="px-8 py-3 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase hover:bg-[#E8C96A] transition-colors duration-300"
+                        className="flex-1 sm:flex-none px-8 py-3.5 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase hover:bg-[#E8C96A] transition-colors duration-300"
                       >
-                        Zoek mijn villa ✦
+                        Zoek villa ✦
                       </button>
                     </div>
                   </>

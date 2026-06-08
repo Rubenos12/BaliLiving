@@ -4,6 +4,8 @@ import { motion, Variants, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import type { Villa } from "@/lib/villas-data";
+import VillaReviews from "@/components/VillaReviews";
+import type { VillaReview } from "@/lib/actions/reviews";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
@@ -198,7 +200,17 @@ function BookingWidget({ villa }: { villa: Villa }) {
   );
 }
 
-export default function VillaDetailClient({ villa }: { villa: Villa }) {
+export default function VillaDetailClient({
+  villa,
+  initialReviews = [],
+  averageRating = 0,
+  reviewCount = 0,
+}: {
+  villa: Villa;
+  initialReviews?: VillaReview[];
+  averageRating?: number;
+  reviewCount?: number;
+}) {
   return (
     <>
       {/* Breadcrumb */}
@@ -261,6 +273,16 @@ export default function VillaDetailClient({ villa }: { villa: Villa }) {
                       ? `${villa.guests_max} gasten`
                       : `${villa.guests_min}–${villa.guests_max} gasten`}
                   </span>
+                  {reviewCount > 0 && (
+                    <>
+                      <span className="text-[#C9A84C]/30">·</span>
+                      <a href="#reviews" className="flex items-center gap-1 text-[#C9A84C] hover:text-[#E8C96A] transition-colors">
+                        <span className="text-[#C9A84C]">★</span>
+                        <span>{averageRating.toFixed(1)}</span>
+                        <span className="text-[#F5F0E8]/35">({reviewCount})</span>
+                      </a>
+                    </>
+                  )}
                 </div>
               </motion.div>
 
@@ -349,6 +371,16 @@ export default function VillaDetailClient({ villa }: { villa: Villa }) {
                     </Link>
                   </div>
                 </div>
+              </motion.div>
+
+              {/* Reviews */}
+              <motion.div variants={fadeUp} className="mt-8">
+                <VillaReviews
+                  villaSlug={villa.slug}
+                  initialReviews={initialReviews}
+                  averageRating={averageRating}
+                  reviewCount={reviewCount}
+                />
               </motion.div>
             </motion.div>
           </div>
