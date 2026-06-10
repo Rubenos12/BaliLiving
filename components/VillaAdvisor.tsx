@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import Link from "next/link";
 import type { Villa } from "@/lib/villas-data";
@@ -108,8 +108,25 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
   const [location, setLocation] = useState("");
   const [preferences, setPreferences] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
   const [result, setResult] = useState<AdvisorResult | null>(null);
   const [error, setError] = useState("");
+
+  const LOADING_MESSAGES = [
+    "Villa's worden geanalyseerd...",
+    "Perfecte matches worden gezocht...",
+    "Aanbeveling wordt samengesteld...",
+  ];
+
+  useEffect(() => {
+    if (!loading) return;
+    setLoadingMsgIdx(0);
+    const interval = setInterval(() => {
+      setLoadingMsgIdx((i) => (i + 1) % LOADING_MESSAGES.length);
+    }, 1600);
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
 
   const togglePreference = (pref: string) => {
     setPreferences((prev) =>
@@ -198,6 +215,7 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                       src={recommendedVilla.images[0]}
                       alt={recommendedVilla.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }}
                     />
                   </div>
                   <div className="p-4 sm:p-6">
@@ -296,8 +314,27 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
               </motion.div>
             ) : loading ? (
               <motion.div key="loading" variants={fadeUp} initial="hidden" animate="show" className="py-14 text-center">
-                <div className="text-[#C9A84C] text-4xl mb-4 animate-pulse">✦</div>
-                <p className="text-[#F5F0E8]/50 text-sm">Jouw perfecte villa wordt gezocht...</p>
+                <div className="text-[#C9A84C] text-4xl mb-5 animate-pulse">✦</div>
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={loadingMsgIdx}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.35 }}
+                    className="text-[#F5F0E8]/50 text-sm tracking-wide"
+                  >
+                    {LOADING_MESSAGES[loadingMsgIdx]}
+                  </motion.p>
+                </AnimatePresence>
+                <div className="flex justify-center gap-1 mt-5">
+                  {LOADING_MESSAGES.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`h-0.5 w-6 transition-all duration-300 ${i === loadingMsgIdx ? "bg-[#C9A84C]" : "bg-[#C9A84C]/20"}`}
+                    />
+                  ))}
+                </div>
               </motion.div>
             ) : (
               <motion.div key={`step-${step}`} variants={fadeUp} initial="hidden" animate="show">

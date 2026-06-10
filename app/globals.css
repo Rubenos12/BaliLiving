@@ -156,6 +156,20 @@ a, button {
   100% { transform: scale(1.06); }
 }
 
+/* Broken image fallback — shown when <img> fails to load */
+.img-fallback {
+  background: linear-gradient(135deg, #1C2B1E 0%, #0F1A10 100%);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.img-fallback::after {
+  content: "✦";
+  color: rgba(201, 168, 76, 0.25);
+  font-size: 2.5rem;
+  pointer-events: none;
+}
+
 /* Hero entrance — fade up with fill-mode both */
 @keyframes hero-rise {
   from { opacity: 0; transform: translateY(30px); }

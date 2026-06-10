@@ -145,6 +145,7 @@ export default function ToursClient({ dbTours }: { dbTours: DbTour[] }) {
                       src={tour.image_url}
                       alt={tour.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }}
                     />
                   ) : (
                     <div className="w-full h-full bg-[#243628]" />
@@ -207,6 +208,7 @@ export default function ToursClient({ dbTours }: { dbTours: DbTour[] }) {
                     src={tour.image}
                     alt={tour.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1C2B1E] via-[#1C2B1E]/20 to-transparent pointer-events-none" />
                   <div className="absolute top-4 left-4">

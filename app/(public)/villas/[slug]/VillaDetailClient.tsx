@@ -2,7 +2,7 @@
 
 import { motion, Variants, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { Villa } from "@/lib/villas-data";
 import VillaReviews from "@/components/VillaReviews";
 import type { VillaReview } from "@/lib/actions/reviews";
@@ -20,30 +20,44 @@ const stagger: Variants = {
 function Gallery({ images, name }: { images: string[]; name: string }) {
   const [active, setActive] = useState(0);
   const count = images.length;
+  const touchStartX = useRef<number | null>(null);
+
+  const prev = () => setActive((a) => (a - 1 + count) % count);
+  const next = () => setActive((a) => (a + 1) % count);
 
   return (
     <div className="relative">
       {/* Main image */}
-      <div className="aspect-[4/3] md:aspect-[16/9] lg:aspect-[2/1] bg-[#243628] relative overflow-hidden">
+      <div
+        className="aspect-[4/3] md:aspect-[16/9] lg:aspect-[2/1] bg-[#243628] relative overflow-hidden"
+        onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+        onTouchEnd={(e) => {
+          if (touchStartX.current === null) return;
+          const delta = touchStartX.current - e.changedTouches[0].clientX;
+          if (Math.abs(delta) > 50) delta > 0 ? next() : prev();
+          touchStartX.current = null;
+        }}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={images[active]}
           alt={`${name} — foto ${active + 1}`}
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+          onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0F1A10]/30 to-transparent pointer-events-none" />
         <div className="absolute bottom-4 right-4 bg-[#1C2B1E]/80 px-3 py-1.5 text-[#C9A84C] text-xs tracking-wider">
           {active + 1} / {count}
         </div>
         <button
-          onClick={() => setActive((a) => (a - 1 + count) % count)}
+          onClick={prev}
           className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] text-xl transition-all duration-200"
           aria-label="Vorige foto"
         >
           ‹
         </button>
         <button
-          onClick={() => setActive((a) => (a + 1) % count)}
+          onClick={next}
           className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] text-xl transition-all duration-200"
           aria-label="Volgende foto"
         >
@@ -61,7 +75,12 @@ function Gallery({ images, name }: { images: string[]; name: string }) {
             }`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} alt="" className="w-full h-full object-cover" />
+            <img
+              src={src}
+              alt=""
+              className="w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }}
+            />
           </button>
         ))}
       </div>
