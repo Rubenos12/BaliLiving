@@ -11,12 +11,16 @@ type GuestProfile = {
   tripType?: string;
   region?: string;
   dates?: string;
+  guestName?: string;
+  guestEmail?: string;
+  guestPhone?: string;
 };
 
 type Message = {
   role: "user" | "assistant";
   content: string;
   quickReplies?: string[];
+  bookingCreated?: boolean;
 };
 
 const GREETING: Message = {
@@ -55,6 +59,18 @@ function extractProfileHints(text: string, current: GuestProfile): GuestProfile 
   const dateMatch = text.match(/\d{1,2}[- /]\d{1,2}|januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december/i);
   if (dateMatch && !updated.dates) updated.dates = dateMatch[0];
 
+  // Email
+  const emailMatch = text.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
+  if (emailMatch) updated.guestEmail = emailMatch[0];
+
+  // Phone (Dutch/international formats)
+  const phoneMatch = text.match(/(\+?31|0)[- ]?\d{1,3}[- ]?\d{3,4}[- ]?\d{4}/);
+  if (phoneMatch) updated.guestPhone = phoneMatch[0];
+
+  // Name (simple patterns: "Ik ben ...", "Mijn naam is ...")
+  const nameMatch = text.match(/(?:ik ben|mijn naam is|naam[: ]+)([A-Z][a-zA-Z]+(?: [A-Z][a-zA-Z]+)*)/);
+  if (nameMatch) updated.guestName = nameMatch[1];
+
   return updated;
 }
 
@@ -80,7 +96,7 @@ function renderMessage(content: string) {
 
 // Profile badge shown in header when we know something
 function ProfileBadge({ profile }: { profile: GuestProfile }) {
-  const known = [profile.guests, profile.tripType, profile.region, profile.budget].filter(Boolean);
+  const known = [profile.guests, profile.tripType, profile.region, profile.budget, profile.guestName, profile.guestEmail].filter(Boolean);
   if (known.length === 0) return null;
   return (
     <div className="flex flex-wrap gap-1 px-5 pb-2 bg-[#131E14]">
@@ -147,7 +163,12 @@ export default function ConciergeChat() {
       const data: ConciergeResponse = await res.json();
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: data.message, quickReplies: data.quickReplies ?? [] },
+        {
+          role: "assistant",
+          content: data.message,
+          quickReplies: data.quickReplies ?? [],
+          bookingCreated: data.bookingCreated,
+        },
       ]);
     } catch {
       setMessages((prev) => [
@@ -243,9 +264,19 @@ export default function ConciergeChat() {
                     className={`max-w-[82%] text-sm leading-relaxed px-4 py-2.5 ${
                       msg.role === "user"
                         ? "bg-[#C9A84C] text-[#1C2B1E] rounded-2xl rounded-br-sm"
+                        : msg.bookingCreated
+                        ? "bg-[#1a3a1a] text-[#F5F0E8]/85 border border-[#4CAF50]/40 rounded-2xl rounded-bl-sm"
                         : "bg-[#243628] text-[#F5F0E8]/85 border border-[#C9A84C]/10 rounded-2xl rounded-bl-sm"
                     }`}
                   >
+                    {msg.bookingCreated && (
+                      <div className="flex items-center gap-1.5 mb-1.5 text-[#4CAF50] text-[0.6rem] tracking-[0.15em] uppercase">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        Boekingsaanvraag ingediend
+                      </div>
+                    )}
                     {renderMessage(msg.content)}
                   </div>
                 </div>
