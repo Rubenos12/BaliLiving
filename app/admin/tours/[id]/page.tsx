@@ -13,7 +13,8 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     name: "", location: "", short_description: "", long_description: "",
-    price_per_person: "", duration_hours: "", max_guests: "10", published: true,
+    price_per_person: "", duration_hours: "", max_guests: "10",
+    image_url: "", tag: "", published: true,
   });
 
   useEffect(() => {
@@ -29,6 +30,8 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
           price_per_person: String(data.price_per_person ?? ""),
           duration_hours: String(data.duration_hours ?? ""),
           max_guests: String(data.max_guests ?? "10"),
+          image_url: data.image_url ?? "",
+          tag: data.tag ?? "",
           published: data.published ?? true,
         });
       }
@@ -51,6 +54,8 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
       price_per_person: parseInt(form.price_per_person) || 0,
       duration_hours: parseFloat(form.duration_hours) || 0,
       max_guests: parseInt(form.max_guests) || 10,
+      image_url: form.image_url,
+      tag: form.tag,
       published: form.published,
     });
     setSaving(false);
@@ -79,6 +84,8 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
           <Field label="DUUR (UUR)" value={form.duration_hours} onChange={set("duration_hours")} type="number" />
           <Field label="MAX. GASTEN" value={form.max_guests} onChange={set("max_guests")} type="number" />
         </div>
+        <Field label="FOTO URL" value={form.image_url} onChange={set("image_url")} placeholder="https://..." />
+        <Field label="TAG / LABEL" value={form.tag} onChange={set("tag")} placeholder="Bijv. Bestseller, Nieuw" />
         <div className="flex items-center gap-3">
           <input type="checkbox" id="pub" checked={form.published}
             onChange={(e) => setForm((f) => ({ ...f, published: e.target.checked }))}
@@ -99,20 +106,20 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
   );
 }
 
-function Field({ label, value, onChange, required, multiline, type }: {
+function Field({ label, value, onChange, required, multiline, type, placeholder }: {
   label: string; value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  required?: boolean; multiline?: boolean; type?: string;
+  required?: boolean; multiline?: boolean; type?: string; placeholder?: string;
 }) {
   return (
     <div>
       <label className="block text-[#C9A84C] text-[0.6rem] tracking-[0.25em] uppercase mb-2">{label}</label>
       {multiline ? (
-        <textarea value={value} onChange={onChange} rows={3}
-          className="w-full bg-[#1C2B1E] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors resize-none" />
+        <textarea value={value} onChange={onChange} rows={3} placeholder={placeholder}
+          className="w-full bg-[#1C2B1E] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors resize-none placeholder:text-[#F5F0E8]/20" />
       ) : (
-        <input type={type ?? "text"} value={value} onChange={onChange} required={required}
-          className="w-full bg-[#1C2B1E] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors" />
+        <input type={type ?? "text"} value={value} onChange={onChange} required={required} placeholder={placeholder}
+          className="w-full bg-[#1C2B1E] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder:text-[#F5F0E8]/20" />
       )}
     </div>
   );

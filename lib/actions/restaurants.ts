@@ -13,6 +13,9 @@ type RestaurantData = {
   opening_hours: string;
   phone: string;
   website: string;
+  image_url: string;
+  tag: string;
+  sfeer: string;
   published: boolean;
 };
 
@@ -30,4 +33,14 @@ export async function updateRestaurant(id: string, data: RestaurantData) {
   const { error } = await supabase.from("restaurants").update(data).eq("id", id);
   if (error) return { error: error.message };
   return { success: true };
+}
+
+export async function getPublishedRestaurants() {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("restaurants")
+    .select("*")
+    .eq("published", true)
+    .order("created_at", { ascending: true });
+  return data ?? [];
 }

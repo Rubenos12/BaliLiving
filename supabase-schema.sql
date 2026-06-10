@@ -387,3 +387,49 @@ CREATE POLICY "Admins can update reviews"
 CREATE POLICY "Admins can delete reviews"
   ON villa_reviews FOR DELETE
   USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+
+-- ============================================================
+-- Visa Applications table
+-- ============================================================
+CREATE TABLE IF NOT EXISTS visa_applications (
+  id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  applicant_name    text NOT NULL,
+  applicant_email   text NOT NULL,
+  applicant_phone   text,
+  nationality       text NOT NULL,
+  passport_number   text,
+  passport_expiry   date,
+  travel_date       date NOT NULL,
+  return_date       date NOT NULL,
+  num_travelers     integer NOT NULL DEFAULT 1,
+  visa_type         text NOT NULL DEFAULT 'tourist'
+                    CHECK (visa_type IN ('tourist','business','social','other')),
+  notes             text,
+  admin_notes       text,
+  status            text NOT NULL DEFAULT 'pending'
+                    CHECK (status IN ('pending','in_progress','approved','rejected')),
+  created_at        timestamptz NOT NULL DEFAULT now(),
+  updated_at        timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE visa_applications ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can create visa applications"
+  ON visa_applications FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Admins can manage visa applications"
+  ON visa_applications FOR ALL
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+
+-- ============================================================
+-- Add image_url and tag to tours
+-- ============================================================
+ALTER TABLE tours ADD COLUMN IF NOT EXISTS image_url text NOT NULL DEFAULT '';
+ALTER TABLE tours ADD COLUMN IF NOT EXISTS tag       text NOT NULL DEFAULT '';
+
+-- ============================================================
+-- Add image_url, tag, sfeer to restaurants
+-- ============================================================
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS image_url text NOT NULL DEFAULT '';
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS tag       text NOT NULL DEFAULT '';
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS sfeer     text NOT NULL DEFAULT '';

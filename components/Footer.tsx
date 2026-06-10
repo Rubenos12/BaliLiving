@@ -49,8 +49,8 @@ export default function Footer() {
               {[
                 { label: "Over Ons", href: "/over-ons" },
                 { label: "Contact", href: "/contact" },
-                { label: "Veelgestelde Vragen", href: "#" },
-                { label: "Reistips", href: "#" },
+                { label: "Veelgestelde Vragen", href: "/contact" },
+                { label: "Reistips", href: "/over-ons" },
               ].map((item) => (
                 <li key={item.label}>
                   <Link href={item.href} className="text-[#F5F0E8]/60 text-sm hover:text-[#C9A84C] transition-colors duration-300">

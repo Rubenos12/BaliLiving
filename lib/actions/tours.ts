@@ -11,6 +11,8 @@ type TourData = {
   price_per_person: number;
   duration_hours: number;
   max_guests: number;
+  image_url: string;
+  tag: string;
   published: boolean;
 };
 
@@ -28,4 +30,14 @@ export async function updateTour(id: string, data: TourData) {
   const { error } = await supabase.from("tours").update(data).eq("id", id);
   if (error) return { error: error.message };
   return { success: true };
+}
+
+export async function getPublishedTours() {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("tours")
+    .select("*")
+    .eq("published", true)
+    .order("created_at", { ascending: true });
+  return data ?? [];
 }

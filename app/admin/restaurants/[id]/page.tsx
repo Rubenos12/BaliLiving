@@ -16,7 +16,8 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
   const [form, setForm] = useState({
     name: "", location: "", cuisine: "", price_range: "€€",
     short_description: "", long_description: "",
-    opening_hours: "", phone: "", website: "", published: true,
+    opening_hours: "", phone: "", website: "",
+    image_url: "", tag: "", sfeer: "", published: true,
   });
 
   useEffect(() => {
@@ -34,6 +35,9 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
           opening_hours: data.opening_hours ?? "",
           phone: data.phone ?? "",
           website: data.website ?? "",
+          image_url: data.image_url ?? "",
+          tag: data.tag ?? "",
+          sfeer: data.sfeer ?? "",
           published: data.published ?? true,
         });
       }
@@ -58,6 +62,9 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
       opening_hours: form.opening_hours,
       phone: form.phone,
       website: form.website,
+      image_url: form.image_url,
+      tag: form.tag,
+      sfeer: form.sfeer,
       published: form.published,
     });
     setSaving(false);
@@ -104,6 +111,11 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
           <Field label="TELEFOON" value={form.phone} onChange={set("phone")} />
         </div>
         <Field label="WEBSITE" value={form.website} onChange={set("website")} />
+        <Field label="FOTO URL" value={form.image_url} onChange={set("image_url")} placeholder="https://..." />
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="TAG / LABEL" value={form.tag} onChange={set("tag")} placeholder="Bijv. Award Winning" />
+          <Field label="SFEER" value={form.sfeer} onChange={set("sfeer")} placeholder="Bijv. Romantisch, Fine Dining" />
+        </div>
         <div className="flex items-center gap-3">
           <input type="checkbox" id="pub" checked={form.published}
             onChange={(e) => setForm((f) => ({ ...f, published: e.target.checked }))}
