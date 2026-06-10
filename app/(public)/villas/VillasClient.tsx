@@ -95,6 +95,20 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
         </div>
       </section>
 
+      {/* AI Advisor */}
+      <VillaAdvisor villas={villas} />
+
+      {/* Divider */}
+      <div className="bg-[#131E14] py-8">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-center gap-4">
+            <div className="flex-1 h-px bg-[#C9A84C]/15" />
+            <span className="text-[#F5F0E8]/25 text-[0.6rem] tracking-[0.35em] uppercase shrink-0">╱ Of blader zelf</span>
+            <div className="flex-1 h-px bg-[#C9A84C]/15" />
+          </div>
+        </div>
+      </div>
+
       {/* Filter bar */}
       <section className="bg-[#1C2B1E] border-y border-[#C9A84C]/15 py-5 space-y-3">
         {/* Region filters */}
@@ -135,9 +149,6 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
           ))}
         </div>
       </section>
-
-      {/* AI Advisor */}
-      <VillaAdvisor villas={villas} />
 
       {/* Villas grid */}
       <section className="py-28 max-w-7xl mx-auto px-6">

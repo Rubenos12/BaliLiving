@@ -174,131 +174,38 @@ function CountUp({ target, duration = 1800 }: { target: number; duration?: numbe
   return <span ref={ref} className="tabular-nums">{count}</span>;
 }
 
-/* ─── Lotus Petal Rain (signature Bali animation) ───────────────── */
-function LotusRain() {
-  const [statusIdx, setStatusIdx] = useState(0);
-  const [count, setCount] = useState(12);
-
-  const statuses = [
-    { text: "Villa's beschikbaar · Bali", label: "Live",      tone: "gold"  },
-    { text: "Nieuwe boeking ontvangen",   label: "Actief",    tone: "gold"  },
-    { text: "Chauffeur ingepland · DPS",  label: "Klaar",     tone: "green" },
-    { text: "Reis volledig bevestigd",    label: "Bevestigd", tone: "green" },
+/* ─── Credentials Stats Card ────────────────────────────────────── */
+function CredentialsCard() {
+  const stats = [
+    { value: 200, suffix: "+", label: "villa's op Bali" },
+    { value: 5,   suffix: " jaar", label: "Bali-expertise" },
   ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStatusIdx((idx) => {
-        const next = (idx + 1) % statuses.length;
-        if (next === 0) setCount((c) => c + 1);
-        return next;
-      });
-    }, 2400);
-    return () => clearInterval(interval);
-  }, [statuses.length]);
-
-  const petals = [
-    { left: "12%", delay: "0.0s", dur: "3.0s", size: 14 },
-    { left: "24%", delay: "1.4s", dur: "3.4s", size: 11 },
-    { left: "36%", delay: "0.7s", dur: "2.8s", size: 16 },
-    { left: "50%", delay: "2.0s", dur: "3.2s", size: 13 },
-    { left: "63%", delay: "0.4s", dur: "3.0s", size: 15 },
-    { left: "75%", delay: "1.7s", dur: "2.9s", size: 12 },
-    { left: "87%", delay: "1.0s", dur: "3.3s", size: 14 },
-  ];
-  const ripples = [
-    { left: "20%", delay: "0.3s" },
-    { left: "50%", delay: "1.2s" },
-    { left: "78%", delay: "2.0s" },
-  ];
-
-  const status = statuses[statusIdx];
-  const dotColor = status.tone === "gold" ? "#C9A84C" : "#4ade80";
-
   return (
-    <div
-      className="relative h-44 w-full rounded-3xl overflow-hidden border border-[#C9A84C]/20"
-      style={{ background: "linear-gradient(180deg, #0F1A10 0%, #1C2B1E 60%, #243628 100%)" }}
-    >
-      <div className="absolute -top-6 -left-4 h-16 w-28 rounded-full bg-[#C9A84C]/8 blur-2xl" />
-      <div className="absolute top-4 right-8 h-12 w-20 rounded-full bg-[#C9A84C]/6 blur-xl" />
-
-      <div className="absolute top-3 left-4 right-4 flex items-center justify-between z-20">
-        <div className="flex items-center gap-2">
-          <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="2">
-            <path d="M12 2C8 8 5 12 5 15a7 7 0 0 0 14 0c0-3-3-7-7-13z" />
-          </svg>
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#C9A84C]/80">
-            Bali Concierge
-          </span>
+    <div className="rounded-3xl border border-[#C9A84C]/20 bg-[#131E14] overflow-hidden">
+      <div className="flex items-center justify-between px-8 pt-6 pb-4">
+        <span className="text-[#C9A84C]/50 text-[0.6rem] tracking-[0.3em] uppercase">Onze cijfers</span>
+        <span className="h-2 w-2 rounded-full bg-[#C9A84C] ring-pulse-gold flex-shrink-0" />
+      </div>
+      {stats.map(({ value, suffix, label }) => (
+        <div key={label} className="px-8 py-5 border-t border-[#C9A84C]/10">
+          <div className="flex items-baseline gap-3">
+            <span className="text-5xl font-light text-[#F5F0E8]" style={{ fontFamily: "var(--font-cormorant)" }}>
+              <CountUp target={value} />{suffix}
+            </span>
+            <span className="text-[#C9A84C]/50 text-xs tracking-[0.15em]">╱</span>
+            <span className="text-[#F5F0E8]/50 text-sm">{label}</span>
+          </div>
         </div>
-        <div className="flex items-baseline gap-1">
-          <span className="font-mono text-sm font-bold text-[#C9A84C] tabular-nums">
-            {String(count).padStart(2, "0")}
-          </span>
-          <span className="font-mono text-[9px] uppercase tracking-widest text-[#F5F0E8]/40">vandaag</span>
+      ))}
+      <div className="px-8 py-5 border-t border-[#C9A84C]/10">
+        <div className="flex items-baseline gap-3">
+          <span className="text-5xl font-light text-[#F5F0E8]" style={{ fontFamily: "var(--font-cormorant)" }}>24/7</span>
+          <span className="text-[#C9A84C]/50 text-xs tracking-[0.15em]">╱</span>
+          <span className="text-[#F5F0E8]/50 text-sm">persoonlijke service</span>
         </div>
       </div>
-
-      <svg className="absolute left-3 right-3 top-9 h-5 w-[calc(100%-24px)]" viewBox="0 0 400 20" preserveAspectRatio="none">
-        <rect x="0" y="8" width="400" height="4" rx="2" fill="#C9A84C" fillOpacity="0.18" />
-        <rect x="0" y="9" width="400" height="1.5" fill="#C9A84C" fillOpacity="0.3" />
-        {[60, 140, 220, 300, 380].map((x) => (
-          <g key={x}>
-            <rect x={x - 4} y="3" width="8" height="5" rx="1" fill="#C9A84C" fillOpacity="0.35" />
-            <rect x={x - 2} y="0" width="4" height="3" rx="0.5" fill="#C9A84C" fillOpacity="0.25" />
-          </g>
-        ))}
-      </svg>
-
-      <div className="absolute inset-x-0 top-14 bottom-11 overflow-hidden">
-        {petals.map((p, i) => (
-          <svg
-            key={i}
-            className="absolute top-0"
-            style={{
-              left: p.left, width: `${p.size}px`, height: `${Math.round(p.size * 1.4)}px`,
-              animation: `petal-fall ${p.dur} ease-in-out ${p.delay} infinite`,
-              filter: "drop-shadow(0 1px 3px rgba(201,168,76,0.35))",
-              transform: "translateX(-50%)",
-            }}
-            viewBox="0 0 20 28"
-          >
-            <defs>
-              <linearGradient id={`pg-${i}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#E8C96A" />
-                <stop offset="50%" stopColor="#C9A84C" />
-                <stop offset="100%" stopColor="#A88930" />
-              </linearGradient>
-            </defs>
-            <path d="M10 1 C 7 5, 2 10, 2 16 Q 2 24 10 27 Q 18 24 18 16 C 18 10, 13 5, 10 1 Z" fill={`url(#pg-${i})`} fillOpacity="0.85" />
-            <path d="M10 4 C 9 8, 7 12, 7 16" fill="none" stroke="#E8C96A" strokeWidth="0.7" strokeOpacity="0.5" />
-          </svg>
-        ))}
-      </div>
-
-      <svg className="absolute bottom-9 left-3 right-3 h-2.5 w-[calc(100%-24px)]" viewBox="0 0 200 10" preserveAspectRatio="none">
-        <path d="M0,5 Q12.5,2 25,5 T50,5 T75,5 T100,5 T125,5 T150,5 T175,5 T200,5" fill="none" stroke="#C9A84C" strokeOpacity="0.35" strokeWidth="1.2" />
-      </svg>
-
-      <div className="absolute bottom-[34px] left-3 right-3 h-2">
-        {ripples.map((r, i) => (
-          <span
-            key={i}
-            className="absolute top-0 -translate-x-1/2 rounded-full border border-[#C9A84C]/40"
-            style={{ left: r.left, width: "4px", height: "4px", animation: `petal-ripple 2.8s ease-out ${r.delay} infinite` }}
-          />
-        ))}
-      </div>
-
-      <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between z-20">
-        <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full" style={{ background: dotColor, boxShadow: `0 0 0 0 ${dotColor}80`, animation: "ring-pulse-gold 2.5s infinite" }} />
-          <span className="font-mono text-[10px] text-[#F5F0E8]/60 truncate max-w-[120px]">{status.text}</span>
-        </div>
-        <span className="font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border" style={{ color: dotColor, borderColor: `${dotColor}40` }}>
-          {status.label}
-        </span>
+      <div className="px-8 py-4 bg-[#0F1A10] border-t border-[#C9A84C]/10">
+        <p className="text-[#F5F0E8]/25 text-xs tracking-wider">Opgericht door Edwin &amp; Citty · Bali since 2019</p>
       </div>
     </div>
   );
@@ -544,9 +451,7 @@ export default function HomePage() {
               </div>
             </motion.div>
             <motion.div variants={fadeUp}>
-              <div className="p-1 rounded-3xl border border-[#C9A84C]/15 bg-[#131E14]">
-                <LotusRain />
-              </div>
+              <CredentialsCard />
             </motion.div>
           </motion.div>
         </div>
