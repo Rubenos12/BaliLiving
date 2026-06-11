@@ -74,16 +74,19 @@ function extractProfileHints(text: string, current: GuestProfile): GuestProfile 
   return updated;
 }
 
-// Render assistant message — no markdown, just clean text + villa links
+// Render assistant message — no markdown, just clean text + villa links.
+// Only relative hrefs (/path) are rendered as links to block prompt-injection redirects.
 function renderMessage(content: string) {
   const parts = content.split(/(\[[^\]]+\]\([^)]+\))/g);
   return parts.map((part, i) => {
     const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
     if (match) {
+      const href = match[2];
+      if (!href.startsWith("/")) return <span key={i}>{match[1]}</span>;
       return (
         <a
           key={i}
-          href={match[2]}
+          href={href}
           className="text-[#C9A84C] underline underline-offset-2 hover:text-[#E8C96A] transition-colors"
         >
           {match[1]}

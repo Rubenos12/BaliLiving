@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -15,10 +16,34 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
+const BASE_URL = "https://www.baliliving.nl";
+
 export const metadata: Metadata = {
-  title: "BaliLiving — Jouw Exclusieve Bali Ervaring",
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "BaliLiving — Jouw Exclusieve Bali Ervaring",
+    template: "%s — BaliLiving",
+  },
   description: "BaliLiving biedt complete ondersteuning voor jouw Bali reis. Boek villa's, tours, restaurants en meer. Exclusief, persoonlijk en op maat gemaakt voor Nederland.",
-  keywords: "Bali, villa boeken, tours Bali, restaurants Bali, luxe reizen, BaliLiving",
+  keywords: "Bali, villa boeken, tours Bali, restaurants Bali, luxe reizen, BaliLiving, Edwin Citty",
+  authors: [{ name: "BaliLiving" }],
+  openGraph: {
+    type: "website",
+    locale: "nl_NL",
+    url: BASE_URL,
+    siteName: "BaliLiving",
+    title: "BaliLiving — Jouw Exclusieve Bali Ervaring",
+    description: "Exclusieve villa's, tours, restaurants en transfers op Bali. Persoonlijk geregeld door Edwin & Citty.",
+    images: [{ url: "/og-default.jpg", width: 1200, height: 630, alt: "BaliLiving" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BaliLiving — Jouw Exclusieve Bali Ervaring",
+    description: "Exclusieve villa's, tours, restaurants en transfers op Bali.",
+    images: ["/og-default.jpg"],
+  },
+  robots: { index: true, follow: true },
+  alternates: { canonical: BASE_URL },
 };
 
 export default function RootLayout({
@@ -33,6 +58,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col antialiased">
         {children}
+        <Analytics />
       </body>
     </html>
   );

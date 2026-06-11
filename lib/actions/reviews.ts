@@ -2,15 +2,20 @@
 
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { requireAdminUser } from "@/lib/actions/admin-auth";
+import { z } from "zod";
 
-export type ReviewPayload = {
-  villa_slug: string;
-  booking_id?: string;
-  reviewer_name: string;
-  reviewer_email: string;
-  rating: number;
-  review_text: string;
-};
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const reviewSchema = z.object({
+  villa_slug: z.string().min(1).max(100),
+  booking_id: z.string().uuid().optional(),
+  reviewer_name: z.string().min(1).max(200).trim(),
+  reviewer_email: z.string().max(320).refine((v) => EMAIL_RE.test(v), "Ongeldig e-mailadres"),
+  rating: z.number().int().min(1).max(5),
+  review_text: z.string().min(1).max(5000).trim(),
+});
+
+export type ReviewPayload = z.infer<typeof reviewSchema>;
 
 export type VillaReview = {
   id: string;
@@ -23,22 +28,21 @@ export type VillaReview = {
 };
 
 export async function createReview(payload: ReviewPayload) {
-  if (!payload.reviewer_name || !payload.reviewer_email || !payload.review_text) {
-    return { error: "Naam, e-mail en review tekst zijn verplicht." };
+  const parsed = reviewSchema.safeParse(payload);
+  if (!parsed.success) {
+    return { error: "Ongeldige invoer: " + parsed.error.issues[0]?.message };
   }
-  if (payload.rating < 1 || payload.rating > 5) {
-    return { error: "Beoordeling moet tussen 1 en 5 zijn." };
-  }
+  const input = parsed.data;
 
   const supabase = await createClient();
   const { error } = await supabase.from("villa_reviews").insert([
     {
-      villa_slug: payload.villa_slug,
-      booking_id: payload.booking_id ?? null,
-      reviewer_name: payload.reviewer_name,
-      reviewer_email: payload.reviewer_email,
-      rating: payload.rating,
-      review_text: payload.review_text,
+      villa_slug: input.villa_slug,
+      booking_id: input.booking_id ?? null,
+      reviewer_name: input.reviewer_name,
+      reviewer_email: input.reviewer_email.trim().toLowerCase(),
+      rating: input.rating,
+      review_text: input.review_text,
       published: false,
     },
   ]);

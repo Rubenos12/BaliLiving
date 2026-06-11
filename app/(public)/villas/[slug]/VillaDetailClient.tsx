@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, Variants, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useRef } from "react";
 import type { Villa } from "@/lib/villas-data";
@@ -38,11 +39,13 @@ function Gallery({ images, name }: { images: string[]; name: string }) {
           touchStartX.current = null;
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={images[active]}
           alt={`${name} — foto ${active + 1}`}
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+          fill
+          priority
+          sizes="(max-width: 768px) 100vw, 80vw"
+          className="object-cover transition-opacity duration-500"
           onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0F1A10]/30 to-transparent pointer-events-none" />
@@ -81,11 +84,12 @@ function Gallery({ images, name }: { images: string[]; name: string }) {
                 active === i ? "ring-2 ring-[#C9A84C]" : "opacity-50 hover:opacity-80"
               }`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={src}
                 alt=""
-                className="w-full h-full object-cover"
+                fill
+                sizes="120px"
+                className="object-cover"
                 onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }}
               />
             </button>

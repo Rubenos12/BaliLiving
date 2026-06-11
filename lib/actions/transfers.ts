@@ -1,66 +1,56 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { z } from "zod";
 
-export type TransferRequestPayload = {
-  from_location: string;
-  to_location: string;
-  transfer_date: string;
-  transfer_time: string;
-  passengers: number;
-  tier: "normaal" | "luxe" | "vip";
-  guest_name: string;
-  guest_email: string;
-  guest_phone: string;
-  notes?: string;
-  ai_recommendation?: string;
-  estimated_travel_time?: string;
-  luggage?: string;
-  occasion?: string;
-};
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const transferSchema = z.object({
+  from_location: z.string().min(1).max(200).trim(),
+  to_location: z.string().min(1).max(200).trim(),
+  transfer_date: z.string().min(1),
+  transfer_time: z.string(),
+  passengers: z.number().int().min(1).max(20),
+  tier: z.enum(["normaal", "luxe", "vip"]),
+  guest_name: z.string().min(1).max(200).trim(),
+  guest_email: z.string().max(320).refine((v) => EMAIL_RE.test(v), "Ongeldig e-mailadres"),
+  guest_phone: z.string().min(1).max(50),
+  notes: z.string().max(2000).optional(),
+  ai_recommendation: z.string().max(1000).optional(),
+  estimated_travel_time: z.string().max(100).optional(),
+  luggage: z.string().max(20).optional(),
+  occasion: z.string().max(50).optional(),
+});
+
+export type TransferRequestPayload = z.infer<typeof transferSchema>;
 
 export async function createTransferRequest(payload: TransferRequestPayload) {
-  const supabase = await createClient();
+  const parsed = transferSchema.safeParse(payload);
+  if (!parsed.success) {
+    return { error: "Ongeldige invoer: " + parsed.error.issues[0]?.message };
+  }
+  const input = parsed.data;
 
-  if (!payload.from_location || !payload.to_location) {
-    return { error: "Vertrek- en aankomstlocatie zijn verplicht." };
-  }
-  if (!payload.transfer_date) {
-    return { error: "Datum is verplicht." };
-  }
-  if (!payload.guest_name || !payload.guest_email || !payload.guest_phone) {
-    return { error: "Naam, e-mail en telefoonnummer zijn verplicht." };
-  }
-  if (!EMAIL_REGEX.test(payload.guest_email)) {
-    return { error: "Ongeldig e-mailadres." };
-  }
-  if (payload.guest_name.length > 100) {
-    return { error: "Naam mag maximaal 100 tekens bevatten." };
-  }
-  if ((payload.notes ?? "").length > 1000) {
-    return { error: "Opmerkingen mogen maximaal 1000 tekens bevatten." };
-  }
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("transfer_requests")
     .insert([
       {
-        from_location: payload.from_location,
-        to_location: payload.to_location,
-        transfer_date: payload.transfer_date,
-        transfer_time: payload.transfer_time || null,
-        passengers: payload.passengers,
-        tier: payload.tier,
-        guest_name: payload.guest_name,
-        guest_email: payload.guest_email,
-        guest_phone: payload.guest_phone,
-        notes: payload.notes || "",
-        ai_recommendation: payload.ai_recommendation || "",
-        estimated_travel_time: payload.estimated_travel_time || "",
-        luggage: payload.luggage || "",
-        occasion: payload.occasion || "",
+        from_location: input.from_location,
+        to_location: input.to_location,
+        transfer_date: input.transfer_date,
+        transfer_time: input.transfer_time || null,
+        passengers: input.passengers,
+        tier: input.tier,
+        guest_name: input.guest_name,
+        guest_email: input.guest_email.trim().toLowerCase(),
+        guest_phone: input.guest_phone,
+        notes: input.notes || "",
+        ai_recommendation: input.ai_recommendation || "",
+        estimated_travel_time: input.estimated_travel_time || "",
+        luggage: input.luggage || "",
+        occasion: input.occasion || "",
         status: "pending",
       },
     ])

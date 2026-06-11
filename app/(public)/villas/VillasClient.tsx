@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, Variants } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { Villa } from "@/lib/villas-data";
@@ -193,11 +194,12 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
               >
                 {/* Image */}
                 <div className="aspect-[4/3] bg-[#243628] relative overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={villa.images[0]}
                     alt={villa.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
                     onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0F1A10]/40 to-transparent pointer-events-none" />

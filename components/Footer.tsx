@@ -6,11 +6,6 @@ const IconInstagram = () => (
   </svg>
 );
 
-const IconFacebook = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-  </svg>
-);
 
 const IconWhatsApp = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -94,27 +89,24 @@ export default function Footer() {
               </li>
               <li className="pt-4">
                 <div className="flex gap-4">
-                  <Link
-                    href="#"
+                  <a
+                    href="https://www.instagram.com/baliliving.nl"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label="Instagram"
                     className="text-[#F5F0E8]/40 hover:text-[#C9A84C] transition-colors duration-300"
                   >
                     <IconInstagram />
-                  </Link>
-                  <Link
-                    href="#"
-                    aria-label="Facebook"
-                    className="text-[#F5F0E8]/40 hover:text-[#C9A84C] transition-colors duration-300"
-                  >
-                    <IconFacebook />
-                  </Link>
-                  <Link
-                    href="#"
+                  </a>
+                  <a
+                    href="https://wa.me/31201234567"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label="WhatsApp"
                     className="text-[#F5F0E8]/40 hover:text-[#C9A84C] transition-colors duration-300"
                   >
                     <IconWhatsApp />
-                  </Link>
+                  </a>
                 </div>
               </li>
             </ul>
@@ -127,11 +119,12 @@ export default function Footer() {
             © {new Date().getFullYear()} BaliLiving. Alle rechten voorbehouden.
           </p>
           <div className="flex gap-6">
-            {["Privacybeleid", "Algemene Voorwaarden"].map((item) => (
-              <Link key={item} href="/contact" className="text-[#F5F0E8]/30 text-xs hover:text-[#C9A84C] transition-colors duration-300">
-                {item}
-              </Link>
-            ))}
+            <Link href="/privacybeleid" className="text-[#F5F0E8]/30 text-xs hover:text-[#C9A84C] transition-colors duration-300">
+              Privacybeleid
+            </Link>
+            <Link href="/contact" className="text-[#F5F0E8]/30 text-xs hover:text-[#C9A84C] transition-colors duration-300">
+              Algemene Voorwaarden
+            </Link>
           </div>
         </div>
       </div>

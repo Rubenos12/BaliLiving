@@ -2,27 +2,39 @@
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { requireAdminUser } from "./admin-auth";
+import { sendBookingConfirmation, sendBookingStatusUpdate } from "@/lib/email";
+import { z } from "zod";
 
-export type BookingPayload = {
-  villa_id: string;
-  villa_name: string;
-  guest_name: string;
-  guest_email: string;
-  guest_phone: string;
-  guest_count: number;
-  check_in: string;
-  check_out: string;
-  total_nights: number;
-  total_price: number;
-  notes: string;
-};
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const bookingInputSchema = z.object({
+  villa_id: z.string().uuid(),
+  villa_name: z.string().max(200),
+  guest_name: z.string().min(1).max(200).trim(),
+  guest_email: z.string().max(320).refine((v) => EMAIL_RE.test(v), "Ongeldig e-mailadres"),
+  guest_phone: z.string().max(50),
+  guest_count: z.number().int().min(1).max(50),
+  check_in: z.string(),
+  check_out: z.string(),
+  total_nights: z.number(),
+  total_price: z.number(),
+  notes: z.string().max(3000),
+});
+
+export type BookingPayload = z.infer<typeof bookingInputSchema>;
 
 export async function createBooking(payload: BookingPayload) {
+  const parsed = bookingInputSchema.safeParse(payload);
+  if (!parsed.success) {
+    return { error: "Ongeldige invoer: " + parsed.error.issues[0]?.message };
+  }
+  const input = parsed.data;
+
   const supabase = createServiceClient();
 
   // Validate dates
-  const checkIn = new Date(payload.check_in);
-  const checkOut = new Date(payload.check_out);
+  const checkIn = new Date(input.check_in);
+  const checkOut = new Date(input.check_out);
 
   if (isNaN(checkIn.getTime()) || isNaN(checkOut.getTime())) {
     return { error: "Ongeldige datums opgegeven." };
@@ -43,7 +55,7 @@ export async function createBooking(payload: BookingPayload) {
   const { data: villa } = await supabase
     .from("villas")
     .select("id, name, price_per_night, guests_max")
-    .eq("id", payload.villa_id)
+    .eq("id", input.villa_id)
     .eq("published", true)
     .single();
 
@@ -51,7 +63,7 @@ export async function createBooking(payload: BookingPayload) {
     return { error: "Villa niet gevonden." };
   }
 
-  if (payload.guest_count < 1 || payload.guest_count > villa.guests_max) {
+  if (input.guest_count < 1 || input.guest_count > villa.guests_max) {
     return { error: `Maximaal ${villa.guests_max} gasten toegestaan voor deze villa.` };
   }
 
@@ -67,28 +79,28 @@ export async function createBooking(payload: BookingPayload) {
   const { data: blocked } = await supabase
     .from("blocked_dates")
     .select("blocked_date")
-    .eq("villa_id", payload.villa_id)
+    .eq("villa_id", input.villa_id)
     .in("blocked_date", dates);
 
   if (blocked && blocked.length > 0) {
     return { error: "Een of meer geselecteerde datums zijn niet meer beschikbaar." };
   }
 
-  const { data, error } = await supabase
+  const { data: booking, error } = await supabase
     .from("bookings")
     .insert([
       {
-        villa_id: payload.villa_id,
+        villa_id: input.villa_id,
         villa_name: villa.name,
-        guest_name: payload.guest_name.trim(),
-        guest_email: payload.guest_email.trim().toLowerCase(),
-        guest_phone: payload.guest_phone.trim(),
-        guest_count: payload.guest_count,
-        check_in: payload.check_in,
-        check_out: payload.check_out,
+        guest_name: input.guest_name.trim(),
+        guest_email: input.guest_email.trim().toLowerCase(),
+        guest_phone: input.guest_phone.trim(),
+        guest_count: input.guest_count,
+        check_in: input.check_in,
+        check_out: input.check_out,
         total_nights,
         total_price, // server-calculated, not from client
-        notes: payload.notes.trim(),
+        notes: input.notes.trim(),
         status: "pending",
       },
     ])
@@ -100,14 +112,25 @@ export async function createBooking(payload: BookingPayload) {
     return { error: "Er is iets misgegaan. Probeer het opnieuw of neem contact op." };
   }
 
-  // Send push notification to admin devices (fire and forget)
+  // Fire-and-forget: push notification + confirmation email
   void sendPushToAdminDevices(supabase, {
     title: "Nieuwe boekingsaanvraag",
-    body: `${payload.guest_name} wil ${villa.name} boeken (${total_nights} nachten)`,
-    data: { bookingId: data.id },
+    body: `${input.guest_name} wil ${villa.name} boeken (${total_nights} nachten)`,
+    data: { bookingId: booking.id },
+  });
+  void sendBookingConfirmation({
+    id: booking.id,
+    guest_name: input.guest_name,
+    guest_email: input.guest_email,
+    villa_name: villa.name,
+    check_in: input.check_in,
+    check_out: input.check_out,
+    total_nights,
+    total_price,
+    guest_count: input.guest_count,
   });
 
-  return { data };
+  return { data: booking };
 }
 
 async function sendPushToAdminDevices(
@@ -181,6 +204,26 @@ export async function updateBookingStatus(
     return { error: "Boeking niet gevonden." };
   }
 
+  // Before accepting: re-check that the dates are still free (prevent double-booking)
+  if (status === "accepted") {
+    const start = new Date(booking.check_in);
+    const end = new Date(booking.check_out);
+    const datesToCheck: string[] = [];
+    for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+      datesToCheck.push(d.toISOString().split("T")[0]);
+    }
+
+    const { data: alreadyBlocked } = await supabase
+      .from("blocked_dates")
+      .select("blocked_date")
+      .eq("villa_id", booking.villa_id)
+      .in("blocked_date", datesToCheck);
+
+    if (alreadyBlocked && alreadyBlocked.length > 0) {
+      return { error: "Een of meer datums zijn al geblokkeerd door een andere boeking. Dubbelboeking voorkomen." };
+    }
+  }
+
   const { error } = await supabase
     .from("bookings")
     .update({
@@ -208,6 +251,18 @@ export async function updateBookingStatus(
       .from("blocked_dates")
       .upsert(dates, { onConflict: "villa_id,blocked_date" });
   }
+
+  // Notify guest of accept/reject (fire and forget)
+  void sendBookingStatusUpdate({
+    id: bookingId,
+    guest_name: booking.guest_name,
+    guest_email: booking.guest_email,
+    villa_name: booking.villa_name,
+    check_in: booking.check_in,
+    check_out: booking.check_out,
+    status,
+    admin_notes: adminNotes,
+  });
 
   return { success: true };
 }

@@ -14,9 +14,24 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const villa = await fetchVillaBySlug(slug);
   if (!villa) return {};
+  const coverImage = villa.images?.[0] ?? "/og-default.jpg";
   return {
-    title: `${villa.name} — BaliLiving`,
+    title: villa.name,
     description: villa.short_description,
+    openGraph: {
+      title: `${villa.name} — BaliLiving`,
+      description: villa.short_description,
+      url: `https://www.baliliving.nl/villas/${slug}`,
+      images: [{ url: coverImage, width: 1200, height: 800, alt: villa.name }],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${villa.name} — BaliLiving`,
+      description: villa.short_description,
+      images: [coverImage],
+    },
+    alternates: { canonical: `https://www.baliliving.nl/villas/${slug}` },
   };
 }
 
