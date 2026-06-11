@@ -224,7 +224,7 @@ export default function ConciergeChat() {
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
             className="absolute bottom-0 right-0 w-[92vw] sm:w-96 bg-[#1C2B1E] border border-[#C9A84C]/25 shadow-2xl flex flex-col overflow-hidden"
-            style={{ maxWidth: "min(92vw, 24rem)", height: "min(580px, 90vh)" }}
+            style={{ maxWidth: "min(92vw, 24rem)", height: "min(520px, calc(100dvh - 120px))" }}
           >
             {/* Header */}
             <div className="border-b border-[#C9A84C]/15 bg-[#131E14] shrink-0">
@@ -247,7 +247,7 @@ export default function ConciergeChat() {
                 </div>
                 <button
                   onClick={() => setOpen(false)}
-                  className="w-7 h-7 flex items-center justify-center text-[#F5F0E8]/35 hover:text-[#F5F0E8] transition-colors"
+                  className="w-9 h-9 flex items-center justify-center text-[#F5F0E8]/35 hover:text-[#F5F0E8] transition-colors"
                   aria-label="Sluit chat"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -312,7 +312,7 @@ export default function ConciergeChat() {
                       <button
                         key={chip}
                         onClick={() => sendMessage(chip)}
-                        className="text-xs px-3 py-1.5 border border-[#C9A84C]/35 text-[#C9A84C] hover:bg-[#C9A84C] hover:text-[#1C2B1E] transition-all duration-200 rounded-full"
+                        className="text-xs px-3 py-2 min-h-[36px] border border-[#C9A84C]/35 text-[#C9A84C] hover:bg-[#C9A84C] hover:text-[#1C2B1E] transition-all duration-200 rounded-full"
                       >
                         {chip}
                       </button>
@@ -346,7 +346,7 @@ export default function ConciergeChat() {
                 <button
                   onClick={() => sendMessage(input)}
                   disabled={!input.trim() || loading}
-                  className="w-9 h-9 bg-[#C9A84C] text-[#1C2B1E] flex items-center justify-center hover:bg-[#E8C96A] transition-colors duration-200 disabled:opacity-35 disabled:cursor-not-allowed rounded-lg shrink-0"
+                  className="w-11 h-11 bg-[#C9A84C] text-[#1C2B1E] flex items-center justify-center hover:bg-[#E8C96A] transition-colors duration-200 disabled:opacity-35 disabled:cursor-not-allowed rounded-lg shrink-0"
                   aria-label="Verstuur"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

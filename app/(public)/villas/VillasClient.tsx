@@ -117,7 +117,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
             <button
               key={f}
               onClick={() => setActiveRegion(f)}
-              className={`text-xs tracking-[0.2em] uppercase px-5 py-2 transition-all duration-300 ${
+              className={`text-xs tracking-[0.2em] uppercase px-5 py-2.5 min-h-[44px] transition-all duration-300 ${
                 activeRegion === f
                   ? "bg-[#C9A84C] text-[#1C2B1E]"
                   : "text-[#F5F0E8]/50 border border-[#F5F0E8]/10 hover:border-[#C9A84C]/50 hover:text-[#C9A84C]"
@@ -136,7 +136,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
             <button
               key={f.label}
               onClick={() => setActiveExperience((prev) => (prev === f.label ? "" : f.label))}
-              className={`text-xs tracking-[0.15em] uppercase px-4 py-1.5 transition-all duration-300 border ${
+              className={`text-xs tracking-[0.15em] uppercase px-4 py-2.5 min-h-[44px] transition-all duration-300 border ${
                 activeExperience === f.label
                   ? "bg-[#C9A84C]/20 border-[#C9A84C]/60 text-[#C9A84C]"
                   : "border-[#C9A84C]/15 text-[#F5F0E8]/40 hover:border-[#C9A84C]/40 hover:text-[#C9A84C]/80"
@@ -253,7 +253,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
                     </div>
                     <Link
                       href={`/villas/${villa.slug}`}
-                      className="px-5 py-2.5 border border-[#C9A84C]/40 text-[#C9A84C] text-xs tracking-[0.2em] uppercase hover:bg-[#C9A84C] hover:text-[#1C2B1E] transition-all duration-300"
+                      className="px-5 py-3 border border-[#C9A84C]/40 text-[#C9A84C] text-xs tracking-[0.2em] uppercase hover:bg-[#C9A84C] hover:text-[#1C2B1E] transition-all duration-300"
                     >
                       Bekijk
                     </Link>

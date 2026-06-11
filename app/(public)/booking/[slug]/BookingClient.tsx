@@ -43,7 +43,7 @@ function StepIndicator({ current }: { current: Step }) {
         <div key={s.n} className="flex items-center">
           <div className="flex flex-col items-center">
             <div
-              className={`w-10 h-10 flex items-center justify-center text-sm transition-all duration-300 ${
+              className={`w-11 h-11 flex items-center justify-center text-sm transition-all duration-300 ${
                 current > s.n
                   ? "bg-[#C9A84C] text-[#1C2B1E]"
                   : current === s.n
@@ -286,7 +286,7 @@ export default function BookingClient({
                         value={checkIn}
                         onChange={(e) => setCheckIn(e.target.value)}
                         min={new Date().toISOString().split("T")[0]}
-                        className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                        className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
                       />
                     </div>
                     <div>
@@ -298,7 +298,7 @@ export default function BookingClient({
                         value={checkOut}
                         onChange={(e) => setCheckOut(e.target.value)}
                         min={checkIn || new Date().toISOString().split("T")[0]}
-                        className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                        className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
                       />
                     </div>
                   </div>
@@ -306,19 +306,19 @@ export default function BookingClient({
                     <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
                       Aantal gasten
                     </label>
-                    <div className="flex items-center border border-[#C9A84C]/20 bg-[#243628] w-40">
+                    <div className="flex items-center border border-[#C9A84C]/20 bg-[#243628] w-44">
                       <button
                         onClick={() => setGuests((g) => Math.max(1, g - 1))}
-                        className="px-4 py-3 text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors text-lg leading-none"
+                        className="w-12 h-12 flex items-center justify-center text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors text-lg leading-none"
                       >
                         −
                       </button>
-                      <span className="flex-1 text-center text-[#F5F0E8] text-sm py-3">
+                      <span className="flex-1 text-center text-[#F5F0E8] text-sm">
                         {guests}
                       </span>
                       <button
                         onClick={() => setGuests((g) => Math.min(villa.guests_max, g + 1))}
-                        className="px-4 py-3 text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors text-lg leading-none"
+                        className="w-12 h-12 flex items-center justify-center text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors text-lg leading-none"
                       >
                         +
                       </button>
@@ -406,7 +406,7 @@ export default function BookingClient({
                           value={form.naam}
                           onChange={(e) => setForm({ ...form, naam: e.target.value })}
                           placeholder="Jouw naam"
-                          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
+                          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
                         />
                       </div>
                       <div>
@@ -419,7 +419,7 @@ export default function BookingClient({
                           value={form.email}
                           onChange={(e) => setForm({ ...form, email: e.target.value })}
                           placeholder="jouw@email.nl"
-                          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
+                          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
                         />
                       </div>
                     </div>
@@ -444,7 +444,7 @@ export default function BookingClient({
                         onChange={(e) => setForm({ ...form, bericht: e.target.value })}
                         rows={3}
                         placeholder="Speciale verzoeken, vragen, allergiën..."
-                        className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20 resize-none"
+                        className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20 resize-none"
                       />
                     </div>
 

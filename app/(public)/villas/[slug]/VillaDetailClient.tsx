@@ -57,7 +57,7 @@ function Gallery({ images, name }: { images: string[]; name: string }) {
         {count > 1 && (
           <button
             onClick={prev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] text-xl transition-all duration-200"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] text-xl transition-all duration-200"
             aria-label="Vorige foto"
           >
             ‹
@@ -66,7 +66,7 @@ function Gallery({ images, name }: { images: string[]; name: string }) {
         {count > 1 && (
           <button
             onClick={next}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] text-xl transition-all duration-200"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] text-xl transition-all duration-200"
             aria-label="Volgende foto"
           >
             ›
@@ -147,7 +147,7 @@ function BookingWidget({ villa }: { villa: Villa }) {
             value={checkIn}
             onChange={(e) => setCheckIn(e.target.value)}
             min={new Date().toISOString().split("T")[0]}
-            className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+            className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
           />
         </div>
         <div>
@@ -159,7 +159,7 @@ function BookingWidget({ villa }: { villa: Villa }) {
             value={checkOut}
             onChange={(e) => setCheckOut(e.target.value)}
             min={checkIn || new Date().toISOString().split("T")[0]}
-            className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+            className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
           />
         </div>
       </div>
@@ -172,16 +172,16 @@ function BookingWidget({ villa }: { villa: Villa }) {
         <div className="flex items-center border border-[#C9A84C]/20 bg-[#243628]">
           <button
             onClick={() => setGuests((g) => Math.max(1, g - 1))}
-            className="px-4 py-2.5 text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors text-lg leading-none"
+            className="w-11 h-11 flex items-center justify-center text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors text-lg leading-none"
           >
             −
           </button>
-          <span className="flex-1 text-center text-[#F5F0E8] text-sm py-2.5">
+          <span className="flex-1 text-center text-[#F5F0E8] text-sm">
             {guests} {guests === 1 ? "gast" : "gasten"}
           </span>
           <button
             onClick={() => setGuests((g) => Math.min(villa.guests_max, g + 1))}
-            className="px-4 py-2.5 text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors text-lg leading-none"
+            className="w-11 h-11 flex items-center justify-center text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors text-lg leading-none"
           >
             +
           </button>
@@ -426,7 +426,7 @@ export default function VillaDetailClient({
       </section>
 
       {/* Mobile booking bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#1C2B1E] border-t border-[#C9A84C]/30 px-4 py-4 flex items-center justify-between">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#1C2B1E] border-t border-[#C9A84C]/30 px-4 pt-4 pb-safe flex items-center justify-between">
         <div>
           <span
             className="text-2xl font-light text-[#C9A84C]"
@@ -438,14 +438,14 @@ export default function VillaDetailClient({
         </div>
         <Link
           href={`/booking/${villa.slug}`}
-          className="px-8 py-3 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.25em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300"
+          className="px-8 py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.25em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300"
         >
           Boek Nu
         </Link>
       </div>
 
       {/* Mobile bottom padding for fixed bar */}
-      <div className="lg:hidden h-24" />
+      <div className="lg:hidden h-28" />
 
       {/* More villas */}
       <section className="py-20 bg-[#131E14]">

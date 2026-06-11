@@ -131,7 +131,7 @@ function LocationInput({
           }}
           onFocus={() => setOpen(true)}
           placeholder={placeholder}
-          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] pl-10 pr-4 py-3.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/25"
+          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] pl-10 pr-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/25"
           autoComplete="off"
         />
       </div>
@@ -152,7 +152,7 @@ function LocationInput({
                   onChange(loc);
                   setOpen(false);
                 }}
-                className="w-full text-left px-4 py-3.5 text-sm text-[#F5F0E8]/70 hover:bg-[#243628] hover:text-[#F5F0E8] transition-colors border-b border-[#C9A84C]/10 last:border-0"
+                className="w-full text-left px-4 py-4 text-sm text-[#F5F0E8]/70 hover:bg-[#243628] hover:text-[#F5F0E8] transition-colors border-b border-[#C9A84C]/10 last:border-0"
               >
                 {loc}
               </button>
@@ -575,7 +575,7 @@ export default function TransfersClient() {
                     value={date}
                     min={new Date().toISOString().split("T")[0]}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-3.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
                     style={{ colorScheme: "dark" }}
                   />
                 </div>
@@ -587,7 +587,7 @@ export default function TransfersClient() {
                     type="time"
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
-                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-3.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
                     style={{ colorScheme: "dark" }}
                   />
                 </div>
@@ -661,15 +661,20 @@ export default function TransfersClient() {
                 <button
                   type="button"
                   onClick={() => setReturnTrip((prev) => !prev)}
-                  className={`relative w-12 h-6 rounded-full transition-colors duration-300 shrink-0 ${
-                    returnTrip ? "bg-[#C9A84C]" : "bg-[#243628] border border-[#C9A84C]/25"
-                  }`}
+                  aria-pressed={returnTrip}
+                  className="shrink-0 p-3 -mr-3"
                 >
                   <span
-                    className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#F5F0E8] shadow transition-transform duration-300 ${
-                      returnTrip ? "translate-x-6" : "translate-x-0.5"
+                    className={`relative block w-12 h-6 rounded-full transition-colors duration-300 ${
+                      returnTrip ? "bg-[#C9A84C]" : "bg-[#243628] border border-[#C9A84C]/25"
                     }`}
-                  />
+                  >
+                    <span
+                      className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#F5F0E8] shadow transition-transform duration-300 ${
+                        returnTrip ? "translate-x-6" : "translate-x-0.5"
+                      }`}
+                    />
+                  </span>
                 </button>
               </div>
 
@@ -693,7 +698,7 @@ export default function TransfersClient() {
                           value={returnDate}
                           min={date || new Date().toISOString().split("T")[0]}
                           onChange={(e) => setReturnDate(e.target.value)}
-                          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-3.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
                           style={{ colorScheme: "dark" }}
                         />
                       </div>
@@ -705,7 +710,7 @@ export default function TransfersClient() {
                           type="time"
                           value={returnTime}
                           onChange={(e) => setReturnTime(e.target.value)}
-                          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-3.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
                           style={{ colorScheme: "dark" }}
                         />
                       </div>
@@ -919,7 +924,7 @@ export default function TransfersClient() {
 
                       {/* CTA */}
                       <div
-                        className={`text-center py-3 text-[0.65rem] tracking-[0.25em] uppercase border transition-all ${
+                        className={`text-center py-4 text-[0.65rem] tracking-[0.25em] uppercase border transition-all ${
                           isSelected
                             ? "bg-[#C9A84C] text-[#1C2B1E] border-[#C9A84C]"
                             : "text-[#C9A84C] border-[#C9A84C]/30 group-hover:bg-[#C9A84C]/10"
@@ -1056,7 +1061,7 @@ export default function TransfersClient() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Uw volledige naam"
-                      className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
+                      className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
                     />
                   </div>
                   <div>
@@ -1069,7 +1074,7 @@ export default function TransfersClient() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="+31 6 ..."
-                      className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
+                      className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
                     />
                   </div>
                 </div>
@@ -1097,7 +1102,7 @@ export default function TransfersClient() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Vluchtummer, speciale verzoeken, kinderstoel nodig..."
-                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20 resize-none"
+                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20 resize-none"
                   />
                 </div>
 

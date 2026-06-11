@@ -88,13 +88,13 @@ export default function Footer() {
                 </a>
               </li>
               <li className="pt-4">
-                <div className="flex gap-4">
+                <div className="flex gap-2">
                   <a
                     href="https://www.instagram.com/baliliving.nl"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Instagram"
-                    className="text-[#F5F0E8]/40 hover:text-[#C9A84C] transition-colors duration-300"
+                    className="w-10 h-10 flex items-center justify-center text-[#F5F0E8]/40 hover:text-[#C9A84C] transition-colors duration-300"
                   >
                     <IconInstagram />
                   </a>
@@ -103,7 +103,7 @@ export default function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="WhatsApp"
-                    className="text-[#F5F0E8]/40 hover:text-[#C9A84C] transition-colors duration-300"
+                    className="w-10 h-10 flex items-center justify-center text-[#F5F0E8]/40 hover:text-[#C9A84C] transition-colors duration-300"
                   >
                     <IconWhatsApp />
                   </a>

@@ -66,6 +66,16 @@ a, button {
   transition: all 0.3s ease;
 }
 
+/* Eliminate 300ms tap delay on iOS for all interactive elements */
+a, button, input, select, textarea {
+  touch-action: manipulation;
+}
+
+/* Safe-area padding for fixed bottom bars on notched iPhones */
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
 /* ─── Premium utility classes ─────────────────────────────────── */
 
 /* Noise overlay — subtle film grain texture */

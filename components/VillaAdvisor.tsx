@@ -300,7 +300,7 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                               </p>
                               <Link
                                 href={`/villas/${altVilla.slug}`}
-                                className="block text-center py-2 border border-[#C9A84C]/25 text-[#C9A84C] text-[0.6rem] tracking-[0.2em] uppercase hover:border-[#C9A84C]/60 hover:bg-[#C9A84C]/8 transition-colors"
+                                className="block text-center py-3 border border-[#C9A84C]/25 text-[#C9A84C] text-[0.6rem] tracking-[0.2em] uppercase hover:border-[#C9A84C]/60 hover:bg-[#C9A84C]/8 transition-colors"
                               >
                                 Bekijk
                               </Link>
