@@ -21,7 +21,7 @@ export async function sendBookingConfirmation(booking: {
   const fmt = (d: string) =>
     new Date(d).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" });
 
-  await Promise.allSettled([
+  const results = await Promise.allSettled([
     // Guest confirmation
     resend.emails.send({
       from: FROM,
@@ -69,6 +69,9 @@ export async function sendBookingConfirmation(booking: {
       `,
     }),
   ]);
+  results.forEach((r) => {
+    if (r.status === "rejected") console.error("Email send failed:", r.reason);
+  });
 }
 
 export async function sendBookingStatusUpdate(booking: {
@@ -107,5 +110,5 @@ export async function sendBookingStatusUpdate(booking: {
         <p style="color:#aaa; font-size:12px; margin-top:32px;">Referentie: ${ref} · BaliLiving · Exclusieve Bali Ervaringen</p>
       </div>
     `,
-  }).catch(() => {});
+  }).catch((err) => { console.error("Status email failed:", err); });
 }

@@ -112,23 +112,26 @@ export async function createBooking(payload: BookingPayload) {
     return { error: "Er is iets misgegaan. Probeer het opnieuw of neem contact op." };
   }
 
-  // Fire-and-forget: push notification + confirmation email
-  void sendPushToAdminDevices(supabase, {
-    title: "Nieuwe boekingsaanvraag",
-    body: `${input.guest_name} wil ${villa.name} boeken (${total_nights} nachten)`,
-    data: { bookingId: booking.id },
-  });
-  void sendBookingConfirmation({
-    id: booking.id,
-    guest_name: input.guest_name,
-    guest_email: input.guest_email,
-    villa_name: villa.name,
-    check_in: input.check_in,
-    check_out: input.check_out,
-    total_nights,
-    total_price,
-    guest_count: input.guest_count,
-  });
+  // Run push notification and confirmation email before returning
+  // (fire-and-forget is not safe in Vercel serverless — function exits before promise resolves)
+  await Promise.allSettled([
+    sendPushToAdminDevices(supabase, {
+      title: "Nieuwe boekingsaanvraag",
+      body: `${input.guest_name} wil ${villa.name} boeken (${total_nights} nachten)`,
+      data: { bookingId: booking.id },
+    }),
+    sendBookingConfirmation({
+      id: booking.id,
+      guest_name: input.guest_name,
+      guest_email: input.guest_email,
+      villa_name: villa.name,
+      check_in: input.check_in,
+      check_out: input.check_out,
+      total_nights,
+      total_price,
+      guest_count: input.guest_count,
+    }),
+  ]);
 
   return { data: booking };
 }
@@ -252,8 +255,7 @@ export async function updateBookingStatus(
       .upsert(dates, { onConflict: "villa_id,blocked_date" });
   }
 
-  // Notify guest of accept/reject (fire and forget)
-  void sendBookingStatusUpdate({
+  await sendBookingStatusUpdate({
     id: bookingId,
     guest_name: booking.guest_name,
     guest_email: booking.guest_email,
