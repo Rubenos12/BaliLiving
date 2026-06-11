@@ -46,44 +46,52 @@ function Gallery({ images, name }: { images: string[]; name: string }) {
           onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0F1A10]/30 to-transparent pointer-events-none" />
-        <div className="absolute bottom-4 right-4 bg-[#1C2B1E]/80 px-3 py-1.5 text-[#C9A84C] text-xs tracking-wider">
-          {active + 1} / {count}
-        </div>
-        <button
-          onClick={prev}
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] text-xl transition-all duration-200"
-          aria-label="Vorige foto"
-        >
-          ‹
-        </button>
-        <button
-          onClick={next}
-          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] text-xl transition-all duration-200"
-          aria-label="Volgende foto"
-        >
-          ›
-        </button>
-      </div>
-      {/* Thumbnails */}
-      <div className="flex gap-2 mt-2">
-        {images.map((src, i) => (
+        {count > 1 && (
+          <div className="absolute bottom-4 right-4 bg-[#1C2B1E]/80 px-3 py-1.5 text-[#C9A84C] text-xs tracking-wider">
+            {active + 1} / {count}
+          </div>
+        )}
+        {count > 1 && (
           <button
-            key={i}
-            onClick={() => setActive(i)}
-            className={`flex-1 aspect-video overflow-hidden transition-all duration-200 ${
-              active === i ? "ring-2 ring-[#C9A84C]" : "opacity-50 hover:opacity-80"
-            }`}
+            onClick={prev}
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] text-xl transition-all duration-200"
+            aria-label="Vorige foto"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={src}
-              alt=""
-              className="w-full h-full object-cover"
-              onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }}
-            />
+            ‹
           </button>
-        ))}
+        )}
+        {count > 1 && (
+          <button
+            onClick={next}
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#1C2B1E]/70 hover:bg-[#1C2B1E] flex items-center justify-center text-[#C9A84C] text-xl transition-all duration-200"
+            aria-label="Volgende foto"
+          >
+            ›
+          </button>
+        )}
       </div>
+      {/* Thumbnails — only when more than 1 image */}
+      {count > 1 && (
+        <div className="flex gap-2 mt-2">
+          {images.map((src, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              className={`flex-1 aspect-video overflow-hidden transition-all duration-200 ${
+                active === i ? "ring-2 ring-[#C9A84C]" : "opacity-50 hover:opacity-80"
+              }`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={src}
+                alt=""
+                className="w-full h-full object-cover"
+                onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }}
+              />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

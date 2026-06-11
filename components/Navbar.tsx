@@ -60,13 +60,16 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-xs tracking-[0.2em] uppercase transition-colors duration-300 ${
+                className={`relative text-xs tracking-[0.2em] uppercase transition-colors duration-300 pb-1 ${
                   pathname === link.href
                     ? "text-[#C9A84C]"
                     : "text-[#F5F0E8]/80 hover:text-[#C9A84C]"
                 }`}
               >
                 {link.label}
+                {pathname === link.href && (
+                  <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#C9A84C]" />
+                )}
               </Link>
             ))}
             <Link

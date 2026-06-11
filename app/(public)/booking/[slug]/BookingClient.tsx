@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, Variants } from "framer-motion";
+import { motion, Variants, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import type { Villa } from "@/lib/villas-data";
@@ -14,6 +14,12 @@ const fadeUp: Variants = {
 const stagger: Variants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.08 } },
+};
+
+const stepSlide: Variants = {
+  hidden: (dir: number) => ({ opacity: 0, x: dir * 24 }),
+  show: { opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" } },
+  exit: (dir: number) => ({ opacity: 0, x: dir * -24, transition: { duration: 0.2, ease: "easeIn" } }),
 };
 
 type Step = 1 | 2 | 3;
@@ -83,6 +89,7 @@ export default function BookingClient({
   initialGuests: number;
 }) {
   const [step, setStep] = useState<Step>(1);
+  const [stepDir, setStepDir] = useState(1); // 1 = forward, -1 = backward
   const [checkIn, setCheckIn] = useState(initialCheckIn);
   const [checkOut, setCheckOut] = useState(initialCheckOut);
   const [guests, setGuests] = useState(initialGuests);
@@ -93,7 +100,9 @@ export default function BookingClient({
     bericht: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [bookingRef, setBookingRef] = useState("");
 
   const nights =
     checkIn && checkOut
@@ -116,9 +125,15 @@ export default function BookingClient({
         })
       : "—";
 
+  const goToStep = (next: Step) => {
+    setStepDir(next > step ? 1 : -1);
+    setStep(next);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError("");
+    setIsSubmitting(true);
 
     const result = await createBooking({
       villa_id: villaId,
@@ -134,11 +149,16 @@ export default function BookingClient({
       notes: form.bericht,
     });
 
+    setIsSubmitting(false);
+
     if (result.error) {
       setSubmitError(result.error);
       return;
     }
 
+    if (result.data?.id) {
+      setBookingRef(result.data.id.slice(0, 8).toUpperCase());
+    }
     setSubmitted(true);
     setStep(3);
   };
@@ -182,6 +202,12 @@ export default function BookingClient({
               <span className="text-[#F5F0E8]/50">Totaal ({nights} nachten)</span>
               <span className="text-[#C9A84C] font-medium">€{total.toLocaleString("nl-NL")}</span>
             </div>
+            {bookingRef && (
+              <div className="flex justify-between text-sm border-t border-[#C9A84C]/10 pt-3">
+                <span className="text-[#F5F0E8]/35">Referentie</span>
+                <span className="text-[#F5F0E8]/50 font-mono tracking-wider">{bookingRef}</span>
+              </div>
+            )}
           </motion.div>
           <motion.div variants={fadeUp}>
             <Link
@@ -231,211 +257,241 @@ export default function BookingClient({
 
         <StepIndicator current={step} />
 
-        {/* Step 1 — Dates */}
-        {step === 1 && (
-          <motion.div initial="hidden" animate="show" variants={stagger}>
-            <motion.div variants={fadeUp} className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-6 md:p-8 mb-6">
-              <h2
-                className="text-2xl font-light text-[#F5F0E8] mb-6"
-                style={{ fontFamily: "var(--font-cormorant)" }}
-              >
-                Kies je datums
-              </h2>
-              <div className="grid grid-cols-2 gap-4 mb-5">
-                <div>
-                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
-                    Check-in
-                  </label>
-                  <input
-                    type="date"
-                    value={checkIn}
-                    onChange={(e) => setCheckIn(e.target.value)}
-                    min={new Date().toISOString().split("T")[0]}
-                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
-                    Check-out
-                  </label>
-                  <input
-                    type="date"
-                    value={checkOut}
-                    onChange={(e) => setCheckOut(e.target.value)}
-                    min={checkIn || new Date().toISOString().split("T")[0]}
-                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
-                  Aantal gasten
-                </label>
-                <div className="flex items-center border border-[#C9A84C]/20 bg-[#243628] w-40">
-                  <button
-                    onClick={() => setGuests((g) => Math.max(1, g - 1))}
-                    className="px-4 py-3 text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors text-lg leading-none"
-                  >
-                    −
-                  </button>
-                  <span className="flex-1 text-center text-[#F5F0E8] text-sm py-3">
-                    {guests}
-                  </span>
-                  <button
-                    onClick={() => setGuests((g) => Math.min(villa.guests_max, g + 1))}
-                    className="px-4 py-3 text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors text-lg leading-none"
-                  >
-                    +
-                  </button>
-                </div>
-                <p className="text-[#F5F0E8]/30 text-[0.65rem] mt-1.5">Max. {villa.guests_max} gasten</p>
-              </div>
-            </motion.div>
-
-            {/* Price breakdown — Airbnb-style transparency */}
-            {nights > 0 && (
-              <motion.div variants={fadeUp} className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-6 mb-6">
-                <p className="text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-4">
-                  Prijsoverzicht
-                </p>
-                <div className="space-y-2.5 mb-4">
-                  <div className="flex justify-between text-sm text-[#F5F0E8]/65">
-                    <span>
-                      €{villa.price_per_night.toLocaleString("nl-NL")} × {nights} {nights === 1 ? "nacht" : "nachten"}
-                    </span>
-                    <span>€{total.toLocaleString("nl-NL")}</span>
-                  </div>
-                  <div className="flex justify-between text-sm text-[#F5F0E8]/65">
-                    <span>Servicekosten</span>
-                    <span className="text-[#F5F0E8]/35 italic text-xs self-center">Na bevestiging</span>
-                  </div>
-                </div>
-                <div className="flex justify-between text-sm font-medium text-[#F5F0E8] border-t border-[#C9A84C]/15 pt-3">
-                  <span>Totaal accommodatie</span>
-                  <span
-                    className="text-[#C9A84C] text-xl font-light"
+        <AnimatePresence mode="wait" custom={stepDir}>
+          {/* Step 1 — Dates */}
+          {step === 1 && (
+            <motion.div
+              key="step1"
+              custom={stepDir}
+              variants={stepSlide}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+            >
+              <motion.div variants={stagger} initial="hidden" animate="show">
+                <motion.div variants={fadeUp} className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-6 md:p-8 mb-6">
+                  <h2
+                    className="text-2xl font-light text-[#F5F0E8] mb-6"
                     style={{ fontFamily: "var(--font-cormorant)" }}
                   >
-                    €{total.toLocaleString("nl-NL")}
-                  </span>
-                </div>
-                <p className="text-[#F5F0E8]/30 text-[0.65rem] mt-3 leading-relaxed">
-                  Geen betaling nu — Edwin & Citty bevestigen jouw aanvraag binnen 24 uur.
-                </p>
-              </motion.div>
-            )}
-
-            <motion.div variants={fadeUp}>
-              <button
-                onClick={() => setStep(2)}
-                disabled={!checkIn || !checkOut || nights < 1}
-                className="w-full py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Doorgaan naar gegevens →
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* Step 2 — Guest details */}
-        {step === 2 && (
-          <motion.div initial="hidden" animate="show" variants={stagger}>
-            <motion.div variants={fadeUp} className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-6 md:p-8 mb-4">
-              <h2
-                className="text-2xl font-light text-[#F5F0E8] mb-1"
-                style={{ fontFamily: "var(--font-cormorant)" }}
-              >
-                Jouw gegevens
-              </h2>
-              <p className="text-[#F5F0E8]/40 text-sm mb-6">
-                {formatDate(checkIn)} → {formatDate(checkOut)} · {nights} nachten · {guests} gasten
-              </p>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
-                      Naam *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={form.naam}
-                      onChange={(e) => setForm({ ...form, naam: e.target.value })}
-                      placeholder="Jouw naam"
-                      className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
-                    />
+                    Kies je datums
+                  </h2>
+                  <div className="grid grid-cols-2 gap-4 mb-5">
+                    <div>
+                      <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
+                        Check-in
+                      </label>
+                      <input
+                        type="date"
+                        value={checkIn}
+                        onChange={(e) => setCheckIn(e.target.value)}
+                        min={new Date().toISOString().split("T")[0]}
+                        className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
+                        Check-out
+                      </label>
+                      <input
+                        type="date"
+                        value={checkOut}
+                        onChange={(e) => setCheckOut(e.target.value)}
+                        min={checkIn || new Date().toISOString().split("T")[0]}
+                        className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
-                      E-mailadres *
+                      Aantal gasten
                     </label>
-                    <input
-                      type="email"
-                      required
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      placeholder="jouw@email.nl"
-                      className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
-                    />
+                    <div className="flex items-center border border-[#C9A84C]/20 bg-[#243628] w-40">
+                      <button
+                        onClick={() => setGuests((g) => Math.max(1, g - 1))}
+                        className="px-4 py-3 text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors text-lg leading-none"
+                      >
+                        −
+                      </button>
+                      <span className="flex-1 text-center text-[#F5F0E8] text-sm py-3">
+                        {guests}
+                      </span>
+                      <button
+                        onClick={() => setGuests((g) => Math.min(villa.guests_max, g + 1))}
+                        className="px-4 py-3 text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors text-lg leading-none"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <p className="text-[#F5F0E8]/30 text-[0.65rem] mt-1.5">Max. {villa.guests_max} gasten</p>
                   </div>
-                </div>
-                <div>
-                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
-                    Telefoonnummer
-                  </label>
-                  <input
-                    type="tel"
-                    value={form.telefoon}
-                    onChange={(e) => setForm({ ...form, telefoon: e.target.value })}
-                    placeholder="+31 6 ..."
-                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
-                    Bijzonderheden / verzoeken
-                  </label>
-                  <textarea
-                    value={form.bericht}
-                    onChange={(e) => setForm({ ...form, bericht: e.target.value })}
-                    rows={3}
-                    placeholder="Speciale verzoeken, vragen, allergiën..."
-                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20 resize-none"
-                  />
-                </div>
+                </motion.div>
 
-                {submitError && (
-                  <p className="text-red-400 text-xs text-center py-2">{submitError}</p>
+                {/* Price breakdown */}
+                {nights > 0 && (
+                  <motion.div variants={fadeUp} className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-6 mb-6">
+                    <p className="text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-4">
+                      Prijsoverzicht
+                    </p>
+                    <div className="space-y-2.5 mb-4">
+                      <div className="flex justify-between text-sm text-[#F5F0E8]/65">
+                        <span>
+                          €{villa.price_per_night.toLocaleString("nl-NL")} × {nights} {nights === 1 ? "nacht" : "nachten"}
+                        </span>
+                        <span>€{total.toLocaleString("nl-NL")}</span>
+                      </div>
+                      <div className="flex justify-between text-sm text-[#F5F0E8]/65">
+                        <span>Servicekosten</span>
+                        <span className="text-[#F5F0E8]/35 italic text-xs self-center">Na bevestiging</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between text-sm font-medium text-[#F5F0E8] border-t border-[#C9A84C]/15 pt-3">
+                      <span>Totaal accommodatie</span>
+                      <span
+                        className="text-[#C9A84C] text-xl font-light"
+                        style={{ fontFamily: "var(--font-cormorant)" }}
+                      >
+                        €{total.toLocaleString("nl-NL")}
+                      </span>
+                    </div>
+                    <p className="text-[#F5F0E8]/30 text-[0.65rem] mt-3 leading-relaxed">
+                      Geen betaling nu — Edwin & Citty bevestigen jouw aanvraag binnen 24 uur.
+                    </p>
+                  </motion.div>
                 )}
-                <div className="flex gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setStep(1)}
-                    className="px-6 py-4 border border-[#C9A84C]/30 text-[#C9A84C] text-xs tracking-[0.25em] uppercase hover:bg-[#C9A84C]/10 transition-all duration-300"
-                  >
-                    ← Terug
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300"
-                  >
-                    Aanvraag bevestigen ✦
-                  </button>
-                </div>
-              </form>
-            </motion.div>
 
-            <motion.div variants={fadeUp} className="bg-[#1C2B1E] border border-[#C9A84C]/15 p-5">
-              <div className="flex items-start gap-3">
-                <span className="text-[#C9A84C] text-sm mt-0.5">🔒</span>
-                <p className="text-[#F5F0E8]/40 text-xs leading-relaxed">
-                  Je gegevens worden nooit gedeeld met derden. Edwin of Citty neemt binnen
-                  24 uur contact op voor definitieve bevestiging. Betaling verloopt na bevestiging.
-                </p>
-              </div>
+                <motion.div variants={fadeUp}>
+                  <button
+                    onClick={() => goToStep(2)}
+                    disabled={!checkIn || !checkOut || nights < 1}
+                    className="w-full py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Doorgaan naar gegevens →
+                  </button>
+                </motion.div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
+          )}
+
+          {/* Step 2 — Guest details */}
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              custom={stepDir}
+              variants={stepSlide}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+            >
+              <motion.div variants={stagger} initial="hidden" animate="show">
+                <motion.div variants={fadeUp} className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-6 md:p-8 mb-4">
+                  <h2
+                    className="text-2xl font-light text-[#F5F0E8] mb-1"
+                    style={{ fontFamily: "var(--font-cormorant)" }}
+                  >
+                    Jouw gegevens
+                  </h2>
+                  <p className="text-[#F5F0E8]/40 text-sm mb-6">
+                    {formatDate(checkIn)} → {formatDate(checkOut)} · {nights} nachten · {guests} gasten
+                  </p>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
+                          Naam *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={form.naam}
+                          onChange={(e) => setForm({ ...form, naam: e.target.value })}
+                          placeholder="Jouw naam"
+                          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
+                          E-mailadres *
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          value={form.email}
+                          onChange={(e) => setForm({ ...form, email: e.target.value })}
+                          placeholder="jouw@email.nl"
+                          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
+                        Telefoonnummer
+                      </label>
+                      <input
+                        type="tel"
+                        value={form.telefoon}
+                        onChange={(e) => setForm({ ...form, telefoon: e.target.value })}
+                        placeholder="+31 6 ..."
+                        className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
+                        Bijzonderheden / verzoeken
+                      </label>
+                      <textarea
+                        value={form.bericht}
+                        onChange={(e) => setForm({ ...form, bericht: e.target.value })}
+                        rows={3}
+                        placeholder="Speciale verzoeken, vragen, allergiën..."
+                        className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20 resize-none"
+                      />
+                    </div>
+
+                    {submitError && (
+                      <p className="text-red-400 text-xs text-center py-2">{submitError}</p>
+                    )}
+                    <div className="flex gap-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => goToStep(1)}
+                        className="px-6 py-4 border border-[#C9A84C]/30 text-[#C9A84C] text-xs tracking-[0.25em] uppercase hover:bg-[#C9A84C]/10 transition-all duration-300"
+                      >
+                        ← Terug
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex-1 py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" strokeLinecap="round"/>
+                            </svg>
+                            Bezig...
+                          </>
+                        ) : (
+                          "Aanvraag bevestigen ✦"
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+
+                <motion.div variants={fadeUp} className="bg-[#1C2B1E] border border-[#C9A84C]/15 p-5">
+                  <div className="flex items-start gap-3">
+                    <span className="text-[#C9A84C] text-sm mt-0.5">🔒</span>
+                    <p className="text-[#F5F0E8]/40 text-xs leading-relaxed">
+                      Je gegevens worden nooit gedeeld met derden. Edwin of Citty neemt binnen
+                      24 uur contact op voor definitieve bevestiging. Betaling verloopt na bevestiging.
+                    </p>
+                  </div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

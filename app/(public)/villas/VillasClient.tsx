@@ -57,15 +57,14 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
   const [activeExperience, setActiveExperience] = useState("");
 
   const filtered = villas.filter((v) => {
-    const regionMatch =
-      activeRegion === "Alle Villa's" || v.region === activeRegion;
+    const regionMatch = activeRegion === "Alle Villa's" || v.region === activeRegion;
     const expFilter = EXPERIENCE_FILTERS.find((f) => f.label === activeExperience);
     const expMatch = !activeExperience || (expFilter ? expFilter.match(v) : true);
     return regionMatch && expMatch;
   });
 
-  // Keep a single active filter alias for display
-  const activeFilter = activeExperience || activeRegion;
+  const hasActiveFilters = activeRegion !== "Alle Villa's" || activeExperience !== "";
+  const clearFilters = () => { setActiveRegion("Alle Villa's"); setActiveExperience(""); };
 
   return (
     <>
@@ -116,9 +115,9 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
           {REGION_FILTERS.map((f) => (
             <button
               key={f}
-              onClick={() => { setActiveRegion(f); setActiveExperience(""); }}
+              onClick={() => setActiveRegion(f)}
               className={`text-xs tracking-[0.2em] uppercase px-5 py-2 transition-all duration-300 ${
-                activeRegion === f && !activeExperience
+                activeRegion === f
                   ? "bg-[#C9A84C] text-[#1C2B1E]"
                   : "text-[#F5F0E8]/50 border border-[#F5F0E8]/10 hover:border-[#C9A84C]/50 hover:text-[#C9A84C]"
               }`}
@@ -135,9 +134,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
           {EXPERIENCE_FILTERS.map((f) => (
             <button
               key={f.label}
-              onClick={() =>
-                setActiveExperience((prev) => (prev === f.label ? "" : f.label))
-              }
+              onClick={() => setActiveExperience((prev) => (prev === f.label ? "" : f.label))}
               className={`text-xs tracking-[0.15em] uppercase px-4 py-1.5 transition-all duration-300 border ${
                 activeExperience === f.label
                   ? "bg-[#C9A84C]/20 border-[#C9A84C]/60 text-[#C9A84C]"
@@ -151,10 +148,34 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
       </section>
 
       {/* Villas grid */}
-      <section className="py-28 max-w-7xl mx-auto px-6">
+      <section className="py-20 max-w-7xl mx-auto px-6">
+        {/* Result count + clear */}
+        <div className="flex items-center justify-between mb-10">
+          <p className="text-[#F5F0E8]/40 text-sm">
+            <span className="text-[#F5F0E8]">{filtered.length}</span>{" "}
+            villa{filtered.length !== 1 ? "'s" : ""} gevonden
+          </p>
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="text-xs text-[#C9A84C]/50 hover:text-[#C9A84C] tracking-wider transition-colors duration-200"
+            >
+              Wis filters ×
+            </button>
+          )}
+        </div>
+
         {filtered.length === 0 ? (
-          <div className="text-center py-20 text-[#F5F0E8]/30 text-sm">
-            Geen villa&apos;s gevonden voor {activeExperience || activeRegion}
+          <div className="text-center py-20">
+            <p className="text-[#F5F0E8]/30 text-sm mb-4">
+              Geen villa&apos;s gevonden voor deze combinatie.
+            </p>
+            <button
+              onClick={clearFilters}
+              className="text-xs text-[#C9A84C] tracking-wider hover:underline"
+            >
+              Probeer andere filters
+            </button>
           </div>
         ) : (
           <motion.div
@@ -162,14 +183,15 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
             initial="hidden"
             animate="show"
             variants={stagger}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-10"
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
             {filtered.map((villa) => (
               <motion.div
                 key={villa.slug}
                 variants={fadeUp}
-                className="group bg-[#1C2B1E] border border-[#C9A84C]/10 hover:border-[#C9A84C]/40 transition-all duration-500"
+                className="group bg-[#1C2B1E] border border-[#C9A84C]/10 hover:border-[#C9A84C]/35 transition-all duration-500"
               >
+                {/* Image */}
                 <div className="aspect-[4/3] bg-[#243628] relative overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -186,46 +208,52 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
                   </div>
                 </div>
 
-                <div className="p-9">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3
-                        className="text-2xl font-light text-[#F5F0E8] group-hover:text-[#C9A84C] transition-colors duration-300"
-                        style={{ fontFamily: "var(--font-cormorant)" }}
-                      >
-                        {villa.name}
-                      </h3>
-                      <p className="text-[#C9A84C]/70 text-xs tracking-wider mt-1">{villa.location}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[#F5F0E8]/40 text-xs">
-                        {villa.guests_min === villa.guests_max
-                          ? `${villa.guests_max} gasten`
-                          : `${villa.guests_min}–${villa.guests_max} gasten`}
-                      </p>
-                      <p className="text-[#F5F0E8]/40 text-xs">{villa.bedrooms} slaapkamers</p>
-                    </div>
+                {/* Card body */}
+                <div className="p-6">
+                  {/* Name + location */}
+                  <h3
+                    className="text-2xl font-light text-[#F5F0E8] group-hover:text-[#C9A84C] transition-colors duration-300 leading-tight"
+                    style={{ fontFamily: "var(--font-cormorant)" }}
+                  >
+                    {villa.name}
+                  </h3>
+                  <p className="text-[#C9A84C]/70 text-xs tracking-wider mt-1 mb-4">{villa.location}</p>
+
+                  {/* Stat chips */}
+                  <div className="flex items-center gap-2 mb-6">
+                    <span className="inline-flex items-center gap-1.5 border border-[#C9A84C]/20 text-[#F5F0E8]/55 text-xs px-3 py-1.5">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M2 9V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3"/><path d="M2 11v9"/><path d="M22 11v9"/><path d="M2 15h20"/><rect x="6" y="15" width="4" height="5"/><rect x="14" y="15" width="4" height="5"/>
+                      </svg>
+                      {villa.bedrooms} slpk
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 border border-[#C9A84C]/20 text-[#F5F0E8]/55 text-xs px-3 py-1.5">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                      </svg>
+                      {villa.guests_min === villa.guests_max
+                        ? villa.guests_max
+                        : `${villa.guests_min}–${villa.guests_max}`}{" "}
+                      gst
+                    </span>
                   </div>
 
-                  <ul className="space-y-2 mb-6">
-                    {villa.amenities.slice(0, 4).map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-[#F5F0E8]/55 text-sm">
-                        <span className="text-[#C9A84C] text-xs">✦</span>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="flex items-center justify-between pt-5 border-t border-[#C9A84C]/10">
-                    <p className="text-[#C9A84C] text-sm font-light" style={{ fontFamily: "var(--font-cormorant)" }}>
-                      Vanaf €{villa.price_per_night.toLocaleString("nl-NL")} / nacht
-                    </p>
+                  {/* Price + CTA */}
+                  <div className="flex items-center justify-between pt-4 border-t border-[#C9A84C]/10">
+                    <div>
+                      <p
+                        className="text-[#C9A84C] text-xl font-light leading-none"
+                        style={{ fontFamily: "var(--font-cormorant)" }}
+                      >
+                        €{villa.price_per_night.toLocaleString("nl-NL")}
+                      </p>
+                      <p className="text-[#F5F0E8]/35 text-[0.65rem] mt-0.5">per nacht</p>
+                    </div>
                     <Link
                       href={`/villas/${villa.slug}`}
-                      className="text-xs tracking-[0.2em] uppercase text-[#F5F0E8]/50 hover:text-[#C9A84C] transition-colors duration-300 flex items-center gap-2"
+                      className="px-5 py-2.5 border border-[#C9A84C]/40 text-[#C9A84C] text-xs tracking-[0.2em] uppercase hover:bg-[#C9A84C] hover:text-[#1C2B1E] transition-all duration-300"
                     >
-                      Bekijk villa
-                      <span className="w-4 h-px bg-current" />
+                      Bekijk
                     </Link>
                   </div>
                 </div>

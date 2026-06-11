@@ -25,6 +25,11 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Anchor link offset — prevent scrolling under the fixed navbar */
+[id] {
+  scroll-margin-top: 100px;
+}
+
 body {
   background: var(--bali-green);
   color: var(--bali-cream);
