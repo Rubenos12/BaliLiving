@@ -43,16 +43,16 @@ const LOCATION_OPTIONS = [
 ];
 
 const PREFERENCE_OPTIONS = [
-  { value: "privé zwembad", label: "Privé zwembad" },
-  { value: "strand en oceaan", label: "Strand & oceaan" },
-  { value: "natuur en jungle", label: "Natuur & jungle" },
-  { value: "romantisch voor twee", label: "Romantisch" },
-  { value: "gezinsvriendelijk", label: "Gezin" },
+  { value: "pool", label: "Privé zwembad" },
+  { value: "strand", label: "Strand & oceaan" },
+  { value: "natuur", label: "Natuur & jungle" },
+  { value: "romantisch", label: "Romantisch" },
+  { value: "kinderen", label: "Gezin" },
   { value: "surfen", label: "Surfen" },
-  { value: "eco en duurzaam", label: "Eco & duurzaam" },
-  { value: "eigen chef", label: "Eigen chef" },
-  { value: "grote groep of feest", label: "Grote groep" },
-  { value: "yoga en wellness", label: "Yoga & wellness" },
+  { value: "eco", label: "Eco & duurzaam" },
+  { value: "chef", label: "Eigen chef" },
+  { value: "groep", label: "Grote groep" },
+  { value: "wellness", label: "Yoga & wellness" },
 ];
 
 type Step = 1 | 2 | 3 | 4 | 5;

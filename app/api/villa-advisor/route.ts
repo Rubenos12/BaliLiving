@@ -20,6 +20,7 @@ function checkRateLimit(ip: string): boolean {
 const VALID_PREFERENCES = [
   "pool", "strand", "romantisch", "natuur", "wellness",
   "wifi", "chef", "kinderen", "afgelegen", "modern",
+  "surfen", "eco", "groep",
 ] as const;
 
 const requestSchema = z.object({
