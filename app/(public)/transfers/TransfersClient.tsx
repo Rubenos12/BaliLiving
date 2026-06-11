@@ -565,35 +565,35 @@ export default function TransfersClient() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
-                    Datum
-                  </label>
-                  <input
-                    type="date"
-                    value={date}
-                    min={new Date().toISOString().split("T")[0]}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
-                    style={{ colorScheme: "dark" }}
-                  />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:contents gap-4">
+                  <div>
+                    <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
+                      Datum
+                    </label>
+                    <input
+                      type="date"
+                      value={date}
+                      min={new Date().toISOString().split("T")[0]}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                      style={{ colorScheme: "dark" }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
+                      Tijdstip
+                    </label>
+                    <input
+                      type="time"
+                      value={time}
+                      onChange={(e) => setTime(e.target.value)}
+                      className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
+                      style={{ colorScheme: "dark" }}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
-                    Tijdstip
-                  </label>
-                  <input
-                    type="time"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-3 sm:px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
-                    style={{ colorScheme: "dark" }}
-                  />
-                </div>
-                <div className="col-span-2 sm:col-span-1">
-                  <PassengerCounter value={passengers} onChange={setPassengers} />
-                </div>
+                <PassengerCounter value={passengers} onChange={setPassengers} />
               </div>
 
               {/* Luggage */}
@@ -601,18 +601,16 @@ export default function TransfersClient() {
                 <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
                   Bagage
                 </label>
-                <div className="flex border border-[#C9A84C]/20">
-                  {(["geen", "1-2", "3-4", "5+"] as const).map((opt, i) => (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {(["geen", "1-2", "3-4", "5+"] as const).map((opt) => (
                     <button
                       key={opt}
                       type="button"
                       onClick={() => setLuggage(opt)}
-                      className={`flex-1 min-h-[48px] py-3 text-xs tracking-[0.1em] uppercase transition-all duration-200 ${
-                        i > 0 ? "border-l border-[#C9A84C]/20" : ""
-                      } ${
+                      className={`min-h-[48px] py-3 text-xs tracking-[0.1em] uppercase border transition-all duration-200 ${
                         luggage === opt
-                          ? "bg-[#C9A84C] text-[#1C2B1E]"
-                          : "bg-[#243628] text-[#F5F0E8]/50 hover:text-[#F5F0E8]/80"
+                          ? "bg-[#C9A84C] text-[#1C2B1E] border-[#C9A84C]"
+                          : "bg-[#243628] border-[#C9A84C]/20 text-[#F5F0E8]/50 hover:text-[#F5F0E8]/80"
                       }`}
                     >
                       {opt === "geen" ? "Geen" : `${opt} koffers`}
@@ -653,30 +651,28 @@ export default function TransfersClient() {
               </div>
 
               {/* Return trip toggle */}
-              <div className="flex items-center justify-between py-3 border border-[#C9A84C]/15 px-4">
+              <button
+                type="button"
+                onClick={() => setReturnTrip((prev) => !prev)}
+                aria-pressed={returnTrip}
+                className="w-full flex items-center justify-between py-4 px-4 border border-[#C9A84C]/15 text-left"
+              >
                 <div>
                   <p className="text-[#F5F0E8]/70 text-sm">Heen &amp; terug?</p>
                   <p className="text-[#F5F0E8]/30 text-[0.65rem]">Boek retour in één aanvraag</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setReturnTrip((prev) => !prev)}
-                  aria-pressed={returnTrip}
-                  className="shrink-0 p-3 -mr-3"
+                <span
+                  className={`relative flex-shrink-0 w-11 h-6 rounded-full transition-colors duration-300 ${
+                    returnTrip ? "bg-[#C9A84C]" : "bg-[#243628] border border-[#C9A84C]/25"
+                  }`}
                 >
                   <span
-                    className={`relative block w-12 h-6 rounded-full transition-colors duration-300 ${
-                      returnTrip ? "bg-[#C9A84C]" : "bg-[#243628] border border-[#C9A84C]/25"
+                    className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-[#F5F0E8] shadow transition-transform duration-300 ${
+                      returnTrip ? "translate-x-5" : "translate-x-0"
                     }`}
-                  >
-                    <span
-                      className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#F5F0E8] shadow transition-transform duration-300 ${
-                        returnTrip ? "translate-x-6" : "translate-x-0.5"
-                      }`}
-                    />
-                  </span>
-                </button>
-              </div>
+                  />
+                </span>
+              </button>
 
               {/* Return date/time */}
               <AnimatePresence>
@@ -834,9 +830,7 @@ export default function TransfersClient() {
             </h2>
           </div>
 
-          {/* Mobile: horizontal scroll — Desktop: 3-col grid */}
-          <div className="-mx-6 px-6 md:mx-0 md:px-0 overflow-x-auto md:overflow-visible pb-4 md:pb-0">
-            <div className="flex md:grid md:grid-cols-3 gap-4 w-max md:w-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {TIERS.map((tier, i) => {
                 const isRecommended = aiResult?.tier === tier.id;
                 const isSelected = selectedTier === tier.id;
@@ -848,7 +842,7 @@ export default function TransfersClient() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1, duration: 0.5 }}
                     onClick={() => handleTierSelect(tier.id)}
-                    className={`relative cursor-pointer group transition-all duration-300 w-[78vw] sm:w-[55vw] md:w-auto flex-shrink-0 md:flex-shrink pt-4 ${
+                    className={`relative cursor-pointer group transition-all duration-300 pt-4 ${
                       isSelected
                         ? "ring-2 ring-[#C9A84C]"
                         : "hover:ring-1 hover:ring-[#C9A84C]/40"
@@ -936,12 +930,7 @@ export default function TransfersClient() {
                   </motion.div>
                 );
               })}
-            </div>
           </div>
-          {/* Mobile swipe hint */}
-          <p className="md:hidden text-center text-[#F5F0E8]/20 text-[0.6rem] tracking-wider mt-2">
-            ← Swipe om alle opties te zien →
-          </p>
         </div>
       </section>
 
