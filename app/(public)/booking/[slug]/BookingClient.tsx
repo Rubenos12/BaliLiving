@@ -351,7 +351,7 @@ export default function BookingClient({
                     <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
                       Aantal gasten
                     </label>
-                    <div className="flex items-center border border-[#C9A84C]/20 bg-[#243628] w-44">
+                    <div className="flex items-center border border-[#C9A84C]/20 bg-[#243628] w-full max-w-[11rem]">
                       <button
                         onClick={() => setGuests((g) => Math.max(1, g - 1))}
                         className="w-12 h-12 flex items-center justify-center text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-colors text-lg leading-none"

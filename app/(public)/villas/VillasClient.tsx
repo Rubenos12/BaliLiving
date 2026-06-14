@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, Variants } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -56,6 +56,7 @@ const EXPERIENCE_FILTERS: { label: string; match: (v: Villa) => boolean }[] = [
 export default function VillasClient({ villas }: { villas: Villa[] }) {
   const [activeRegion, setActiveRegion] = useState("Alle Villa's");
   const [activeExperience, setActiveExperience] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const filtered = villas.filter((v) => {
     const regionMatch = activeRegion === "Alle Villa's" || v.region === activeRegion;
@@ -64,6 +65,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
     return regionMatch && expMatch;
   });
 
+  const activeCount = (activeRegion !== "Alle Villa's" ? 1 : 0) + (activeExperience ? 1 : 0);
   const hasActiveFilters = activeRegion !== "Alle Villa's" || activeExperience !== "";
   const clearFilters = () => { setActiveRegion("Alle Villa's"); setActiveExperience(""); };
 
@@ -109,8 +111,46 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
         </div>
       </div>
 
-      {/* Filter bar */}
-      <section className="sticky top-[72px] z-40 bg-[#1C2B1E] border-y border-[#C9A84C]/15 py-5 space-y-3">
+      {/* Mobile: compact filter button + active chips */}
+      <div className="md:hidden sticky top-[72px] z-40 bg-[#1C2B1E] border-b border-[#C9A84C]/15 px-4 py-3 flex items-center gap-2 overflow-x-auto">
+        <button
+          onClick={() => setFilterOpen(true)}
+          aria-label="Open filters"
+          className={`flex items-center gap-1.5 shrink-0 text-xs tracking-[0.15em] uppercase px-4 py-2.5 border transition-all duration-200 whitespace-nowrap ${
+            activeCount > 0
+              ? "bg-[#C9A84C]/15 border-[#C9A84C]/50 text-[#C9A84C]"
+              : "border-[#F5F0E8]/15 text-[#F5F0E8]/50"
+          }`}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
+          </svg>
+          Filters{activeCount > 0 ? ` (${activeCount})` : ""}
+        </button>
+        {activeRegion !== "Alle Villa's" && (
+          <span className="flex items-center gap-1 shrink-0 text-xs px-3 py-2 bg-[#C9A84C] text-[#1C2B1E] whitespace-nowrap">
+            {activeRegion}
+            <button
+              onClick={() => setActiveRegion("Alle Villa's")}
+              className="ml-1 leading-none text-[#1C2B1E]/60 hover:text-[#1C2B1E] transition-colors"
+              aria-label={`Verwijder ${activeRegion} filter`}
+            >×</button>
+          </span>
+        )}
+        {activeExperience && (
+          <span className="flex items-center gap-1 shrink-0 text-xs px-3 py-2 bg-[#C9A84C]/20 border border-[#C9A84C]/60 text-[#C9A84C] whitespace-nowrap">
+            {activeExperience}
+            <button
+              onClick={() => setActiveExperience("")}
+              className="ml-1 leading-none text-[#C9A84C]/60 hover:text-[#C9A84C] transition-colors"
+              aria-label={`Verwijder ${activeExperience} filter`}
+            >×</button>
+          </span>
+        )}
+      </div>
+
+      {/* Desktop: sticky filter bar */}
+      <section className="hidden md:block sticky top-[72px] z-40 bg-[#1C2B1E] border-y border-[#C9A84C]/15 py-5 space-y-3">
         {/* Region filters */}
         <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-2">
           {REGION_FILTERS.map((f) => (
@@ -280,6 +320,87 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
           </motion.div>
         )}
       </section>
+
+      {/* Mobile: filter bottom sheet */}
+      <AnimatePresence>
+        {filterOpen && (
+          <motion.div
+            key="filter-sheet-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[45] md:hidden flex flex-col justify-end"
+          >
+            <div className="absolute inset-0 bg-black/60" onClick={() => setFilterOpen(false)} aria-hidden="true" />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 320, damping: 32 }}
+              className="relative bg-[#1C2B1E] rounded-t-2xl px-5 pt-5 pb-safe max-h-[85dvh] overflow-y-auto overscroll-contain"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Villa filters"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-light text-[#F5F0E8]" style={{ fontFamily: "var(--font-cormorant)" }}>
+                  Filters
+                </h3>
+                <button
+                  onClick={() => setFilterOpen(false)}
+                  className="w-10 h-10 flex items-center justify-center text-[#F5F0E8]/40 hover:text-[#F5F0E8] transition-colors"
+                  aria-label="Sluit filters"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+
+              <p className="text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-3">Regio</p>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {REGION_FILTERS.map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setActiveRegion(f)}
+                    className={`text-xs tracking-[0.15em] uppercase px-4 py-2.5 min-h-[44px] transition-all duration-200 ${
+                      activeRegion === f
+                        ? "bg-[#C9A84C] text-[#1C2B1E]"
+                        : "text-[#F5F0E8]/50 border border-[#F5F0E8]/10 hover:border-[#C9A84C]/50 hover:text-[#C9A84C]"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+
+              <p className="text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-3">Sfeer</p>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {EXPERIENCE_FILTERS.map((f) => (
+                  <button
+                    key={f.label}
+                    onClick={() => setActiveExperience((prev) => (prev === f.label ? "" : f.label))}
+                    className={`text-xs tracking-[0.15em] uppercase px-4 py-2.5 min-h-[44px] transition-all duration-200 border ${
+                      activeExperience === f.label
+                        ? "bg-[#C9A84C]/20 border-[#C9A84C]/60 text-[#C9A84C]"
+                        : "border-[#C9A84C]/15 text-[#F5F0E8]/40 hover:border-[#C9A84C]/40 hover:text-[#C9A84C]/80"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setFilterOpen(false)}
+                className="w-full py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300 mb-2"
+              >
+                Toon {filtered.length} villa&apos;s
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* CTA */}
       <section className="py-28 bg-[#131E14] text-center">

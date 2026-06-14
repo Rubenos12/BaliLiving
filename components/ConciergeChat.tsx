@@ -196,7 +196,7 @@ export default function ConciergeChat() {
   const activeChips = (!loading && lastAiMsg?.quickReplies?.length) ? lastAiMsg.quickReplies : [];
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed right-6 z-50" style={{ bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))" }}>
       <AnimatePresence>
         {!open && (
           <motion.button
@@ -260,7 +260,7 @@ export default function ConciergeChat() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ overscrollBehavior: "contain" }}>
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div
@@ -336,11 +336,11 @@ export default function ConciergeChat() {
                   rows={1}
                   disabled={loading}
                   className="flex-1 bg-[#1C2B1E] border border-[#C9A84C]/20 text-[#F5F0E8] text-sm px-3 py-2 resize-none focus:outline-none focus:border-[#C9A84C]/50 transition-colors placeholder:text-[#F5F0E8]/20 disabled:opacity-40 rounded-lg"
-                  style={{ minHeight: "2.5rem", maxHeight: "5rem" }}
+                  style={{ minHeight: "2.5rem", maxHeight: "8rem" }}
                   onInput={(e) => {
                     const el = e.currentTarget;
                     el.style.height = "auto";
-                    el.style.height = `${Math.min(el.scrollHeight, 80)}px`;
+                    el.style.height = `${Math.min(el.scrollHeight, 128)}px`;
                   }}
                 />
                 <button
