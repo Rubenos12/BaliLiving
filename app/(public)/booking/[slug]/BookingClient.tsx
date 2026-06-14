@@ -6,6 +6,8 @@ import { useState } from "react";
 import type { Villa } from "@/lib/villas-data";
 import { createBooking } from "@/lib/actions/bookings";
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
@@ -78,18 +80,20 @@ function StepIndicator({ current }: { current: Step }) {
 export default function BookingClient({
   villa,
   villaId,
+  blockedDates,
   initialCheckIn,
   initialCheckOut,
   initialGuests,
 }: {
   villa: Villa;
   villaId: string;
+  blockedDates: string[];
   initialCheckIn: string;
   initialCheckOut: string;
   initialGuests: number;
 }) {
   const [step, setStep] = useState<Step>(1);
-  const [stepDir, setStepDir] = useState(1); // 1 = forward, -1 = backward
+  const [stepDir, setStepDir] = useState(1);
   const [checkIn, setCheckIn] = useState(initialCheckIn);
   const [checkOut, setCheckOut] = useState(initialCheckOut);
   const [guests, setGuests] = useState(initialGuests);
@@ -99,10 +103,13 @@ export default function BookingClient({
     telefoon: "",
     bericht: "",
   });
+  const [emailError, setEmailError] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [bookingRef, setBookingRef] = useState("");
+
+  const blockedSet = new Set(blockedDates);
 
   const nights =
     checkIn && checkOut
@@ -125,13 +132,38 @@ export default function BookingClient({
         })
       : "—";
 
+  // Check if the selected date range overlaps any blocked dates
+  const blockedInRange: string[] = [];
+  if (checkIn && checkOut && nights > 0) {
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+      const key = d.toISOString().split("T")[0];
+      if (blockedSet.has(key)) blockedInRange.push(key);
+    }
+  }
+  const hasBlockedConflict = blockedInRange.length > 0;
+
   const goToStep = (next: Step) => {
     setStepDir(next > step ? 1 : -1);
     setStep(next);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleStep1Continue = () => {
+    if (!checkIn || !checkOut || nights < 1 || hasBlockedConflict) return;
+    goToStep(2);
+  };
+
+  const handleStep2Continue = () => {
+    if (!EMAIL_RE.test(form.email)) {
+      setEmailError("Voer een geldig e-mailadres in.");
+      return;
+    }
+    setEmailError("");
+    goToStep(3);
+  };
+
+  const handleSubmit = async () => {
     setSubmitError("");
     setIsSubmitting(true);
 
@@ -160,10 +192,9 @@ export default function BookingClient({
       setBookingRef(result.data.id.slice(0, 8).toUpperCase());
     }
     setSubmitted(true);
-    setStep(3);
   };
 
-  if (submitted && step === 3) {
+  if (submitted) {
     return (
       <div className="min-h-screen flex items-center justify-center px-6 pt-28 pb-16">
         <motion.div
@@ -209,12 +240,18 @@ export default function BookingClient({
               </div>
             )}
           </motion.div>
-          <motion.div variants={fadeUp}>
+          <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/"
               className="inline-block px-10 py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase hover:bg-[#E8C96A] transition-all duration-300"
             >
               Terug naar home
+            </Link>
+            <Link
+              href="/villas"
+              className="inline-block px-10 py-4 border border-[#C9A84C]/40 text-[#C9A84C] text-xs tracking-[0.3em] uppercase hover:bg-[#C9A84C] hover:text-[#1C2B1E] transition-all duration-300"
+            >
+              Bekijk andere villa&apos;s
             </Link>
           </motion.div>
         </motion.div>
@@ -302,6 +339,14 @@ export default function BookingClient({
                       />
                     </div>
                   </div>
+
+                  {/* Blocked date warning */}
+                  {hasBlockedConflict && (
+                    <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs leading-relaxed" role="alert">
+                      Deze periode bevat geblokkeerde datums ({blockedInRange.slice(0, 3).join(", ")}{blockedInRange.length > 3 ? ` en ${blockedInRange.length - 3} meer` : ""}). Kies andere datums.
+                    </div>
+                  )}
+
                   <div>
                     <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
                       Aantal gasten
@@ -362,8 +407,8 @@ export default function BookingClient({
 
                 <motion.div variants={fadeUp}>
                   <button
-                    onClick={() => goToStep(2)}
-                    disabled={!checkIn || !checkOut || nights < 1}
+                    onClick={handleStep1Continue}
+                    disabled={!checkIn || !checkOut || nights < 1 || hasBlockedConflict}
                     className="w-full py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Doorgaan naar gegevens →
@@ -394,7 +439,7 @@ export default function BookingClient({
                   <p className="text-[#F5F0E8]/40 text-sm mb-6">
                     {formatDate(checkIn)} → {formatDate(checkOut)} · {nights} nachten · {guests} gasten
                   </p>
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
@@ -417,10 +462,13 @@ export default function BookingClient({
                           type="email"
                           required
                           value={form.email}
-                          onChange={(e) => setForm({ ...form, email: e.target.value })}
+                          onChange={(e) => { setForm({ ...form, email: e.target.value }); setEmailError(""); }}
                           placeholder="jouw@email.nl"
-                          className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20"
+                          className={`w-full bg-[#243628] border text-[#F5F0E8] px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20 ${emailError ? "border-red-500/60" : "border-[#C9A84C]/20"}`}
                         />
+                        {emailError && (
+                          <p className="text-red-400 text-xs mt-1" role="alert">{emailError}</p>
+                        )}
                       </div>
                     </div>
                     <div>
@@ -447,10 +495,6 @@ export default function BookingClient({
                         className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/20 resize-none"
                       />
                     </div>
-
-                    {submitError && (
-                      <p className="text-red-400 text-xs text-center py-2">{submitError}</p>
-                    )}
                     <div className="flex gap-3 pt-2">
                       <button
                         type="button"
@@ -460,23 +504,15 @@ export default function BookingClient({
                         ← Terug
                       </button>
                       <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="flex-1 py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        type="button"
+                        onClick={handleStep2Continue}
+                        disabled={!form.naam || !form.email}
+                        className="flex-1 py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
-                        {isSubmitting ? (
-                          <>
-                            <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" strokeLinecap="round"/>
-                            </svg>
-                            Bezig...
-                          </>
-                        ) : (
-                          "Aanvraag bevestigen ✦"
-                        )}
+                        Controleer aanvraag →
                       </button>
                     </div>
-                  </form>
+                  </div>
                 </motion.div>
 
                 <motion.div variants={fadeUp} className="bg-[#1C2B1E] border border-[#C9A84C]/15 p-5">
@@ -485,6 +521,110 @@ export default function BookingClient({
                     <p className="text-[#F5F0E8]/40 text-xs leading-relaxed">
                       Je gegevens worden nooit gedeeld met derden. Edwin of Citty neemt binnen
                       24 uur contact op voor definitieve bevestiging. Betaling verloopt na bevestiging.
+                    </p>
+                  </div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* Step 3 — Review & confirm */}
+          {step === 3 && (
+            <motion.div
+              key="step3"
+              custom={stepDir}
+              variants={stepSlide}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+            >
+              <motion.div variants={stagger} initial="hidden" animate="show">
+                <motion.div variants={fadeUp} className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-6 md:p-8 mb-4">
+                  <h2
+                    className="text-2xl font-light text-[#F5F0E8] mb-6"
+                    style={{ fontFamily: "var(--font-cormorant)" }}
+                  >
+                    Controleer je aanvraag
+                  </h2>
+
+                  <div className="space-y-3 mb-6">
+                    <div className="flex justify-between text-sm py-2 border-b border-[#C9A84C]/10">
+                      <span className="text-[#F5F0E8]/50">Villa</span>
+                      <span className="text-[#F5F0E8]">{villa.name}</span>
+                    </div>
+                    <div className="flex justify-between text-sm py-2 border-b border-[#C9A84C]/10">
+                      <span className="text-[#F5F0E8]/50">Check-in</span>
+                      <span className="text-[#F5F0E8]">{formatDate(checkIn)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm py-2 border-b border-[#C9A84C]/10">
+                      <span className="text-[#F5F0E8]/50">Check-out</span>
+                      <span className="text-[#F5F0E8]">{formatDate(checkOut)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm py-2 border-b border-[#C9A84C]/10">
+                      <span className="text-[#F5F0E8]/50">Gasten</span>
+                      <span className="text-[#F5F0E8]">{guests}</span>
+                    </div>
+                    <div className="flex justify-between text-sm py-2 border-b border-[#C9A84C]/10">
+                      <span className="text-[#F5F0E8]/50">Naam</span>
+                      <span className="text-[#F5F0E8]">{form.naam}</span>
+                    </div>
+                    <div className="flex justify-between text-sm py-2 border-b border-[#C9A84C]/10">
+                      <span className="text-[#F5F0E8]/50">E-mail</span>
+                      <span className="text-[#C9A84C]">{form.email}</span>
+                    </div>
+                    {form.telefoon && (
+                      <div className="flex justify-between text-sm py-2 border-b border-[#C9A84C]/10">
+                        <span className="text-[#F5F0E8]/50">Telefoon</span>
+                        <span className="text-[#F5F0E8]">{form.telefoon}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-sm py-3">
+                      <span className="text-[#F5F0E8]/50">Totaal ({nights} nachten)</span>
+                      <span className="text-[#C9A84C] text-xl font-light" style={{ fontFamily: "var(--font-cormorant)" }}>
+                        €{total.toLocaleString("nl-NL")}
+                      </span>
+                    </div>
+                  </div>
+
+                  {submitError && (
+                    <p className="text-red-400 text-xs text-center py-2 mb-3" role="alert">{submitError}</p>
+                  )}
+
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => goToStep(2)}
+                      disabled={isSubmitting}
+                      className="px-6 py-4 border border-[#C9A84C]/30 text-[#C9A84C] text-xs tracking-[0.25em] uppercase hover:bg-[#C9A84C]/10 transition-all duration-300 disabled:opacity-50"
+                    >
+                      ← Wijzigen
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={isSubmitting}
+                      className="flex-1 py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" strokeLinecap="round"/>
+                          </svg>
+                          Bezig...
+                        </>
+                      ) : (
+                        "Aanvraag bevestigen ✦"
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+
+                <motion.div variants={fadeUp} className="bg-[#1C2B1E] border border-[#C9A84C]/15 p-5">
+                  <div className="flex items-start gap-3">
+                    <span className="text-[#C9A84C] text-sm mt-0.5">🔒</span>
+                    <p className="text-[#F5F0E8]/40 text-xs leading-relaxed">
+                      Door te bevestigen geef je BaliLiving toestemming om contact op te nemen.
+                      Geen betaling nu — je boeking wordt binnen 24 uur bevestigd.
                     </p>
                   </div>
                 </motion.div>

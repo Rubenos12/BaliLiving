@@ -16,6 +16,8 @@ export type Villa = {
   cover_icon: string;
   images: string[];
   published?: boolean;
+  avg_rating?: number;
+  review_count?: number;
 };
 
 export const villas: Villa[] = [

@@ -4,6 +4,15 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 const FROM = "BaliLiving <noreply@baliliving.nl>";
 const ADMIN_EMAIL = "info@baliliving.nl";
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
+
 export async function sendBookingConfirmation(booking: {
   id: string;
   guest_name: string;
@@ -29,10 +38,10 @@ export async function sendBookingConfirmation(booking: {
       subject: `Boekingsaanvraag ontvangen — ${booking.villa_name} (ref. ${ref})`,
       html: `
         <div style="font-family: Georgia, serif; max-width: 580px; margin: 0 auto; color: #2E2E2E;">
-          <h1 style="font-size: 22px; color: #1C2B1E;">Bedankt voor je aanvraag, ${booking.guest_name}.</h1>
+          <h1 style="font-size: 22px; color: #1C2B1E;">Bedankt voor je aanvraag, ${escapeHtml(booking.guest_name)}.</h1>
           <p>We hebben je boekingsaanvraag ontvangen en nemen <strong>binnen 24 uur</strong> contact met je op ter bevestiging.</p>
           <table style="width:100%; border-collapse:collapse; margin: 24px 0;">
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee; color:#888;">Villa</td><td style="padding:8px 0; border-bottom:1px solid #eee;"><strong>${booking.villa_name}</strong></td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee; color:#888;">Villa</td><td style="padding:8px 0; border-bottom:1px solid #eee;"><strong>${escapeHtml(booking.villa_name)}</strong></td></tr>
             <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee; color:#888;">Inchecken</td><td style="padding:8px 0; border-bottom:1px solid #eee;">${fmt(booking.check_in)}</td></tr>
             <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee; color:#888;">Uitchecken</td><td style="padding:8px 0; border-bottom:1px solid #eee;">${fmt(booking.check_out)}</td></tr>
             <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee; color:#888;">Nachten</td><td style="padding:8px 0; border-bottom:1px solid #eee;">${booking.total_nights}</td></tr>
@@ -56,9 +65,9 @@ export async function sendBookingConfirmation(booking: {
           <h1 style="font-size: 20px; color: #1C2B1E;">Nieuwe boekingsaanvraag</h1>
           <table style="width:100%; border-collapse:collapse; margin: 20px 0;">
             <tr><td style="padding:8px 0; border-bottom:1px solid #eee; color:#888;">Referentie</td><td style="padding:8px 0; border-bottom:1px solid #eee;"><strong>${ref}</strong></td></tr>
-            <tr><td style="padding:8px 0; border-bottom:1px solid #eee; color:#888;">Gast</td><td style="padding:8px 0; border-bottom:1px solid #eee;">${booking.guest_name}</td></tr>
-            <tr><td style="padding:8px 0; border-bottom:1px solid #eee; color:#888;">E-mail</td><td style="padding:8px 0; border-bottom:1px solid #eee;"><a href="mailto:${booking.guest_email}">${booking.guest_email}</a></td></tr>
-            <tr><td style="padding:8px 0; border-bottom:1px solid #eee; color:#888;">Villa</td><td style="padding:8px 0; border-bottom:1px solid #eee;"><strong>${booking.villa_name}</strong></td></tr>
+            <tr><td style="padding:8px 0; border-bottom:1px solid #eee; color:#888;">Gast</td><td style="padding:8px 0; border-bottom:1px solid #eee;">${escapeHtml(booking.guest_name)}</td></tr>
+            <tr><td style="padding:8px 0; border-bottom:1px solid #eee; color:#888;">E-mail</td><td style="padding:8px 0; border-bottom:1px solid #eee;"><a href="mailto:${escapeHtml(booking.guest_email)}">${escapeHtml(booking.guest_email)}</a></td></tr>
+            <tr><td style="padding:8px 0; border-bottom:1px solid #eee; color:#888;">Villa</td><td style="padding:8px 0; border-bottom:1px solid #eee;"><strong>${escapeHtml(booking.villa_name)}</strong></td></tr>
             <tr><td style="padding:8px 0; border-bottom:1px solid #eee; color:#888;">Inchecken</td><td style="padding:8px 0; border-bottom:1px solid #eee;">${fmt(booking.check_in)}</td></tr>
             <tr><td style="padding:8px 0; border-bottom:1px solid #eee; color:#888;">Uitchecken</td><td style="padding:8px 0; border-bottom:1px solid #eee;">${fmt(booking.check_out)}</td></tr>
             <tr><td style="padding:8px 0; border-bottom:1px solid #eee; color:#888;">Gasten</td><td style="padding:8px 0; border-bottom:1px solid #eee;">${booking.guest_count}</td></tr>
@@ -97,8 +106,8 @@ export async function sendBookingStatusUpdate(booking: {
 
   const body =
     booking.status === "accepted"
-      ? `<p>Geweldig nieuws, ${booking.guest_name}! Je boeking voor <strong>${booking.villa_name}</strong> (${fmt(booking.check_in)} – ${fmt(booking.check_out)}) is <strong style="color:#2e7d32;">bevestigd</strong>.</p><p>We nemen binnenkort contact met je op voor de betaalgegevens en verdere details.</p>`
-      : `<p>Helaas kunnen we je boeking voor <strong>${booking.villa_name}</strong> (${fmt(booking.check_in)} – ${fmt(booking.check_out)}) niet verwerken${booking.admin_notes ? `: ${booking.admin_notes}` : "."}</p><p>Neem contact op via <a href="mailto:${ADMIN_EMAIL}" style="color:#C9A84C;">${ADMIN_EMAIL}</a> — we helpen je graag aan een alternatief.</p>`;
+      ? `<p>Geweldig nieuws, ${escapeHtml(booking.guest_name)}! Je boeking voor <strong>${escapeHtml(booking.villa_name)}</strong> (${fmt(booking.check_in)} – ${fmt(booking.check_out)}) is <strong style="color:#2e7d32;">bevestigd</strong>.</p><p>We nemen binnenkort contact met je op voor de betaalgegevens en verdere details.</p>`
+      : `<p>Helaas kunnen we je boeking voor <strong>${escapeHtml(booking.villa_name)}</strong> (${fmt(booking.check_in)} – ${fmt(booking.check_out)}) niet verwerken${booking.admin_notes ? `: ${escapeHtml(booking.admin_notes)}` : "."}</p><p>Neem contact op via <a href="mailto:${ADMIN_EMAIL}" style="color:#C9A84C;">${ADMIN_EMAIL}</a> — we helpen je graag aan een alternatief.</p>`;
 
   await resend.emails.send({
     from: FROM,

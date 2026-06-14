@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { fetchVillas } from "@/lib/actions/villas-fetch";
+import { getVillaRatingsBatch } from "@/lib/actions/reviews";
 import VillasClient from "./VillasClient";
 
 export const dynamic = "force-dynamic";
@@ -17,5 +18,10 @@ export const metadata: Metadata = {
 
 export default async function VillasPage() {
   const villas = await fetchVillas();
-  return <VillasClient villas={villas} />;
+  const ratings = await getVillaRatingsBatch(villas.map((v) => v.slug));
+  const villasWithRatings = villas.map((v) => {
+    const r = ratings.get(v.slug);
+    return r ? { ...v, avg_rating: r.avg, review_count: r.count } : v;
+  });
+  return <VillasClient villas={villasWithRatings} />;
 }

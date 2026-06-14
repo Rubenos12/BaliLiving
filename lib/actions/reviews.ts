@@ -79,6 +79,32 @@ export async function getVillaAverageRating(
   return { avg: Math.round(avg * 10) / 10, count: data.length };
 }
 
+export async function getVillaRatingsBatch(
+  slugs: string[]
+): Promise<Map<string, { avg: number; count: number }>> {
+  if (slugs.length === 0) return new Map();
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("villa_reviews")
+    .select("villa_slug, rating")
+    .in("villa_slug", slugs)
+    .eq("published", true);
+
+  const map = new Map<string, { avg: number; count: number }>();
+  if (!data) return map;
+
+  const grouped: Record<string, number[]> = {};
+  for (const row of data as { villa_slug: string; rating: number }[]) {
+    if (!grouped[row.villa_slug]) grouped[row.villa_slug] = [];
+    grouped[row.villa_slug].push(row.rating);
+  }
+  for (const [slug, ratings] of Object.entries(grouped)) {
+    const avg = ratings.reduce((s, r) => s + r, 0) / ratings.length;
+    map.set(slug, { avg: Math.round(avg * 10) / 10, count: ratings.length });
+  }
+  return map;
+}
+
 export async function publishReview(id: string, published: boolean) {
   await requireAdminUser();
   const supabase = createServiceClient();

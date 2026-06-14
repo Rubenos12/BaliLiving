@@ -31,14 +31,20 @@ type Booking = {
   total_price: number;
   status: string;
   notes: string;
+  admin_notes?: string;
   created_at: string;
 };
+
+function fmtDate(d: string) {
+  return new Date(d).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+}
 
 export default function BookingsClient({ bookings: initial }: { bookings: Booking[] }) {
   const [bookings, setBookings] = useState(initial);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState<string | null>(null);
   const [pulse, setPulse] = useState(false);
+  const [rejectModal, setRejectModal] = useState<{ id: string; notes: string } | null>(null);
 
   // Real-time subscription
   useEffect(() => {
@@ -70,17 +76,74 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
   const filtered = filter === "all" ? bookings : bookings.filter((b) => b.status === filter);
   const pending = bookings.filter((b) => b.status === "pending").length;
 
-  const handle = async (id: string, status: "accepted" | "rejected") => {
-    setLoading(id + status);
-    const result = await updateBookingStatus(id, status);
+  const handleAccept = async (id: string) => {
+    setLoading(id + "accepted");
+    const result = await updateBookingStatus(id, "accepted");
     if (!result.error) {
-      setBookings((bs) => bs.map((b) => b.id === id ? { ...b, status } : b));
+      setBookings((bs) => bs.map((b) => b.id === id ? { ...b, status: "accepted" } : b));
     }
     setLoading(null);
   };
 
+  const openRejectModal = (id: string) => {
+    setRejectModal({ id, notes: "" });
+  };
+
+  const handleReject = async () => {
+    if (!rejectModal) return;
+    setLoading(rejectModal.id + "rejected");
+    const result = await updateBookingStatus(rejectModal.id, "rejected", rejectModal.notes);
+    if (!result.error) {
+      setBookings((bs) =>
+        bs.map((b) =>
+          b.id === rejectModal.id
+            ? { ...b, status: "rejected", admin_notes: rejectModal.notes }
+            : b
+        )
+      );
+    }
+    setLoading(null);
+    setRejectModal(null);
+  };
+
   return (
     <div className="p-4 md:p-8">
+      {/* Reject modal */}
+      {rejectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="bg-[#1C2B1E] border border-[#C9A84C]/20 p-6 max-w-md w-full">
+            <h3 className="text-xl font-light text-[#F5F0E8] mb-4" style={{ fontFamily: "var(--font-cormorant)" }}>
+              Boeking afwijzen
+            </h3>
+            <p className="text-[#F5F0E8]/50 text-sm mb-4">
+              Voeg optioneel een reden toe voor de gast. Dit wordt opgenomen in de e-mail.
+            </p>
+            <textarea
+              value={rejectModal.notes}
+              onChange={(e) => setRejectModal({ ...rejectModal, notes: e.target.value })}
+              placeholder="Bijv. Villa niet beschikbaar op deze datums."
+              rows={3}
+              className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/40 resize-none mb-4 placeholder-[#F5F0E8]/20"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => setRejectModal(null)}
+                className="flex-1 py-3 border border-[#C9A84C]/30 text-[#C9A84C] text-xs tracking-wider uppercase hover:bg-[#C9A84C]/10 transition-colors"
+              >
+                Annuleren
+              </button>
+              <button
+                onClick={handleReject}
+                disabled={loading !== null}
+                className="flex-1 py-3 bg-red-500/20 text-red-400 border border-red-400/30 text-xs tracking-wider uppercase hover:bg-red-500/30 transition-colors disabled:opacity-50"
+              >
+                {loading ? "Bezig..." : "Afwijzen bevestigen"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-light text-[#F5F0E8]" style={{ fontFamily: "var(--font-cormorant)" }}>
@@ -93,8 +156,9 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
             )}
           </p>
         </div>
-        <div className={`flex items-center gap-2 text-xs transition-all duration-500 ${pulse ? "text-green-400" : "text-[#F5F0E8]/20"}`}>
-          <span className={`w-2 h-2 rounded-full ${pulse ? "bg-green-400 animate-pulse" : "bg-[#F5F0E8]/20"}`} />
+        {/* Live indicator — always visible, pulses brighter on new booking */}
+        <div className={`flex items-center gap-2 text-xs transition-all duration-500 ${pulse ? "text-green-400" : "text-[#C9A84C]/50"}`}>
+          <span className={`w-2 h-2 rounded-full transition-all duration-500 ${pulse ? "bg-green-400 animate-pulse" : "bg-[#C9A84C]/40"}`} />
           Live
         </div>
       </div>
@@ -110,7 +174,7 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
           <button
             key={tab.key}
             onClick={() => setFilter(tab.key)}
-            className={`px-4 py-2 text-xs tracking-wider transition-all duration-200 ${
+            className={`px-4 py-2 text-xs tracking-wider transition-all duration-200 whitespace-nowrap ${
               filter === tab.key
                 ? "bg-[#C9A84C] text-[#1C2B1E]"
                 : "bg-[#1C2B1E] text-[#F5F0E8]/50 border border-[#C9A84C]/15 hover:border-[#C9A84C]/40"
@@ -141,10 +205,13 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
                     {b.villa_name}
                   </p>
                   <p className="text-[#F5F0E8]/50 text-xs mt-1">
-                    {b.check_in} → {b.check_out} · {b.total_nights} nachten · {b.guest_count} gasten
+                    {fmtDate(b.check_in)} → {fmtDate(b.check_out)} · {b.total_nights} nachten · {b.guest_count} gasten
                   </p>
                   {b.notes && (
                     <p className="text-[#F5F0E8]/30 text-xs mt-1 italic">&ldquo;{b.notes}&rdquo;</p>
+                  )}
+                  {b.status === "rejected" && b.admin_notes && (
+                    <p className="text-red-400/60 text-xs mt-1 italic">Reden: {b.admin_notes}</p>
                   )}
                 </div>
 
@@ -161,21 +228,21 @@ export default function BookingsClient({ bookings: initial }: { bookings: Bookin
               {b.status === "pending" && (
                 <div className="border-t border-[#C9A84C]/10 px-5 py-3 flex items-center gap-3">
                   <button
-                    onClick={() => handle(b.id, "accepted")}
+                    onClick={() => handleAccept(b.id)}
                     disabled={loading === b.id + "accepted"}
                     className="px-4 py-2.5 bg-green-500/15 text-green-400 border border-green-400/30 text-[0.6rem] tracking-wider uppercase hover:bg-green-500/25 transition-colors disabled:opacity-50 whitespace-nowrap"
                   >
                     {loading === b.id + "accepted" ? "Bezig..." : "✓ Accepteren"}
                   </button>
                   <button
-                    onClick={() => handle(b.id, "rejected")}
-                    disabled={loading === b.id + "rejected"}
+                    onClick={() => openRejectModal(b.id)}
+                    disabled={loading !== null}
                     className="px-4 py-2.5 bg-red-500/15 text-red-400 border border-red-400/30 text-[0.6rem] tracking-wider uppercase hover:bg-red-500/25 transition-colors disabled:opacity-50 whitespace-nowrap"
                   >
-                    {loading === b.id + "rejected" ? "Bezig..." : "✕ Afwijzen"}
+                    ✕ Afwijzen
                   </button>
                   <span className="text-[#F5F0E8]/25 text-xs ml-auto">
-                    {new Date(b.created_at).toLocaleDateString("nl-NL")}
+                    {fmtDate(b.created_at)}
                   </span>
                 </div>
               )}

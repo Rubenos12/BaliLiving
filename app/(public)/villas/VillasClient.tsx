@@ -110,7 +110,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
       </div>
 
       {/* Filter bar */}
-      <section className="bg-[#1C2B1E] border-y border-[#C9A84C]/15 py-5 space-y-3">
+      <section className="sticky top-[72px] z-40 bg-[#1C2B1E] border-y border-[#C9A84C]/15 py-5 space-y-3">
         {/* Region filters */}
         <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-2">
           {REGION_FILTERS.map((f) => (
@@ -173,9 +173,16 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
             </p>
             <button
               onClick={clearFilters}
-              className="text-xs text-[#C9A84C] tracking-wider hover:underline"
+              className="text-xs text-[#C9A84C] tracking-wider hover:underline mb-8 block mx-auto"
             >
               Probeer andere filters
+            </button>
+            <p className="text-[#F5F0E8]/25 text-xs mb-4">Of laat onze AI de perfecte match vinden:</p>
+            <button
+              onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              className="inline-block px-8 py-3 border border-[#C9A84C]/40 text-[#C9A84C] text-xs tracking-[0.2em] uppercase hover:bg-[#C9A84C] hover:text-[#1C2B1E] transition-all duration-300"
+            >
+              Gebruik Villa Advisor ✦
             </button>
           </div>
         ) : (
@@ -222,7 +229,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
                   <p className="text-[#C9A84C]/70 text-xs tracking-wider mt-1 mb-4">{villa.location}</p>
 
                   {/* Stat chips */}
-                  <div className="flex items-center gap-2 mb-6">
+                  <div className="flex items-center gap-2 mb-6 flex-wrap">
                     <span className="inline-flex items-center gap-1.5 border border-[#C9A84C]/20 text-[#F5F0E8]/55 text-xs px-3 py-1.5">
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M2 9V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3"/><path d="M2 11v9"/><path d="M22 11v9"/><path d="M2 15h20"/><rect x="6" y="15" width="4" height="5"/><rect x="14" y="15" width="4" height="5"/>
@@ -238,6 +245,15 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
                         : `${villa.guests_min}–${villa.guests_max}`}{" "}
                       gst
                     </span>
+                    {villa.avg_rating && villa.avg_rating > 0 ? (
+                      <span className="inline-flex items-center gap-1 border border-[#C9A84C]/20 text-[#C9A84C] text-xs px-3 py-1.5">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                        {villa.avg_rating}
+                        <span className="text-[#F5F0E8]/35 ml-0.5">({villa.review_count})</span>
+                      </span>
+                    ) : null}
                   </div>
 
                   {/* Price + CTA */}
