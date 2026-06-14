@@ -335,12 +335,12 @@ export default function HomeClient({ villas }: { villas: Villa[] }) {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 items-center" style={{ animation: "hero-rise 0.7s cubic-bezier(0.25,0.46,0.45,0.94) 1.15s both" }}>
-              <Link href="/villas" className="magnetic-btn inline-flex items-center gap-2 px-10 py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-semibold hover:bg-[#E8C96A]">
-                Ontdek Villa&apos;s
+              <Link href="/reis-planner" className="magnetic-btn inline-flex items-center gap-2 px-10 py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-semibold hover:bg-[#E8C96A]">
+                Plan mijn reis ✦
                 <IconArrowUpRight className="h-4 w-4" strokeWidth={2.2} />
               </Link>
-              <Link href="/over-ons" className="magnetic-btn inline-flex items-center gap-2 px-10 py-4 border border-[#F5F0E8]/30 text-[#F5F0E8] text-xs tracking-[0.3em] uppercase hover:border-[#C9A84C] hover:text-[#C9A84C]">
-                Onze Aanpak
+              <Link href="/villas" className="magnetic-btn inline-flex items-center gap-2 px-10 py-4 border border-[#F5F0E8]/30 text-[#F5F0E8] text-xs tracking-[0.3em] uppercase hover:border-[#C9A84C] hover:text-[#C9A84C]">
+                Bekijk Villa&apos;s
                 <IconArrowRight className="h-4 w-4" strokeWidth={2.2} />
               </Link>
             </div>

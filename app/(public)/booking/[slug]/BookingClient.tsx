@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Villa } from "@/lib/villas-data";
 import { createBooking } from "@/lib/actions/bookings";
+import BaliContextCard from "@/components/BaliContextCard";
+import ActivitySuggestions from "@/components/ActivitySuggestions";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -254,6 +256,14 @@ export default function BookingClient({
               Bekijk andere villa&apos;s
             </Link>
           </motion.div>
+
+          <ActivitySuggestions
+            villaName={villa.name}
+            region={villa.region}
+            checkIn={checkIn}
+            nights={nights}
+            guests={guests}
+          />
         </motion.div>
       </div>
     );
@@ -339,6 +349,9 @@ export default function BookingClient({
                       />
                     </div>
                   </div>
+
+                  {/* Bali date context */}
+                  <BaliContextCard checkIn={checkIn} checkOut={checkOut} />
 
                   {/* Blocked date warning */}
                   {hasBlockedConflict && (

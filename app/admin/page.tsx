@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createServiceClient } from "@/lib/supabase/server";
+import AdminInsightsCard from "./AdminInsightsCard";
 
 export const dynamic = "force-dynamic";
 
@@ -123,7 +124,7 @@ export default async function AdminDashboard() {
 
       {/* Quick actions */}
       <h2 className="text-[#C9A84C] text-xs tracking-[0.3em] uppercase mb-4">Snelle acties</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
         {quickActions.map((a) => (
           <Link
             key={a.href}
@@ -135,6 +136,10 @@ export default async function AdminDashboard() {
           </Link>
         ))}
       </div>
+
+      {/* AI Insights */}
+      <h2 className="text-[#C9A84C] text-xs tracking-[0.3em] uppercase mb-4">AI Analyse</h2>
+      <AdminInsightsCard />
     </div>
   );
 }

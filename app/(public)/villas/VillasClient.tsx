@@ -53,10 +53,23 @@ const EXPERIENCE_FILTERS: { label: string; match: (v: Villa) => boolean }[] = [
   },
 ];
 
+type CompareResult = {
+  winner: string;
+  winner_name: string;
+  winner_reason: string;
+  villa_summaries: Array<{ slug: string; name: string; pros: string[]; cons: string[] }>;
+  final_verdict: string;
+};
+
 export default function VillasClient({ villas }: { villas: Villa[] }) {
   const [activeRegion, setActiveRegion] = useState("Alle Villa's");
   const [activeExperience, setActiveExperience] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
+  const [compareSelection, setCompareSelection] = useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [comparePriority, setComparePriority] = useState("");
+  const [compareLoading, setCompareLoading] = useState(false);
+  const [compareResult, setCompareResult] = useState<CompareResult | null>(null);
 
   const filtered = villas.filter((v) => {
     const regionMatch = activeRegion === "Alle Villa's" || v.region === activeRegion;
@@ -68,6 +81,34 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
   const activeCount = (activeRegion !== "Alle Villa's" ? 1 : 0) + (activeExperience ? 1 : 0);
   const hasActiveFilters = activeRegion !== "Alle Villa's" || activeExperience !== "";
   const clearFilters = () => { setActiveRegion("Alle Villa's"); setActiveExperience(""); };
+
+  const toggleCompare = (slug: string) => {
+    setCompareSelection((prev) => {
+      if (prev.includes(slug)) return prev.filter((s) => s !== slug);
+      if (prev.length >= 3) return prev;
+      return [...prev, slug];
+    });
+  };
+
+  const handleCompare = async () => {
+    if (compareSelection.length < 2 || !comparePriority.trim()) return;
+    setCompareLoading(true);
+    setCompareResult(null);
+    try {
+      const res = await fetch("/api/villa-compare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slugs: compareSelection, priority: comparePriority }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setCompareResult(data);
+    } catch {
+      // stays on input screen — user can retry
+    } finally {
+      setCompareLoading(false);
+    }
+  };
 
   return (
     <>
@@ -255,6 +296,21 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
                       {villa.tag}
                     </span>
                   </div>
+                  <button
+                    onClick={() => toggleCompare(villa.slug)}
+                    disabled={!compareSelection.includes(villa.slug) && compareSelection.length >= 3}
+                    className={`absolute top-4 right-4 w-8 h-8 flex items-center justify-center border text-xs font-medium transition-all duration-200 ${
+                      compareSelection.includes(villa.slug)
+                        ? "bg-[#C9A84C] border-[#C9A84C] text-[#1C2B1E]"
+                        : compareSelection.length >= 3
+                        ? "bg-[#0F1A10]/60 border-[#F5F0E8]/10 text-[#F5F0E8]/20 cursor-not-allowed"
+                        : "bg-[#0F1A10]/60 border-[#F5F0E8]/20 text-[#F5F0E8]/50 hover:border-[#C9A84C]/50 hover:text-[#C9A84C]"
+                    }`}
+                    aria-label={compareSelection.includes(villa.slug) ? `${villa.name} verwijderen uit vergelijking` : `${villa.name} vergelijken`}
+                    aria-pressed={compareSelection.includes(villa.slug)}
+                  >
+                    {compareSelection.includes(villa.slug) ? "✓" : "+"}
+                  </button>
                 </div>
 
                 {/* Card body */}
@@ -397,6 +453,225 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
               >
                 Toon {filtered.length} villa&apos;s
               </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Compare bar — slides up when 2–3 villas selected */}
+      <AnimatePresence>
+        {compareSelection.length >= 2 && (
+          <motion.div
+            key="compare-bar"
+            initial={{ y: 80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 80, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 320, damping: 32 }}
+            className="fixed bottom-0 left-0 right-0 z-[44] bg-[#131E14] border-t border-[#C9A84C]/25 px-4 py-4 flex items-center justify-between"
+            style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
+          >
+            <div>
+              <p className="text-[#F5F0E8] text-sm font-light">{compareSelection.length} villa&apos;s geselecteerd</p>
+              <p className="text-[#F5F0E8]/35 text-xs mt-0.5">
+                {compareSelection.length < 3 ? "Voeg er nog één toe of vergelijk nu" : "Maximum bereikt"}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setCompareSelection([])}
+                className="text-[#F5F0E8]/35 text-xs tracking-[0.15em] uppercase hover:text-[#F5F0E8] transition-colors"
+              >
+                Wissen
+              </button>
+              <button
+                onClick={() => { setCompareOpen(true); setCompareResult(null); setComparePriority(""); }}
+                className="px-5 py-2.5 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.2em] uppercase hover:bg-[#E8C96A] transition-colors"
+              >
+                Vergelijk met AI →
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Compare modal */}
+      <AnimatePresence>
+        {compareOpen && (
+          <motion.div
+            key="compare-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[46] flex flex-col justify-end md:items-center md:justify-center"
+          >
+            <div
+              className="absolute inset-0 bg-black/75"
+              onClick={() => { if (!compareLoading) setCompareOpen(false); }}
+              aria-hidden="true"
+            />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="relative bg-[#1C2B1E] rounded-t-2xl md:rounded-2xl w-full md:max-w-2xl max-h-[90dvh] overflow-y-auto overscroll-contain"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Villa vergelijking"
+            >
+              <div className="px-5 pt-5 pb-safe">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <p className="text-[#C9A84C] text-[0.6rem] tracking-[0.35em] uppercase mb-1">AI Vergelijking</p>
+                    <h3 className="text-2xl font-light text-[#F5F0E8]" style={{ fontFamily: "var(--font-cormorant)" }}>
+                      Welke villa past bij jullie?
+                    </h3>
+                  </div>
+                  {!compareLoading && (
+                    <button
+                      onClick={() => setCompareOpen(false)}
+                      className="w-10 h-10 flex items-center justify-center text-[#F5F0E8]/40 hover:text-[#F5F0E8] transition-colors shrink-0"
+                      aria-label="Sluit vergelijking"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
+                {!compareResult ? (
+                  <>
+                    {/* Selected villa names */}
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {compareSelection.map((slug) => {
+                        const v = villas.find((x) => x.slug === slug);
+                        return v ? (
+                          <span key={slug} className="text-xs px-3 py-1.5 bg-[#C9A84C]/10 border border-[#C9A84C]/30 text-[#C9A84C]">
+                            {v.name}
+                          </span>
+                        ) : null;
+                      })}
+                    </div>
+
+                    {/* Priority input */}
+                    <label className="block mb-2">
+                      <span className="text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase">
+                        Wat vinden jullie het belangrijkste?
+                      </span>
+                    </label>
+                    <textarea
+                      value={comparePriority}
+                      onChange={(e) => setComparePriority(e.target.value)}
+                      placeholder="Bijv. 'We zijn met 2 kinderen en willen dicht bij Ubud, met veel privacy en een grote tuin'"
+                      rows={4}
+                      className="w-full bg-[#131E14] border border-[#C9A84C]/20 text-[#F5F0E8] text-sm placeholder-[#F5F0E8]/25 px-4 py-3 resize-none focus:outline-none focus:border-[#C9A84C]/50 mb-4"
+                      disabled={compareLoading}
+                    />
+
+                    {compareLoading ? (
+                      <div className="py-8 text-center">
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                          className="w-8 h-8 border-2 border-[#C9A84C]/20 border-t-[#C9A84C] rounded-full mx-auto mb-4"
+                        />
+                        <p className="text-[#F5F0E8]/40 text-sm">Claude analyseert de villa&apos;s…</p>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={handleCompare}
+                        disabled={!comparePriority.trim()}
+                        className="w-full py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed mb-2"
+                      >
+                        Vergelijk nu met AI ✦
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  /* Results */
+                  <div className="pb-4">
+                    {/* Winner banner */}
+                    <div className="bg-[#C9A84C]/10 border border-[#C9A84C]/30 p-5 mb-6">
+                      <p className="text-[#C9A84C] text-[0.6rem] tracking-[0.35em] uppercase mb-2">✦ Onze aanbeveling</p>
+                      <h4
+                        className="text-2xl font-light text-[#F5F0E8] mb-3"
+                        style={{ fontFamily: "var(--font-cormorant)" }}
+                      >
+                        {compareResult.winner_name}
+                      </h4>
+                      <p className="text-[#F5F0E8]/65 text-sm leading-relaxed mb-4">
+                        {compareResult.winner_reason}
+                      </p>
+                      <p className="text-[#C9A84C] text-sm italic leading-relaxed border-l-2 border-[#C9A84C]/40 pl-3">
+                        &ldquo;{compareResult.final_verdict}&rdquo;
+                      </p>
+                    </div>
+
+                    {/* Per-villa breakdown */}
+                    <div className="space-y-4 mb-6">
+                      {compareResult.villa_summaries.map((s) => (
+                        <div
+                          key={s.slug}
+                          className={`p-4 border ${s.slug === compareResult.winner ? "border-[#C9A84C]/30 bg-[#C9A84C]/5" : "border-[#F5F0E8]/8"}`}
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <h5
+                              className="text-[#F5F0E8] font-light text-base"
+                              style={{ fontFamily: "var(--font-cormorant)" }}
+                            >
+                              {s.name}
+                            </h5>
+                            {s.slug === compareResult.winner && (
+                              <span className="text-[#C9A84C] text-[0.55rem] tracking-[0.2em] uppercase">Winnaar</span>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <p className="text-[0.55rem] tracking-[0.2em] uppercase text-green-400/70 mb-2">Voordelen</p>
+                              <ul className="space-y-1">
+                                {s.pros.map((p, i) => (
+                                  <li key={i} className="text-[#F5F0E8]/55 text-xs flex gap-1.5">
+                                    <span className="text-green-400/60 shrink-0">✓</span>{p}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            <div>
+                              <p className="text-[0.55rem] tracking-[0.2em] uppercase text-[#F5F0E8]/30 mb-2">Aandachtspunten</p>
+                              <ul className="space-y-1">
+                                {s.cons.map((c, i) => (
+                                  <li key={i} className="text-[#F5F0E8]/40 text-xs flex gap-1.5">
+                                    <span className="text-[#F5F0E8]/25 shrink-0">–</span>{c}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* CTAs */}
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        href={`/villas/${compareResult.winner}`}
+                        onClick={() => { setCompareOpen(false); setCompareSelection([]); }}
+                        className="w-full py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium text-center hover:bg-[#E8C96A] transition-all duration-300 block"
+                      >
+                        Bekijk {compareResult.winner_name} →
+                      </Link>
+                      <button
+                        onClick={() => setCompareResult(null)}
+                        className="w-full py-3 border border-[#F5F0E8]/15 text-[#F5F0E8]/40 text-xs tracking-[0.2em] uppercase hover:text-[#F5F0E8] hover:border-[#F5F0E8]/30 transition-all duration-300"
+                      >
+                        Opnieuw vergelijken
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </motion.div>
           </motion.div>
         )}
