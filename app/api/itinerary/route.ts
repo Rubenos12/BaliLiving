@@ -70,18 +70,19 @@ export async function POST(req: NextRequest) {
       db.from("restaurants").select("name, location, cuisine, price_range, short_description, sfeer, tag").eq("published", true).limit(15),
     ]);
 
-    const filteredVillas = allVillas
-      .filter((v) => v.price_per_night >= range.min && v.price_per_night <= range.max && v.guests_max >= guests)
-      .slice(0, 8)
-      .map((v) => ({
+    const budgetFiltered = allVillas.filter(
+      (v) => v.price_per_night >= range.min && v.price_per_night <= range.max && v.guests_max >= guests
+    );
+    const villaPool = (budgetFiltered.length > 0 ? budgetFiltered : allVillas.filter((v) => v.guests_max >= guests))
+      .slice(0, 6);
+    const filteredVillas = villaPool.map((v) => ({
         slug: v.slug,
         naam: v.name,
         regio: v.region,
-        locatie: v.location,
         prijs_per_nacht: v.price_per_night,
         slaapkamers: v.bedrooms,
         max_gasten: v.guests_max,
-        amenities: v.amenities.slice(0, 8),
+        kenmerken: v.amenities.slice(0, 5).join(", "),
         tag: v.tag,
       }));
 
@@ -156,7 +157,7 @@ Typen voor items: "transfer" | "villa" | "tour" | "restaurant" | "activity". Lin
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 2000,
+        max_tokens: 4000,
         messages: [{ role: "user", content: prompt }],
       }),
     });
@@ -166,17 +167,38 @@ Typen voor items: "transfer" | "villa" | "tour" | "restaurant" | "activity". Lin
     }
 
     const result = await response.json();
-    const text = result.content?.[0]?.type === "text" ? result.content[0].text : "";
-    const clean = text.replace(/```json|```/g, "").trim();
-    const data = JSON.parse(clean);
+    const text: string = result.content?.[0]?.type === "text" ? result.content[0].text : "";
+    if (!text) {
+      console.error("Itinerary: empty Claude response", JSON.stringify(result).slice(0, 300));
+      return NextResponse.json({ error: "AI service heeft geen resultaat teruggegeven." }, { status: 502 });
+    }
+    // Extract the JSON object — Claude sometimes adds a preamble or trailing text
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error("Itinerary: no JSON found in response", text.slice(0, 300));
+      return NextResponse.json({ error: "Kon geen reisplan genereren. Probeer het opnieuw." }, { status: 500 });
+    }
+    let data: unknown;
+    try {
+      data = JSON.parse(jsonMatch[0]);
+    } catch (parseErr) {
+      console.error("Itinerary: JSON parse failed", parseErr, jsonMatch[0].slice(0, 300));
+      return NextResponse.json({ error: "Kon geen reisplan genereren. Probeer het opnieuw." }, { status: 500 });
+    }
+
+    const sanitizeLink = (link: unknown): string | undefined => {
+      if (typeof link !== "string") return undefined;
+      const cleaned = link.startsWith("/") ? link : `/${link}`;
+      return cleaned.length <= 200 ? cleaned : undefined;
+    };
 
     const itemSchema = z.object({
       type: z.enum(["transfer", "villa", "tour", "restaurant", "activity"]),
       time: z.string().max(10),
       title: z.string().max(100),
-      description: z.string().max(300),
+      description: z.string().max(400),
       price: z.number().optional(),
-      link: z.string().startsWith("/").max(200).optional(),
+      link: z.string().max(300).optional().transform(sanitizeLink),
     });
 
     const responseSchema = z.object({
@@ -200,7 +222,7 @@ Typen voor items: "transfer" | "villa" | "tour" | "restaurant" | "activity". Lin
 
     const validated = responseSchema.safeParse(data);
     if (!validated.success) {
-      console.error("Itinerary validation failed:", validated.error.issues);
+      console.error("Itinerary Zod validation failed:", JSON.stringify(validated.error.issues).slice(0, 500));
       return NextResponse.json({ error: "Kon geen reisplan genereren. Probeer het opnieuw." }, { status: 500 });
     }
 
