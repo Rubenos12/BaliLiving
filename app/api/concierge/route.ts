@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
     ? `\nWAT WE AL WETEN OVER DEZE GAST:\n${profileLines.join("\n")}\n`
     : "";
 
-  const systemPrompt = `Je bent de persoonlijke AI concierge van BaliLiving — het exclusieve villa- en reisbedrijf op Bali van Edwin & Citty. Je spreekt altijd Nederlands en bent warm, bondig en deskundig.
+  const systemPrompt = `Je bent de persoonlijke AI concierge van BaliVoorNederlanders — het exclusieve villa- en reisbedrijf op Bali van Edwin & Citty. Je spreekt altijd Nederlands en bent warm, bondig en deskundig.
 ${profileContext}
 BESCHIKBARE VILLA'S (id is nodig voor de tools):
 ${JSON.stringify(villaSummary, null, 2)}

@@ -40,7 +40,7 @@ export default function AdminLoginPage() {
             className="text-4xl font-light text-[#F5F0E8] mb-2"
             style={{ fontFamily: "var(--font-cormorant)" }}
           >
-            Bali<span className="text-[#C9A84C]">Living</span>
+            Bali<span className="text-[#C9A84C]">voor</span>Nederlanders
           </h1>
           <p className="text-[#F5F0E8]/40 text-xs tracking-[0.3em] uppercase">Admin inloggen</p>
         </div>
@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-[#1C2B1E] border border-[#C9A84C]/20 text-[#F5F0E8] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors"
-              placeholder="admin@baliliving.nl"
+              placeholder="admin@balivoornederlanders.nl"
             />
           </div>
           <div>

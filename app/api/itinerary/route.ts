@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
     const arrivalMonth = arrivalDate.toLocaleDateString("nl-NL", { month: "long" });
     const displayDays = Math.min(nights, 6);
 
-    const prompt = `Je bent een persoonlijke reisplanner voor BaliLiving, gerund door Edwin & Citty. Stel een droomreis samen voor onderstaande gast.
+    const prompt = `Je bent een persoonlijke reisplanner voor BaliVoorNederlanders, gerund door Edwin & Citty. Stel een droomreis samen voor onderstaande gast.
 
 REIZIGERSPROFIEL:
 - Aankomst: ${arrival} (${arrivalMonth}), vertrek: ${departure}

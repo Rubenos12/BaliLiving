@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import ReisPlannerClient from "./ReisPlannerClient";
 
 export const metadata: Metadata = {
-  title: "Reis Planner — Stel jouw Bali reis samen | BaliLiving",
+  title: "Reis Planner — Stel jouw Bali reis samen | BaliVoorNederlanders",
   description: "Laat onze AI jouw perfecte Bali-reis samenstellen. Van villa tot tours en restaurants — een persoonlijk reisplan in seconden.",
 };
 

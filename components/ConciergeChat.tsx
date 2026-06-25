@@ -238,7 +238,7 @@ export default function ConciergeChat() {
                   </div>
                   <div>
                     <p className="text-[#F5F0E8] text-sm font-light" style={{ fontFamily: "var(--font-cormorant)" }}>
-                      BaliLiving Concierge
+                      BaliVoorNederlanders Concierge
                     </p>
                     <p className="text-[#C9A84C]/55 text-[0.55rem] tracking-[0.2em] uppercase">
                       Claude AI · altijd beschikbaar

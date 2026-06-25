@@ -93,7 +93,7 @@ export default function ContactPage() {
               <p className="text-[#C9A84C] text-xs tracking-[0.3em] uppercase mb-6">Direct Contact</p>
               <div className="space-y-5">
                 {[
-                  { label: "Email", value: "info@baliliving.nl" },
+                  { label: "Email", value: "info@balivoornederlanders.nl" },
                   { label: "Telefoon", value: "+31 (0)20 123 4567" },
                   { label: "WhatsApp", value: "+31 6 12 34 56 78" },
                 ].map((item) => (

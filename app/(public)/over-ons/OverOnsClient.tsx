@@ -73,7 +73,7 @@ export default function OverOnsClient() {
               <span className="italic text-[#C9A84C]">echte fanaten</span>
             </motion.h1>
             <motion.p variants={fadeUp} className="text-[#F5F0E8]/65 text-xl leading-relaxed">
-              BaliLiving is opgericht door Edwin en Citty — twee Bali-verslaafden die al jarenlang
+              BaliVoorNederlanders is opgericht door Edwin en Citty — twee Bali-verslaafden die al jarenlang
               het eiland bezoeken en inmiddels diep geworteld zijn in de lokale gemeenschap.
               Wat begon als een persoonlijke liefde voor Bali, groeide uit tot een missie.
             </motion.p>
@@ -118,7 +118,7 @@ export default function OverOnsClient() {
                 geen echte lokale connectie. Dat wilden ze anders doen.
               </p>
               <p>
-                BaliLiving biedt een totaalpakket: villa&apos;s, tours, restaurants en alles
+                BaliVoorNederlanders biedt een totaalpakket: villa&apos;s, tours, restaurants en alles
                 daartussenin. Volledig persoonlijk, volledig lokaal, en altijd met de warmte
                 van mensen die het eiland echt kennen en liefhebben.
               </p>
@@ -170,7 +170,7 @@ export default function OverOnsClient() {
                 kennen en vertrouwen.
               </p>
               <p className="text-[#F5F0E8]/60 leading-relaxed">
-                Die lokale wortels zijn de basis van alles wat BaliLiving doet. Jij profiteert
+                Die lokale wortels zijn de basis van alles wat BaliVoorNederlanders doet. Jij profiteert
                 van connecties die je zelf nooit zou kunnen opbouwen.
               </p>
             </motion.div>
@@ -244,7 +244,7 @@ export default function OverOnsClient() {
             >
               De mensen achter
               <br />
-              <span className="italic text-[#C9A84C]">BaliLiving</span>
+              <span className="italic text-[#C9A84C]">BaliVoorNederlanders</span>
             </h2>
           </motion.div>
 

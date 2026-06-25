@@ -19,19 +19,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: villa.name,
     description: villa.short_description,
     openGraph: {
-      title: `${villa.name} — BaliLiving`,
+      title: `${villa.name} — BaliVoorNederlanders`,
       description: villa.short_description,
-      url: `https://www.baliliving.nl/villas/${slug}`,
+      url: `https://www.balivoornederlanders.nl/villas/${slug}`,
       images: [{ url: coverImage, width: 1200, height: 800, alt: villa.name }],
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: `${villa.name} — BaliLiving`,
+      title: `${villa.name} — BaliVoorNederlanders`,
       description: villa.short_description,
       images: [coverImage],
     },
-    alternates: { canonical: `https://www.baliliving.nl/villas/${slug}` },
+    alternates: { canonical: `https://www.balivoornederlanders.nl/villas/${slug}` },
   };
 }
 

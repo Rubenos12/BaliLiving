@@ -86,7 +86,7 @@ CONTACT AANVRAGEN (${contacts.length} totaal):
 - Per interesse: ${Object.entries(interestCounts).map(([i, c]) => `${i}: ${c}×`).join(", ") || "geen"}
 `;
 
-    const prompt = `Je bent een zakelijk adviseur voor BaliLiving, een exclusief Bali-reisbedrijf gerund door Edwin & Citty. Analyseer onderstaande data van de afgelopen 30 dagen en geef een beknopt rapport in het Nederlands.
+    const prompt = `Je bent een zakelijk adviseur voor BaliVoorNederlanders, een exclusief Bali-reisbedrijf gerund door Edwin & Citty. Analyseer onderstaande data van de afgelopen 30 dagen en geef een beknopt rapport in het Nederlands.
 
 ${dataContext}
 

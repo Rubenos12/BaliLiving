@@ -7,12 +7,12 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Luxe Villa's op Bali",
-  description: "Ontdek onze exclusieve villa's op Bali. Van romantische hideaways in Ubud tot strandvilla's in Seminyak — persoonlijk geselecteerd door BaliLiving.",
-  alternates: { canonical: "https://www.baliliving.nl/villas" },
+  description: "Ontdek onze exclusieve villa's op Bali. Van romantische hideaways in Ubud tot strandvilla's in Seminyak — persoonlijk geselecteerd door BaliVoorNederlanders.",
+  alternates: { canonical: "https://www.balivoornederlanders.nl/villas" },
   openGraph: {
-    title: "Luxe Villa's op Bali — BaliLiving",
+    title: "Luxe Villa's op Bali — BaliVoorNederlanders",
     description: "Exclusieve villa's op Bali, persoonlijk geselecteerd. Privépools, strandligging, chef-service en meer.",
-    url: "https://www.baliliving.nl/villas",
+    url: "https://www.balivoornederlanders.nl/villas",
   },
 };
 

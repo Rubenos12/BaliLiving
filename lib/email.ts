@@ -1,8 +1,8 @@
 import { Resend } from "resend";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-const FROM = "BaliLiving <noreply@baliliving.nl>";
-const ADMIN_EMAIL = "info@baliliving.nl";
+const FROM = "BaliVoorNederlanders <noreply@balivoornederlanders.nl>";
+const ADMIN_EMAIL = "info@balivoornederlanders.nl";
 
 function escapeHtml(s: string): string {
   return s
@@ -51,7 +51,7 @@ export async function sendBookingConfirmation(booking: {
           <p style="color:#888; font-size:13px;">Referentienummer: <strong>${ref}</strong></p>
           <p>Heb je vragen? Stuur een e-mail naar <a href="mailto:${ADMIN_EMAIL}" style="color:#C9A84C;">${ADMIN_EMAIL}</a></p>
           <hr style="border:none; border-top:1px solid #eee; margin:32px 0;">
-          <p style="color:#aaa; font-size:12px;">BaliLiving · Exclusieve Bali Ervaringen</p>
+          <p style="color:#aaa; font-size:12px;">BaliVoorNederlanders · Exclusieve Bali Ervaringen</p>
         </div>
       `,
     }),
@@ -73,7 +73,7 @@ export async function sendBookingConfirmation(booking: {
             <tr><td style="padding:8px 0; border-bottom:1px solid #eee; color:#888;">Gasten</td><td style="padding:8px 0; border-bottom:1px solid #eee;">${booking.guest_count}</td></tr>
             <tr><td style="padding:8px 0; color:#888;">Totaalprijs</td><td style="padding:8px 0;"><strong>€${booking.total_price.toLocaleString("nl-NL")}</strong></td></tr>
           </table>
-          <a href="https://www.baliliving.nl/admin/bookings" style="display:inline-block; background:#C9A84C; color:#1C2B1E; padding:10px 20px; text-decoration:none; font-size:14px;">Bekijk in admin panel</a>
+          <a href="https://www.balivoornederlanders.nl/admin/bookings" style="display:inline-block; background:#C9A84C; color:#1C2B1E; padding:10px 20px; text-decoration:none; font-size:14px;">Bekijk in admin panel</a>
         </div>
       `,
     }),
@@ -116,7 +116,7 @@ export async function sendBookingStatusUpdate(booking: {
     html: `
       <div style="font-family: Georgia, serif; max-width: 580px; margin: 0 auto; color: #2E2E2E;">
         ${body}
-        <p style="color:#aaa; font-size:12px; margin-top:32px;">Referentie: ${ref} · BaliLiving · Exclusieve Bali Ervaringen</p>
+        <p style="color:#aaa; font-size:12px; margin-top:32px;">Referentie: ${ref} · BaliVoorNederlanders · Exclusieve Bali Ervaringen</p>
       </div>
     `,
   }).catch((err) => { console.error("Status email failed:", err); });

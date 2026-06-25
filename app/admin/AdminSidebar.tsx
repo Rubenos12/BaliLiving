@@ -29,10 +29,10 @@ export default function AdminSidebar() {
       <div className="px-6 pt-8 pb-6 border-b border-[#C9A84C]/10">
         <Link href="/admin" className="block">
           <span
-            className="text-xl font-light tracking-[0.12em] text-[#F5F0E8]"
+            className="text-base font-light tracking-[0.08em] text-[#F5F0E8] uppercase"
             style={{ fontFamily: "var(--font-cormorant)" }}
           >
-            Bali<span className="text-[#C9A84C]">Living</span>
+            Bali<span className="text-[#C9A84C]">voor</span>Nederlanders
           </span>
           <p className="text-[0.55rem] tracking-[0.35em] text-[#C9A84C]/50 uppercase mt-1">
             Beheer

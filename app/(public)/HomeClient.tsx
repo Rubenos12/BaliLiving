@@ -131,9 +131,9 @@ const HOE_HET_WERKT = [
 ];
 
 const TESTIMONIALS = [
-  { quote: "BaliLiving heeft onze huwelijksreis letterlijk perfect gemaakt. Elke villa, elk restaurant, elke tour was precies wat we gehoopt hadden. Beter dan een reisbureau, het voelde als een vriend die op Bali woont.", name: "Sophie & Thomas", location: "Rotterdam", stars: 5 },
+  { quote: "BaliVoorNederlanders heeft onze huwelijksreis letterlijk perfect gemaakt. Elke villa, elk restaurant, elke tour was precies wat we gehoopt hadden. Beter dan een reisbureau, het voelde als een vriend die op Bali woont.", name: "Sophie & Thomas", location: "Rotterdam", stars: 5 },
   { quote: "Onze gezinsvakantie met vier kinderen was een droom. Edwin en Citty dachten aan alles — van kindvriendelijke activiteiten tot een villa met beveiligd zwembad. Wij komen zeker terug.", name: "Maria van den Berg", location: "Amsterdam", stars: 5 },
-  { quote: "Professioneel, persoonlijk en altijd beschikbaar. Midden in de nacht een vraag? Ze reageerden binnen het uur. BaliLiving is de enige manier om Bali te ontdekken.", name: "Robert Dekker", location: "Utrecht", stars: 5 },
+  { quote: "Professioneel, persoonlijk en altijd beschikbaar. Midden in de nacht een vraag? Ze reageerden binnen het uur. BaliVoorNederlanders is de enige manier om Bali te ontdekken.", name: "Robert Dekker", location: "Utrecht", stars: 5 },
 ];
 
 /* ─── CountUp component ─────────────────────────────────────────── */
@@ -228,7 +228,7 @@ function HoeHetWerkt() {
               <div className="lg:col-span-3 p-8 sm:p-12 lg:p-16 flex flex-col justify-between">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#F5F0E8]/40">{step.meta}</span>
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-[#C9A84C] bg-[#C9A84C]/10 px-3 py-1 rounded-full border border-[#C9A84C]/20">BaliLiving</span>
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-[#C9A84C] bg-[#C9A84C]/10 px-3 py-1 rounded-full border border-[#C9A84C]/20">BaliVoorNederlanders</span>
                 </div>
                 <div className="my-10 lg:my-0 lg:py-10">
                   <span className="font-light text-[6rem] sm:text-[9rem] leading-none text-[#C9A84C]/10 -mb-4 block" style={{ fontFamily: "var(--font-cormorant)" }}>{step.num}</span>
@@ -256,7 +256,7 @@ function HoeHetWerkt() {
                   <span className="h-1.5 w-1.5 rounded-full bg-[#C9A84C] ring-pulse-gold" />
                   <span className="font-mono text-[10px] uppercase tracking-widest text-[#F5F0E8]/80">Stap {step.num}</span>
                 </div>
-                <div className="absolute bottom-4 right-4 font-mono text-[10px] uppercase tracking-widest text-[#F5F0E8]/50">{step.num} / BaliLiving</div>
+                <div className="absolute bottom-4 right-4 font-mono text-[10px] uppercase tracking-widest text-[#F5F0E8]/50">{step.num} / BaliVoorNederlanders</div>
               </div>
             </div>
           </article>
@@ -308,7 +308,7 @@ export default function HomeClient({ villas }: { villas: Villa[] }) {
               className="text-[#C9A84C] text-[0.65rem] tracking-[0.45em] uppercase mb-10"
               style={{ animation: "hero-rise 0.9s cubic-bezier(0.25,0.46,0.45,0.94) 0.3s both" }}
             >
-              Welkom bij BaliLiving
+              Welkom bij BaliVoorNederlanders
             </p>
 
             <h1
@@ -385,12 +385,12 @@ export default function HomeClient({ villas }: { villas: Villa[] }) {
       <section className="py-32 sm:py-40 max-w-7xl mx-auto px-6">
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={stagger} className="grid md:grid-cols-2 gap-16 items-center">
           <motion.div variants={fadeUp}>
-            <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.4em] uppercase mb-6">Waarom BaliLiving</p>
+            <p className="text-[#C9A84C] text-[0.65rem] tracking-[0.4em] uppercase mb-6">Waarom BaliVoorNederlanders</p>
             <h2 className="text-5xl md:text-6xl font-light text-[#F5F0E8] leading-tight mb-8" style={{ fontFamily: "var(--font-cormorant)" }}>
               Meer dan een<br /><span className="italic text-[#C9A84C]">reisbureau</span>
             </h2>
             <div className="space-y-5 text-[#F5F0E8]/60 leading-relaxed">
-              <p>BaliLiving is opgericht door Edwin en Citty — pure Bali-fanaten en mede-eigenaren van STOER Bracelets. Jarenlang kwamen zij op het eiland en bouwden een diep persoonlijk netwerk op met lokale villa-eigenaren, gidsen en restauranthouders.</p>
+              <p>BaliVoorNederlanders is opgericht door Edwin en Citty — pure Bali-fanaten en mede-eigenaren van STOER Bracelets. Jarenlang kwamen zij op het eiland en bouwden een diep persoonlijk netwerk op met lokale villa-eigenaren, gidsen en restauranthouders.</p>
               <p>Dat netwerk zetten zij nu voor jou in. Geen standaard pakketreizen, geen anonieme boekingssites. Gewoon directe, eerlijke service van mensen die Bali net zo lief hebben als jij.</p>
             </div>
             <Link href="/over-ons" className="lift-on-hover inline-flex items-center gap-3 mt-10 text-[#C9A84C] text-[0.7rem] tracking-[0.3em] uppercase group">
@@ -586,7 +586,7 @@ export default function HomeClient({ villas }: { villas: Villa[] }) {
       {/* ─── TRUST PILLARS ────────────────────────────────────────── */}
       <section className="py-28 sm:py-36 max-w-7xl mx-auto px-6">
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={stagger} className="text-center">
-          <motion.p variants={fadeUp} className="text-[#C9A84C] text-[0.65rem] tracking-[0.45em] uppercase mb-4">De BaliLiving Belofte</motion.p>
+          <motion.p variants={fadeUp} className="text-[#C9A84C] text-[0.65rem] tracking-[0.45em] uppercase mb-4">De BaliVoorNederlanders Belofte</motion.p>
           <motion.h2 variants={fadeUp} className="text-4xl sm:text-5xl md:text-6xl font-light text-[#F5F0E8] mb-20" style={{ fontFamily: "var(--font-cormorant)" }}>
             Jouw reis, volledig<br /><span className="italic text-[#C9A84C]">ontzorgd</span>
           </motion.h2>

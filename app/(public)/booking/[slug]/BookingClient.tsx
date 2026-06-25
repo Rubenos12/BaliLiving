@@ -636,7 +636,7 @@ export default function BookingClient({
                   <div className="flex items-start gap-3">
                     <span className="text-[#C9A84C] text-sm mt-0.5">🔒</span>
                     <p className="text-[#F5F0E8]/40 text-xs leading-relaxed">
-                      Door te bevestigen geef je BaliLiving toestemming om contact op te nemen.
+                      Door te bevestigen geef je BaliVoorNederlanders toestemming om contact op te nemen.
                       Geen betaling nu — je boeking wordt binnen 24 uur bevestigd.
                     </p>
                   </div>

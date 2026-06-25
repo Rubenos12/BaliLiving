@@ -140,7 +140,7 @@ export default function VisumPage() {
             </motion.div>
 
             <motion.div variants={fadeUp} className="border-t border-[#C9A84C]/15 pt-10">
-              <p className="text-[#C9A84C] text-xs tracking-[0.3em] uppercase mb-4">Waarom via BaliLiving?</p>
+              <p className="text-[#C9A84C] text-xs tracking-[0.3em] uppercase mb-4">Waarom via BaliVoorNederlanders?</p>
               <p className="text-[#F5F0E8]/50 text-sm leading-relaxed">
                 Wij hebben jarenlange ervaring met Indonesische visumaanvragen en werken samen met betrouwbare lokale partners. Geen verrassingen, geen wachtrijen.
               </p>

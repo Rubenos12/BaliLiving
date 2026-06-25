@@ -4,7 +4,7 @@ import AdminSidebar from "./AdminSidebar";
 import AdminMobileNav from "./AdminMobileNav";
 
 export const metadata = {
-  title: "Admin — BaliLiving",
+  title: "Admin — BaliVoorNederlanders",
 };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

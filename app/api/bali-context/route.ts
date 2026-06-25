@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
   const checkOutMonth = monthNames[checkOutDate.getMonth()];
   const checkInYear = checkInDate.getFullYear();
 
-  const prompt = `Je bent een Bali-expert voor BaliLiving. Een gast wil reizen van ${check_in} tot ${check_out} (${nights} nachten, aankomst in ${checkInMonth} ${checkInYear}).
+  const prompt = `Je bent een Bali-expert voor BaliVoorNederlanders. Een gast wil reizen van ${check_in} tot ${check_out} (${nights} nachten, aankomst in ${checkInMonth} ${checkInYear}).
 
 Geef maximaal 4 korte contextuele inzichten over deze reisperiode op Bali. Denk aan:
 - Seizoen (droog apr-okt, nat nov-mrt) en wat dat betekent praktisch

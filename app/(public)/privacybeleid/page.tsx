@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacybeleid",
-  description: "Het privacybeleid van BaliLiving — hoe wij omgaan met jouw persoonsgegevens.",
+  description: "Het privacybeleid van BaliVoorNederlanders — hoe wij omgaan met jouw persoonsgegevens.",
   robots: { index: false },
 };
 
@@ -25,10 +25,10 @@ export default function PrivacybeleidPage() {
               1. Wie zijn wij?
             </h2>
             <p>
-              BaliLiving is een reisdienstverlener gespecialiseerd in exclusieve villa&apos;s, tours, restaurants en
-              transfers op Bali. BaliLiving is opgericht door Edwin &amp; Citty en is bereikbaar via{" "}
-              <a href="mailto:info@baliliving.nl" className="text-[#C9A84C] hover:text-[#E8C96A]">
-                info@baliliving.nl
+              BaliVoorNederlanders is een reisdienstverlener gespecialiseerd in exclusieve villa&apos;s, tours, restaurants en
+              transfers op Bali. BaliVoorNederlanders is opgericht door Edwin &amp; Citty en is bereikbaar via{" "}
+              <a href="mailto:info@balivoornederlanders.nl" className="text-[#C9A84C] hover:text-[#E8C96A]">
+                info@balivoornederlanders.nl
               </a>
               .
             </p>
@@ -102,8 +102,8 @@ export default function PrivacybeleidPage() {
             </ul>
             <p className="mt-3">
               Stuur een e-mail naar{" "}
-              <a href="mailto:info@baliliving.nl" className="text-[#C9A84C] hover:text-[#E8C96A]">
-                info@baliliving.nl
+              <a href="mailto:info@balivoornederlanders.nl" className="text-[#C9A84C] hover:text-[#E8C96A]">
+                info@balivoornederlanders.nl
               </a>{" "}
               om een van deze rechten uit te oefenen. Wij reageren binnen 30 dagen.
             </p>

@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { fetchVillas } from "@/lib/actions/villas-fetch";
 import { createServiceClient } from "@/lib/supabase/server";
 
-const BASE = "https://www.baliliving.nl";
+const BASE = "https://www.balivoornederlanders.nl";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();

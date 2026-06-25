@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
     const occasionLabel = OCCASION_LABELS[occasion] ?? "niet opgegeven";
     const toneTip = OCCASION_TONE[occasion] ?? "Neutrale, professionele toon.";
 
-    const prompt = `Je bent een premium vervoersadviseur voor BaliLiving, een exclusief reisbedrijf op Bali, Indonesië.
+    const prompt = `Je bent een premium vervoersadviseur voor BaliVoorNederlanders, een exclusief reisbedrijf op Bali, Indonesië.
 
 Analyseer deze transfer aanvraag en geef een persoonlijk advies:
 - Van: ${from}

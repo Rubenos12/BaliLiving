@@ -138,7 +138,7 @@ export async function POST(req: NextRequest) {
       messages: [
         {
           role: "user",
-          content: `Je bent de persoonlijke villa-adviseur van BaliLiving — een exclusief reisbedrijf op Bali van Edwin & Citty. Jouw taak is om de drie beste villa's te selecteren uit de beschikbare lijst.
+          content: `Je bent de persoonlijke villa-adviseur van BaliVoorNederlanders — een exclusief reisbedrijf op Bali van Edwin & Citty. Jouw taak is om de drie beste villa's te selecteren uit de beschikbare lijst.
 
 REISTYPE: ${tripTypeLabel}
 ${tripTypeInstruction}

@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       highlights: v!.highlights ?? [],
     }));
 
-    const prompt = `Je bent een persoonlijke villa-adviseur voor BaliLiving. Een gast wil kiezen tussen ${selectedVillas.length} villa's.
+    const prompt = `Je bent een persoonlijke villa-adviseur voor BaliVoorNederlanders. Een gast wil kiezen tussen ${selectedVillas.length} villa's.
 
 Wat de gast het belangrijkste vindt:
 "${priority}"

@@ -49,10 +49,10 @@ export default function Navbar() {
           <Link href="/" className="group">
             <div className="flex flex-col">
               <span
-                className="text-2xl font-light tracking-[0.2em] text-[#F5F0E8] uppercase"
+                className="text-xl font-light tracking-[0.12em] text-[#F5F0E8] uppercase"
                 style={{ fontFamily: "var(--font-cormorant)" }}
               >
-                Bali<span className="text-[#C9A84C]">Living</span>
+                Bali<span className="text-[#C9A84C]">voor</span>Nederlanders
               </span>
               <span className="text-[0.65rem] tracking-[0.35em] text-[#C9A84C] uppercase">
                 Exclusieve Ervaringen

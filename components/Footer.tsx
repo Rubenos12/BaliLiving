@@ -22,10 +22,10 @@ export default function Footer() {
           <div className="md:col-span-1">
             <div className="flex flex-col mb-6">
               <span
-                className="text-2xl font-light tracking-[0.2em] text-[#F5F0E8] uppercase"
+                className="text-xl font-light tracking-[0.12em] text-[#F5F0E8] uppercase"
                 style={{ fontFamily: "var(--font-cormorant)" }}
               >
-                Bali<span className="text-[#C9A84C]">Living</span>
+                Bali<span className="text-[#C9A84C]">voor</span>Nederlanders
               </span>
               <span className="text-[0.65rem] tracking-[0.35em] text-[#C9A84C] uppercase">
                 Exclusieve Ervaringen
@@ -55,9 +55,9 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* BaliLiving */}
+          {/* BaliVoorNederlanders */}
           <div>
-            <h4 className="text-[#C9A84C] text-xs tracking-[0.3em] uppercase mb-6">BaliLiving</h4>
+            <h4 className="text-[#C9A84C] text-xs tracking-[0.3em] uppercase mb-6">BaliVoorNederlanders</h4>
             <ul className="space-y-3">
               {[
                 { label: "Over Ons", href: "/over-ons" },
@@ -78,8 +78,8 @@ export default function Footer() {
             <h4 className="text-[#C9A84C] text-xs tracking-[0.3em] uppercase mb-6">Contact</h4>
             <ul className="space-y-3 text-[#F5F0E8]/60 text-sm">
               <li>
-                <a href="mailto:info@baliliving.nl" className="hover:text-[#C9A84C] transition-colors duration-300">
-                  info@baliliving.nl
+                <a href="mailto:info@balivoornederlanders.nl" className="hover:text-[#C9A84C] transition-colors duration-300">
+                  info@balivoornederlanders.nl
                 </a>
               </li>
               <li>
@@ -90,7 +90,7 @@ export default function Footer() {
               <li className="pt-4">
                 <div className="flex gap-2">
                   <a
-                    href="https://www.instagram.com/baliliving.nl"
+                    href="https://www.instagram.com/balivoornederlanders"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Instagram"
@@ -116,7 +116,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-16 pt-8 border-t border-[#C9A84C]/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-[#F5F0E8]/30 text-xs tracking-wider">
-            © {new Date().getFullYear()} BaliLiving. Alle rechten voorbehouden.
+            © {new Date().getFullYear()} BaliVoorNederlanders. Alle rechten voorbehouden.
           </p>
           <div className="flex gap-6">
             <Link href="/privacybeleid" className="text-[#F5F0E8]/30 text-xs hover:text-[#C9A84C] transition-colors duration-300">

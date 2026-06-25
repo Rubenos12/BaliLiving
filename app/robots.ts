@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin/", "/api/"],
       },
     ],
-    sitemap: "https://www.baliliving.nl/sitemap.xml",
+    sitemap: "https://www.balivoornederlanders.nl/sitemap.xml",
   };
 }
