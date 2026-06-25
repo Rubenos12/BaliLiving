@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { SkeletonCard } from "@/components/ui/Skeleton";
 
 type Suggestion = {
   type: "transfer" | "tour" | "restaurant";
@@ -60,10 +61,7 @@ export default function ActivitySuggestions({ villaName, region, checkIn, nights
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-[#1C2B1E] border border-[#C9A84C]/10 p-4 animate-pulse">
-                  <div className="h-3 bg-[#C9A84C]/10 rounded w-3/4 mb-2" />
-                  <div className="h-2 bg-[#C9A84C]/5 rounded w-1/2" />
-                </div>
+                <SkeletonCard key={i} />
               ))}
             </div>
           ) : (

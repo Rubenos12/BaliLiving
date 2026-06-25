@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 type ContextItem = {
   icon: string;
@@ -67,14 +68,13 @@ export default function BaliContextCard({ checkIn, checkOut }: Props) {
           transition={{ duration: 0.25 }}
           className="mt-4 bg-[#131E14] border border-[#C9A84C]/15 p-4"
         >
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-[#C9A84C] text-[0.55rem] tracking-[0.3em] uppercase">Bali in jouw periode</span>
-            {loading && (
-              <svg className="animate-spin w-3 h-3 text-[#C9A84C]/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" strokeLinecap="round"/>
-              </svg>
-            )}
-          </div>
+          <span className="text-[#C9A84C] text-[0.55rem] tracking-[0.3em] uppercase block mb-3">Bali in jouw periode</span>
+          {loading && (
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-4/5" />
+              <Skeleton className="h-3 w-3/5" />
+            </div>
+          )}
           {items.length > 0 && (
             <div className="space-y-2">
               {items.map((item, i) => (

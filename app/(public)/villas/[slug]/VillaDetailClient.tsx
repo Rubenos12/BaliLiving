@@ -3,10 +3,12 @@
 import { motion, Variants, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { Villa } from "@/lib/villas-data";
 import VillaReviews from "@/components/VillaReviews";
 import type { VillaReview } from "@/lib/actions/reviews";
+import FavoriteButton from "@/components/FavoriteButton";
+import ShareButton from "@/components/ShareButton";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
@@ -52,6 +54,18 @@ function Gallery({ images, name }: { images: string[]; name: string }) {
         {count > 1 && (
           <div className="absolute bottom-4 right-4 bg-[#1C2B1E]/80 px-3 py-1.5 text-[#C9A84C] text-xs tracking-wider">
             {active + 1} / {count}
+          </div>
+        )}
+        {count > 1 && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 pointer-events-none" aria-hidden>
+            {images.map((_, i) => (
+              <span
+                key={i}
+                className={`block rounded-full transition-all duration-300 ${
+                  active === i ? "w-4 h-1.5 bg-[#C9A84C]" : "w-1.5 h-1.5 bg-white/40"
+                }`}
+              />
+            ))}
           </div>
         )}
         {count > 1 && (
@@ -242,6 +256,19 @@ export default function VillaDetailClient({
   averageRating?: number;
   reviewCount?: number;
 }) {
+  const [barVisible, setBarVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      setBarVisible(currentY < 80 || currentY < lastScrollY.current);
+      lastScrollY.current = currentY;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <>
       {/* Breadcrumb */}
@@ -288,6 +315,17 @@ export default function VillaDetailClient({
                     >
                       {villa.name}
                     </h1>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <FavoriteButton
+                      slug={villa.slug}
+                      size="lg"
+                      className="border border-[#C9A84C]/30 hover:border-[#C9A84C] transition-colors"
+                    />
+                    <ShareButton
+                      title={villa.name}
+                      text={`Bekijk ${villa.name} op BaliVoorNederlanders — luxe villa's op Bali`}
+                    />
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-[#F5F0E8]/50">
@@ -425,8 +463,8 @@ export default function VillaDetailClient({
         </div>
       </section>
 
-      {/* Mobile booking bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#1C2B1E] border-t border-[#C9A84C]/30 px-4 pt-4 pb-safe flex items-center justify-between">
+      {/* Mobile booking bar — hides when scrolling down, reappears on scroll up */}
+      <div className={`lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#1C2B1E] border-t border-[#C9A84C]/30 px-4 pt-4 pb-safe flex items-center justify-between transition-transform duration-300 ${barVisible ? "translate-y-0" : "translate-y-full"}`}>
         <div>
           <span
             className="text-2xl font-light text-[#C9A84C]"

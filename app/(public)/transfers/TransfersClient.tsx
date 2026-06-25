@@ -98,7 +98,9 @@ function LocationInput({
   icon: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [flipUp, setFlipUp] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const filtered = BALI_LOCATIONS.filter(
     (loc) => value.length > 0 && loc.toLowerCase().includes(value.toLowerCase())
@@ -114,6 +116,13 @@ function LocationInput({
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
 
+  const checkFlip = () => {
+    if (!inputRef.current) return;
+    const rect = inputRef.current.getBoundingClientRect();
+    const dropdownHeight = Math.min(filtered.length * 56, 192);
+    setFlipUp(rect.bottom + dropdownHeight > window.innerHeight - 16);
+  };
+
   return (
     <div ref={ref} className="relative">
       <label className="block text-[#C9A84C] text-[0.65rem] tracking-[0.25em] uppercase mb-2">
@@ -124,12 +133,14 @@ function LocationInput({
           {icon}
         </span>
         <input
+          ref={inputRef}
           value={value}
           onChange={(e) => {
             onChange(e.target.value);
             setOpen(true);
+            checkFlip();
           }}
-          onFocus={() => setOpen(true)}
+          onFocus={() => { setOpen(true); checkFlip(); }}
           placeholder={placeholder}
           className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] pl-10 pr-4 py-4 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/25"
           autoComplete="off"
@@ -138,11 +149,15 @@ function LocationInput({
       <AnimatePresence>
         {open && filtered.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: -4 }}
+            initial={{ opacity: 0, y: flipUp ? 4 : -4 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
+            exit={{ opacity: 0, y: flipUp ? 4 : -4 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full left-0 right-0 z-50 bg-[#1A2B1C] border border-[#C9A84C]/25 border-t-0 max-h-48 overflow-y-auto shadow-2xl"
+            className={`absolute left-0 right-0 z-50 bg-[#1A2B1C] border border-[#C9A84C]/25 max-h-48 overflow-y-auto shadow-2xl ${
+              flipUp
+                ? "bottom-full border-b-0 mb-1"
+                : "top-full border-t-0"
+            }`}
           >
             {filtered.map((loc) => (
               <button

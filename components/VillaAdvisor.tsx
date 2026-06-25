@@ -109,6 +109,7 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
   const [preferences, setPreferences] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const [result, setResult] = useState<AdvisorResult | null>(null);
   const [error, setError] = useState("");
 
@@ -119,12 +120,19 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
   ];
 
   useEffect(() => {
-    if (!loading) return;
+    if (!loading) { setLoadingProgress(0); return; }
     setLoadingMsgIdx(0);
-    const interval = setInterval(() => {
+    setLoadingProgress(0);
+    const msgInterval = setInterval(() => {
       setLoadingMsgIdx((i) => (i + 1) % LOADING_MESSAGES.length);
     }, 1600);
-    return () => clearInterval(interval);
+    let p = 0;
+    const progressInterval = setInterval(() => {
+      p += Math.random() * 6 + 2;
+      if (p >= 90) { setLoadingProgress(90); clearInterval(progressInterval); }
+      else setLoadingProgress(p);
+    }, 180);
+    return () => { clearInterval(msgInterval); clearInterval(progressInterval); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
@@ -322,18 +330,19 @@ export default function VillaAdvisor({ villas }: { villas: Villa[] }) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.35 }}
-                    className="text-[#F5F0E8]/50 text-sm tracking-wide"
+                    className="text-[#F5F0E8]/50 text-sm tracking-wide mb-5"
                   >
                     {LOADING_MESSAGES[loadingMsgIdx]}
                   </motion.p>
                 </AnimatePresence>
-                <div className="flex justify-center gap-1 mt-5">
-                  {LOADING_MESSAGES.map((_, i) => (
-                    <span
-                      key={i}
-                      className={`h-0.5 w-6 transition-all duration-300 ${i === loadingMsgIdx ? "bg-[#C9A84C]" : "bg-[#C9A84C]/20"}`}
-                    />
-                  ))}
+                {/* Progress bar */}
+                <div className="w-48 mx-auto h-0.5 bg-[#C9A84C]/15 overflow-hidden rounded-full">
+                  <motion.div
+                    className="h-full bg-[#C9A84C]"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${loadingProgress}%` }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                  />
                 </div>
               </motion.div>
             ) : (

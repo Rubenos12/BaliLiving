@@ -449,9 +449,14 @@ export default function BookingClient({
                   >
                     Jouw gegevens
                   </h2>
-                  <p className="text-[#F5F0E8]/40 text-sm mb-6">
+                  <p className="text-[#F5F0E8]/40 text-sm mb-2">
                     {formatDate(checkIn)} → {formatDate(checkOut)} · {nights} nachten · {guests} gasten
                   </p>
+                  {total > 0 && (
+                    <p className="text-[#C9A84C] mb-6" style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.35rem" }}>
+                      €{total.toLocaleString("nl-NL")} totaal
+                    </p>
+                  )}
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>

@@ -99,7 +99,7 @@ export default function Footer() {
                     <IconInstagram />
                   </a>
                   <a
-                    href="https://wa.me/31201234567"
+                    href="https://wa.me/31201234567?text=Hallo%2C%20ik%20ben%20ge%C3%AFnteresseerd%20in%20een%20villa%20op%20Bali."
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="WhatsApp"

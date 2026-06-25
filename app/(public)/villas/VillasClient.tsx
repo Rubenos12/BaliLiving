@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Villa } from "@/lib/villas-data";
 import VillaAdvisor from "@/components/VillaAdvisor";
+import FavoriteButton from "@/components/FavoriteButton";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -70,17 +71,29 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
   const [comparePriority, setComparePriority] = useState("");
   const [compareLoading, setCompareLoading] = useState(false);
   const [compareResult, setCompareResult] = useState<CompareResult | null>(null);
+  const [compareError, setCompareError] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("aanbevolen");
 
-  const filtered = villas.filter((v) => {
-    const regionMatch = activeRegion === "Alle Villa's" || v.region === activeRegion;
-    const expFilter = EXPERIENCE_FILTERS.find((f) => f.label === activeExperience);
-    const expMatch = !activeExperience || (expFilter ? expFilter.match(v) : true);
-    return regionMatch && expMatch;
-  });
+  const filtered = villas
+    .filter((v) => {
+      const regionMatch = activeRegion === "Alle Villa's" || v.region === activeRegion;
+      const expFilter = EXPERIENCE_FILTERS.find((f) => f.label === activeExperience);
+      const expMatch = !activeExperience || (expFilter ? expFilter.match(v) : true);
+      const q = searchQuery.toLowerCase();
+      const searchMatch = !q || v.name.toLowerCase().includes(q) || v.region.toLowerCase().includes(q) || v.location.toLowerCase().includes(q);
+      return regionMatch && expMatch && searchMatch;
+    })
+    .sort((a, b) => {
+      if (sortBy === "prijs-laag") return a.price_per_night - b.price_per_night;
+      if (sortBy === "prijs-hoog") return b.price_per_night - a.price_per_night;
+      if (sortBy === "slaapkamers") return b.bedrooms - a.bedrooms;
+      return 0;
+    });
 
   const activeCount = (activeRegion !== "Alle Villa's" ? 1 : 0) + (activeExperience ? 1 : 0);
-  const hasActiveFilters = activeRegion !== "Alle Villa's" || activeExperience !== "";
-  const clearFilters = () => { setActiveRegion("Alle Villa's"); setActiveExperience(""); };
+  const hasActiveFilters = activeRegion !== "Alle Villa's" || activeExperience !== "" || searchQuery !== "";
+  const clearFilters = () => { setActiveRegion("Alle Villa's"); setActiveExperience(""); setSearchQuery(""); setSortBy("aanbevolen"); };
 
   const toggleCompare = (slug: string) => {
     setCompareSelection((prev) => {
@@ -94,18 +107,23 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
     if (compareSelection.length < 2 || !comparePriority.trim()) return;
     setCompareLoading(true);
     setCompareResult(null);
+    setCompareError(false);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30_000);
     try {
       const res = await fetch("/api/villa-compare", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slugs: compareSelection, priority: comparePriority }),
+        signal: controller.signal,
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setCompareResult(data);
     } catch {
-      // stays on input screen — user can retry
+      setCompareError(true);
     } finally {
+      clearTimeout(timeout);
       setCompareLoading(false);
     }
   };
@@ -192,8 +210,42 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
 
       {/* Desktop: sticky filter bar */}
       <section className="hidden md:block sticky top-[72px] z-40 bg-[#1C2B1E] border-y border-[#C9A84C]/15 py-5 space-y-3">
+        {/* Search + sort row */}
+        <div className="max-w-7xl mx-auto px-6 flex items-center gap-4">
+          <div className="relative flex-1 max-w-xs">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C9A84C]/50 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Zoek villa, regio…"
+              className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] pl-10 pr-8 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/25"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#F5F0E8]/30 hover:text-[#C9A84C] transition-colors"
+                aria-label="Wis zoekopdracht"
+              >
+                ×
+              </button>
+            )}
+          </div>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8]/70 text-xs tracking-wider px-4 py-2.5 focus:outline-none focus:border-[#C9A84C]/60 transition-colors cursor-pointer"
+          >
+            <option value="aanbevolen">Aanbevolen</option>
+            <option value="prijs-laag">Prijs: laag → hoog</option>
+            <option value="prijs-hoog">Prijs: hoog → laag</option>
+            <option value="slaapkamers">Meeste slaapkamers</option>
+          </select>
+        </div>
         {/* Region filters */}
-        <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-2">
+        <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-2 border-t border-[#C9A84C]/10 pt-3">
           {REGION_FILTERS.map((f) => (
             <button
               key={f}
@@ -233,10 +285,17 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
       <section className="py-20 max-w-7xl mx-auto px-6">
         {/* Result count + clear */}
         <div className="flex items-center justify-between mb-10">
-          <p className="text-[#F5F0E8]/40 text-sm">
-            <span className="text-[#F5F0E8]">{filtered.length}</span>{" "}
-            villa{filtered.length !== 1 ? "'s" : ""} gevonden
-          </p>
+          <div>
+            {searchQuery && (
+              <p className="text-[#C9A84C] text-xs tracking-wider mb-1">
+                Zoekresultaten voor &ldquo;{searchQuery}&rdquo;
+              </p>
+            )}
+            <p className="text-[#F5F0E8]/40 text-sm">
+              <span className="text-[#F5F0E8]">{filtered.length}</span>{" "}
+              villa{filtered.length !== 1 ? "'s" : ""} gevonden
+            </p>
+          </div>
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
@@ -296,21 +355,28 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
                       {villa.tag}
                     </span>
                   </div>
-                  <button
-                    onClick={() => toggleCompare(villa.slug)}
-                    disabled={!compareSelection.includes(villa.slug) && compareSelection.length >= 3}
-                    className={`absolute top-4 right-4 w-8 h-8 flex items-center justify-center border text-xs font-medium transition-all duration-200 ${
-                      compareSelection.includes(villa.slug)
-                        ? "bg-[#C9A84C] border-[#C9A84C] text-[#1C2B1E]"
-                        : compareSelection.length >= 3
-                        ? "bg-[#0F1A10]/60 border-[#F5F0E8]/10 text-[#F5F0E8]/20 cursor-not-allowed"
-                        : "bg-[#0F1A10]/60 border-[#F5F0E8]/20 text-[#F5F0E8]/50 hover:border-[#C9A84C]/50 hover:text-[#C9A84C]"
-                    }`}
-                    aria-label={compareSelection.includes(villa.slug) ? `${villa.name} verwijderen uit vergelijking` : `${villa.name} vergelijken`}
-                    aria-pressed={compareSelection.includes(villa.slug)}
-                  >
-                    {compareSelection.includes(villa.slug) ? "✓" : "+"}
-                  </button>
+                  <div className="absolute top-4 right-4 flex flex-col gap-2">
+                    <FavoriteButton
+                      slug={villa.slug}
+                      size="sm"
+                      className="bg-[#0F1A10]/70 border border-[#F5F0E8]/20 hover:border-[#C9A84C]/60 text-[#F5F0E8]/60"
+                    />
+                    <button
+                      onClick={() => toggleCompare(villa.slug)}
+                      disabled={!compareSelection.includes(villa.slug) && compareSelection.length >= 3}
+                      className={`w-11 h-11 flex items-center justify-center border text-xs font-medium transition-all duration-200 active:scale-95 ${
+                        compareSelection.includes(villa.slug)
+                          ? "bg-[#C9A84C] border-[#C9A84C] text-[#1C2B1E]"
+                          : compareSelection.length >= 3
+                          ? "bg-[#0F1A10]/60 border-[#F5F0E8]/10 text-[#F5F0E8]/20 cursor-not-allowed"
+                          : "bg-[#0F1A10]/60 border-[#F5F0E8]/20 text-[#F5F0E8]/50 hover:border-[#C9A84C]/50 hover:text-[#C9A84C]"
+                      }`}
+                      aria-label={compareSelection.includes(villa.slug) ? `${villa.name} verwijderen uit vergelijking` : `${villa.name} vergelijken`}
+                      aria-pressed={compareSelection.includes(villa.slug)}
+                    >
+                      {compareSelection.includes(villa.slug) ? "✓" : "+"}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Card body */}
@@ -411,6 +477,46 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
                     <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                   </svg>
                 </button>
+              </div>
+
+              {/* Search */}
+              <div className="relative mb-6">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C9A84C]/50 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Zoek villa, regio…"
+                  className="w-full bg-[#243628] border border-[#C9A84C]/20 text-[#F5F0E8] pl-10 pr-8 py-3 text-sm focus:outline-none focus:border-[#C9A84C]/60 transition-colors placeholder-[#F5F0E8]/25"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#F5F0E8]/40 hover:text-[#C9A84C]" aria-label="Wis zoekopdracht">×</button>
+                )}
+              </div>
+
+              {/* Sort */}
+              <p className="text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-3">Sorteren</p>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {[
+                  { value: "aanbevolen", label: "Aanbevolen" },
+                  { value: "prijs-laag", label: "Prijs ↑" },
+                  { value: "prijs-hoog", label: "Prijs ↓" },
+                  { value: "slaapkamers", label: "Slaapkamers" },
+                ].map((s) => (
+                  <button
+                    key={s.value}
+                    onClick={() => setSortBy(s.value)}
+                    className={`text-xs tracking-[0.15em] uppercase px-4 py-2.5 min-h-[44px] transition-all duration-200 border ${
+                      sortBy === s.value
+                        ? "bg-[#C9A84C] border-[#C9A84C] text-[#1C2B1E]"
+                        : "border-[#F5F0E8]/10 text-[#F5F0E8]/50 hover:border-[#C9A84C]/50 hover:text-[#C9A84C]"
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
               </div>
 
               <p className="text-[#C9A84C] text-[0.6rem] tracking-[0.3em] uppercase mb-3">Regio</p>
@@ -570,6 +676,12 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
                       disabled={compareLoading}
                     />
 
+                    {compareError && (
+                      <div className="mb-4 p-4 border border-red-500/30 bg-red-900/20 text-sm text-red-300">
+                        Er ging iets mis. Controleer je verbinding en probeer het opnieuw.
+                      </div>
+                    )}
+
                     {compareLoading ? (
                       <div className="py-8 text-center">
                         <motion.div
@@ -585,7 +697,7 @@ export default function VillasClient({ villas }: { villas: Villa[] }) {
                         disabled={!comparePriority.trim()}
                         className="w-full py-4 bg-[#C9A84C] text-[#1C2B1E] text-xs tracking-[0.3em] uppercase font-medium hover:bg-[#E8C96A] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed mb-2"
                       >
-                        Vergelijk nu met AI ✦
+                        {compareError ? "Probeer opnieuw ✦" : "Vergelijk nu met AI ✦"}
                       </button>
                     )}
                   </>

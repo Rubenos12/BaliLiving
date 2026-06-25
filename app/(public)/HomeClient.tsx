@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, type Variants } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import type { Villa } from "@/lib/villas-data";
 
 /* ─── Inline SVG icons (replaces lucide-react) ───────────────── */
@@ -249,8 +250,14 @@ function HoeHetWerkt() {
               </div>
 
               <div className="lg:col-span-2 relative overflow-hidden min-h-[280px] lg:min-h-full bg-[#0F1A10]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={step.image} alt={step.alt} loading="lazy" className="absolute inset-0 w-full h-full object-cover" style={{ animation: "ken-burns 12s ease-in-out infinite alternate" }} onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }} />
+                <Image
+                  src={step.image}
+                  alt={step.alt}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="object-cover"
+                  style={{ animation: "ken-burns 12s ease-in-out infinite alternate" }}
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0F1A10]/70 via-transparent to-[#0F1A10]/20" />
                 <div className="absolute top-5 left-5 flex items-center gap-2 glass-dark rounded-full pl-3 pr-4 py-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#C9A84C] ring-pulse-gold" />
@@ -275,13 +282,14 @@ export default function HomeClient({ villas }: { villas: Villa[] }) {
 
       {/* ─── HERO ──────────────────────────────────────────────────── */}
       <section id="hero" className="relative min-h-screen overflow-hidden flex flex-col">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920&q=90&auto=format&fit=crop"
           alt="Luxe villa op Bali"
-          className="absolute inset-0 w-full h-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
           style={{ animation: "ken-burns 18s ease-in-out infinite alternate" }}
-          onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }}
         />
         <div className="absolute inset-0 bg-gradient-to-br from-[#0A1209]/75 via-[#131E14]/60 to-[#1C2B1E]/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0F1A10]/80 via-transparent to-transparent" />
@@ -401,8 +409,13 @@ export default function HomeClient({ villas }: { villas: Villa[] }) {
 
           <motion.div variants={fadeUp} className="relative">
             <div className="aspect-[3/4] relative overflow-hidden rounded-sm">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://images.unsplash.com/photo-1537953773345-d172ccf13cf4?w=900&q=85&auto=format&fit=crop" alt="Bali rijstterrassen" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }} />
+              <Image
+                src="https://images.unsplash.com/photo-1537953773345-d172ccf13cf4?w=900&q=85&auto=format&fit=crop"
+                alt="Bali rijstterrassen"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover transition-transform duration-700 hover:scale-105"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0F1A10]/30 to-transparent pointer-events-none" />
             </div>
             <div className="absolute -top-4 -right-4 w-20 h-20 border-t border-r border-[#C9A84C]/40" />
@@ -510,8 +523,13 @@ export default function HomeClient({ villas }: { villas: Villa[] }) {
                 <motion.div key={v.slug} variants={fadeUp} style={{ transitionDelay: `${i * 80}ms` }}>
                   <Link href={`/villas/${v.slug}`} className="group block overflow-hidden rounded-sm">
                     <div className="relative overflow-hidden aspect-[4/5]">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={v.images[0]} alt={v.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.parentElement?.classList.add("img-fallback"); }} />
+                      <Image
+                        src={v.images[0]}
+                        alt={v.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0F1A10]/80 via-transparent to-transparent" />
                       {v.tag && (
                         <div className="absolute top-4 left-4 glass-dark border border-[#C9A84C]/20 px-3 py-1 rounded-full">

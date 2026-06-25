@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const links = [
   { href: "/villas", label: "Villa's" },
@@ -15,6 +16,7 @@ const links = [
 
 const allLinks = [
   ...links,
+  { href: "/favorieten", label: "Favorieten" },
   { href: "/restaurants", label: "Restaurants" },
   { href: "/contact", label: "Contact" },
 ];
@@ -23,10 +25,11 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { count: favCount, hydrated } = useFavorites();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -77,6 +80,22 @@ export default function Navbar() {
                 )}
               </Link>
             ))}
+            {hydrated && (
+              <Link
+                href="/favorieten"
+                aria-label={`Favorieten (${favCount})`}
+                className="relative w-10 h-10 flex items-center justify-center text-[#F5F0E8]/60 hover:text-[#C9A84C] transition-colors duration-300"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill={favCount > 0 ? "#C9A84C" : "none"} stroke={favCount > 0 ? "#C9A84C" : "currentColor"} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+                {favCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 flex items-center justify-center bg-[#C9A84C] text-[#1C2B1E] text-[0.55rem] font-medium rounded-full">
+                    {favCount}
+                  </span>
+                )}
+              </Link>
+            )}
             <Link
               href="/contact"
               className="ml-4 px-6 py-2.5 border border-[#C9A84C] text-[#C9A84C] text-xs tracking-[0.2em] uppercase hover:bg-[#C9A84C] hover:text-[#1C2B1E] transition-all duration-300"
