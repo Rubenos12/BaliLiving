@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import AdminSidebar from "./AdminSidebar";
 import AdminMobileNav from "./AdminMobileNav";
@@ -8,6 +9,16 @@ export const metadata = {
 };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const h = await headers();
+  const pathname = h.get("x-pathname") ?? "";
+
+  // Login page lives inside this layout segment but must not trigger the auth
+  // redirect — otherwise visiting /admin/login would loop: layout redirects to
+  // /admin/login → layout redirects to /admin/login → ∞
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
   // Defense-in-depth: middleware protects routes, but we verify server-side too
   // to guard against middleware bypass vulnerabilities (e.g. CVE-2025-29927 pattern)
   const supabase = await createClient();
