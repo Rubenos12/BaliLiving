@@ -18,14 +18,19 @@ export default async function BookingPage({
   const villaId = (await getVillaIdBySlug(slug)) ?? slug;
   const blockedDates = await getBlockedDates(villaId);
 
+  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+  const safeCheckIn = datePattern.test(sp.checkIn ?? "") ? sp.checkIn! : "";
+  const safeCheckOut = datePattern.test(sp.checkOut ?? "") ? sp.checkOut! : "";
+  const safeGuests = Math.max(1, Math.min(20, parseInt(sp.guests ?? "2") || 2));
+
   return (
     <BookingClient
       villa={villa}
       villaId={villaId}
       blockedDates={blockedDates}
-      initialCheckIn={sp.checkIn || ""}
-      initialCheckOut={sp.checkOut || ""}
-      initialGuests={sp.guests ? parseInt(sp.guests) : 2}
+      initialCheckIn={safeCheckIn}
+      initialCheckOut={safeCheckOut}
+      initialGuests={safeGuests}
     />
   );
 }

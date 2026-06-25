@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { getAllRestaurants, toggleRestaurantPublish, deleteRestaurant } from "@/lib/actions/restaurants";
 
 type Restaurant = {
   id: string; name: string; location: string; cuisine: string;
@@ -13,25 +13,22 @@ export default function AdminRestaurantsPage() {
   const [items, setItems] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetch = useCallback(async () => {
-    const supabase = createClient();
-    const { data } = await supabase.from("restaurants").select("*").order("name");
-    if (data) setItems(data as Restaurant[]);
+  const loadItems = useCallback(async () => {
+    const data = await getAllRestaurants();
+    setItems(data as Restaurant[]);
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => { loadItems(); }, [loadItems]);
 
   const togglePublish = async (id: string, published: boolean) => {
-    const supabase = createClient();
-    await supabase.from("restaurants").update({ published: !published }).eq("id", id);
+    await toggleRestaurantPublish(id, published);
     setItems((t) => t.map((i) => i.id === id ? { ...i, published: !published } : i));
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Restaurant verwijderen?")) return;
-    const supabase = createClient();
-    await supabase.from("restaurants").delete().eq("id", id);
+    await deleteRestaurant(id);
     setItems((t) => t.filter((i) => i.id !== id));
   };
 

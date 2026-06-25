@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { getAllTours, toggleTourPublish, deleteTour } from "@/lib/actions/tours";
 
 type Tour = {
   id: string;
@@ -18,25 +18,22 @@ export default function AdminToursPage() {
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetch = useCallback(async () => {
-    const supabase = createClient();
-    const { data } = await supabase.from("tours").select("*").order("name");
-    if (data) setTours(data as Tour[]);
+  const loadTours = useCallback(async () => {
+    const data = await getAllTours();
+    setTours(data as Tour[]);
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => { loadTours(); }, [loadTours]);
 
   const togglePublish = async (id: string, published: boolean) => {
-    const supabase = createClient();
-    await supabase.from("tours").update({ published: !published }).eq("id", id);
+    await toggleTourPublish(id, published);
     setTours((t) => t.map((i) => i.id === id ? { ...i, published: !published } : i));
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Tour verwijderen?")) return;
-    const supabase = createClient();
-    await supabase.from("tours").delete().eq("id", id);
+    await deleteTour(id);
     setTours((t) => t.filter((i) => i.id !== id));
   };
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { sanitizePromptInput } from "@/lib/utils/sanitize-prompt-input";
 
 // Simple in-memory rate limiter: max 10 requests per IP per minute
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -63,6 +64,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Ongeldige invoer." }, { status: 400 });
     }
     const { from, to, passengers, date, time, luggage, occasion } = inputValidation.data;
+    const safeFrom = sanitizePromptInput(from, 100);
+    const safeTo = sanitizePromptInput(to, 100);
     const safeTime = time ?? "";
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -78,8 +81,8 @@ export async function POST(req: NextRequest) {
     const prompt = `Je bent een premium vervoersadviseur voor BaliVoorNederlanders, een exclusief reisbedrijf op Bali, Indonesië.
 
 Analyseer deze transfer aanvraag en geef een persoonlijk advies:
-- Van: ${from}
-- Naar: ${to}
+- Van: ${safeFrom}
+- Naar: ${safeTo}
 - Datum: ${date || "niet opgegeven"}
 - Tijdstip: ${safeTime || "niet opgegeven"}
 - Aantal reizigers: ${passengers}

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { createStaticTransfer } from "@/lib/actions/static-transfers";
 
 const VEHICLE_OPTIONS = [
   { value: "car", label: "Auto" },
@@ -26,8 +26,7 @@ export default function NewTransferPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    const supabase = createClient();
-    const { error } = await supabase.from("transfers").insert([{
+    const result = await createStaticTransfer({
       name: form.name,
       from_location: form.from_location,
       to_location: form.to_location,
@@ -36,9 +35,9 @@ export default function NewTransferPage() {
       max_passengers: parseInt(form.max_passengers) || 4,
       description: form.description,
       published: form.published,
-    }]);
+    });
     setSaving(false);
-    if (!error) router.push("/admin/transfers");
+    if (!result.error) router.push("/admin/transfers");
   };
 
   return (

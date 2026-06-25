@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const CSP = [
   "default-src 'self'",
   // Scripts: Next.js inline runtime + Vercel Analytics
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+  "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
   // Styles: Tailwind inline styles + Google Fonts
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   // Fonts

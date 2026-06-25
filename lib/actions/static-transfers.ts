@@ -14,6 +14,14 @@ type StaticTransferData = {
   published: boolean;
 };
 
+export async function createStaticTransfer(data: StaticTransferData) {
+  await requireAdminUser();
+  const supabase = createServiceClient();
+  const { error } = await supabase.from("transfers").insert([data]);
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
 export async function updateStaticTransfer(id: string, data: StaticTransferData) {
   await requireAdminUser();
   const supabase = createServiceClient();

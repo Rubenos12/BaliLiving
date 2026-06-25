@@ -4,6 +4,7 @@ import { fetchVillas } from "@/lib/actions/villas-fetch";
 import { createBooking } from "@/lib/actions/bookings";
 import { createServiceClient } from "@/lib/supabase/server";
 import { z } from "zod";
+import { sanitizePromptInput } from "@/lib/utils/sanitize-prompt-input";
 
 // Rate limiter: 20 requests per IP per minute
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -150,16 +151,16 @@ export async function POST(req: NextRequest) {
     voorzieningen: v.amenities.slice(0, 5).join(", "),
   }));
 
-  // Build known profile context
+  // Build known profile context — sanitize all user-supplied strings before embedding in system prompt
   const profileLines: string[] = [];
-  if (profile?.guests) profileLines.push(`Aantal gasten: ${profile.guests}`);
-  if (profile?.budget) profileLines.push(`Budget: ${profile.budget}`);
-  if (profile?.tripType) profileLines.push(`Reistype: ${profile.tripType}`);
-  if (profile?.region) profileLines.push(`Gewenste regio: ${profile.region}`);
-  if (profile?.dates) profileLines.push(`Reisdatums: ${profile.dates}`);
-  if (profile?.guestName) profileLines.push(`Naam gast: ${profile.guestName}`);
-  if (profile?.guestEmail) profileLines.push(`E-mail gast: ${profile.guestEmail}`);
-  if (profile?.guestPhone) profileLines.push(`Telefoon gast: ${profile.guestPhone}`);
+  if (profile?.guests) profileLines.push(`Aantal gasten: ${sanitizePromptInput(profile.guests, 10)}`);
+  if (profile?.budget) profileLines.push(`Budget: ${sanitizePromptInput(profile.budget, 50)}`);
+  if (profile?.tripType) profileLines.push(`Reistype: ${sanitizePromptInput(profile.tripType, 50)}`);
+  if (profile?.region) profileLines.push(`Gewenste regio: ${sanitizePromptInput(profile.region, 60)}`);
+  if (profile?.dates) profileLines.push(`Reisdatums: ${sanitizePromptInput(profile.dates, 50)}`);
+  if (profile?.guestName) profileLines.push(`Naam gast: ${sanitizePromptInput(profile.guestName, 100)}`);
+  if (profile?.guestEmail) profileLines.push(`E-mail gast: ${sanitizePromptInput(profile.guestEmail, 100)}`);
+  if (profile?.guestPhone) profileLines.push(`Telefoon gast: ${sanitizePromptInput(profile.guestPhone, 30)}`);
   const profileContext = profileLines.length > 0
     ? `\nWAT WE AL WETEN OVER DEZE GAST:\n${profileLines.join("\n")}\n`
     : "";
@@ -250,8 +251,15 @@ GESPREKSSTRATEGIE:
       for (const block of toolUseBlocks) {
         let result: string;
 
+        const uuidSchema = z.string().uuid();
+
         if (block.name === "check_availability") {
           const input = block.input as { villa_id: string; check_in: string; check_out: string };
+          if (!uuidSchema.safeParse(input.villa_id).success) {
+            result = JSON.stringify({ error: "Ongeldig villa ID." });
+            toolResultContent.push({ type: "tool_result", tool_use_id: block.id, content: result });
+            continue;
+          }
           const availability = await checkVillaAvailability(input.villa_id, input.check_in, input.check_out);
           result = JSON.stringify(availability);
         } else if (block.name === "create_booking") {
@@ -266,6 +274,11 @@ GESPREKSSTRATEGIE:
             check_out: string;
             notes?: string;
           };
+          if (!uuidSchema.safeParse(input.villa_id).success) {
+            result = JSON.stringify({ error: "Ongeldig villa ID." });
+            toolResultContent.push({ type: "tool_result", tool_use_id: block.id, content: result });
+            continue;
+          }
           const bookingResult = await createBooking({
             villa_id: input.villa_id,
             villa_name: input.villa_name,

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { fetchVillas } from "@/lib/actions/villas-fetch";
 import { createServiceClient } from "@/lib/supabase/server";
+import { sanitizePromptInput } from "@/lib/utils/sanitize-prompt-input";
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 function checkRateLimit(ip: string): boolean {
@@ -46,6 +47,8 @@ export async function POST(req: NextRequest) {
   }
 
   const { arrival, departure, group_type, guests, style, budget, priorities } = parsed.data;
+  const safeStyle = style.map((s) => sanitizePromptInput(s, 50));
+  const safePriorities = priorities.map((p) => sanitizePromptInput(p, 50));
 
   const arrivalDate = new Date(arrival);
   const departureDate = new Date(departure);
@@ -100,9 +103,9 @@ REIZIGERSPROFIEL:
 - Aankomst: ${arrival} (${arrivalMonth}), vertrek: ${departure}
 - Totaal: ${nights} nachten
 - Reisgezelschap: ${group_type} (${guests} personen)
-- Stijl voorkeur: ${style.join(", ")}
+- Stijl voorkeur: ${safeStyle.join(", ")}
 - Budget villa: ${range.label}
-- Prioriteiten: ${priorities.length > 0 ? priorities.join(", ") : "geen specifiek"}
+- Prioriteiten: ${safePriorities.length > 0 ? safePriorities.join(", ") : "geen specifiek"}
 
 BESCHIKBARE VILLA'S (${filteredVillas.length}):
 ${JSON.stringify(filteredVillas, null, 2)}

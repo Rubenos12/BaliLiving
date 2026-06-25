@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { fetchVillas } from "@/lib/actions/villas-fetch";
+import { sanitizePromptInput } from "@/lib/utils/sanitize-prompt-input";
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 function checkRateLimit(ip: string): boolean {
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { slugs, priority } = parsed.data;
+  const safePriority = sanitizePromptInput(priority, 300);
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "AI service niet beschikbaar." }, { status: 500 });
@@ -61,7 +63,7 @@ export async function POST(req: NextRequest) {
     const prompt = `Je bent een persoonlijke villa-adviseur voor BaliVoorNederlanders. Een gast wil kiezen tussen ${selectedVillas.length} villa's.
 
 Wat de gast het belangrijkste vindt:
-"${priority}"
+"${safePriority}"
 
 De villa's om te vergelijken:
 ${JSON.stringify(villaDescriptions, null, 2)}

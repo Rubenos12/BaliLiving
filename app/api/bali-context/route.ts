@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ items: [] });
+    return NextResponse.json({ error: "Service tijdelijk niet beschikbaar." }, { status: 503 });
   }
 
   const checkInDate = new Date(check_in);

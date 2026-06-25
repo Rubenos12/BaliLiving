@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createServiceClient } from "@/lib/supabase/server";
+import { sanitizePromptInput } from "@/lib/utils/sanitize-prompt-input";
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 function checkRateLimit(ip: string): boolean {
@@ -36,8 +37,10 @@ export async function POST(req: NextRequest) {
   }
 
   const { villa_name, region, check_in, nights, guests } = parsed.data;
+  const safeVillaName = sanitizePromptInput(villa_name, 100);
+  const safeRegion = sanitizePromptInput(region, 60);
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return NextResponse.json({ suggestions: [] });
+  if (!apiKey) return NextResponse.json({ error: "Service tijdelijk niet beschikbaar." }, { status: 503 });
 
   try {
     const db = createServiceClient();
@@ -58,7 +61,7 @@ export async function POST(req: NextRequest) {
     const checkInDate = new Date(check_in);
     const monthName = checkInDate.toLocaleDateString("nl-NL", { month: "long" });
 
-    const prompt = `Een gast heeft zojuist ${villa_name} geboekt in ${region}, Bali. ${nights} nachten, ${guests} personen, aankomst ${monthName}.
+    const prompt = `Een gast heeft zojuist ${safeVillaName} geboekt in ${safeRegion}, Bali. ${nights} nachten, ${guests} personen, aankomst ${monthName}.
 
 Beschikbare tours:
 ${JSON.stringify(tours.slice(0, 10).map((t) => ({ name: t.name, description: t.short_description, price_per_person: t.price_per_person, duration_hours: t.duration_hours, location: t.location })), null, 2)}
@@ -68,7 +71,7 @@ ${JSON.stringify(restaurants.slice(0, 10).map((r) => ({ name: r.name, descriptio
 
 Transfers: Luxe €85 / VIP €150 van vliegveld Ngurah Rai naar de villa.
 
-Selecteer exact 3 suggesties: 1 transfer (airport), 1 tour, 1 restaurant. Kies wat het beste past bij de villa locatie, het seizoen (${monthName}), en de groepsgrootte (${guests} personen).
+Selecteer exact 3 suggesties: 1 transfer (airport), 1 tour, 1 restaurant. Kies wat het beste past bij de villa locatie (${safeRegion}), het seizoen (${monthName}), en de groepsgrootte (${guests} personen).
 
 Geef exact dit JSON-formaat terug (geen andere tekst):
 {

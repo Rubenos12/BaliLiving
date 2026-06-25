@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { fetchVillas } from "@/lib/actions/villas-fetch";
 import { z } from "zod";
+import { sanitizePromptInput } from "@/lib/utils/sanitize-prompt-input";
 
 // Simple in-memory rate limiter: max 10 requests per IP per minute
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -90,6 +91,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Ongeldige invoer." }, { status: 400 });
     }
     const { trip_type, budget, guests, location, preferences } = parsed.data;
+    const safeLocation = sanitizePromptInput(location, 50);
 
     const villas = await fetchVillas();
 
@@ -146,7 +148,7 @@ ${tripTypeInstruction}
 Klantenwensen:
 - Budget per nacht: ${formattedBudget}
 - Aantal gasten: ${guests}
-- Locatievoorkeur: ${location === "geen-voorkeur" ? "Geen voorkeur" : location}
+- Locatievoorkeur: ${safeLocation === "geen-voorkeur" ? "Geen voorkeur" : safeLocation}
 - Sfeer & voorkeuren: ${preferences.length > 0 ? preferences.join(", ") : "geen specifieke voorkeur"}
 
 Beschikbare villa's (al gefilterd op budget en capaciteit):
