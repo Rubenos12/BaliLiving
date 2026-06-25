@@ -10,8 +10,12 @@ const links = [
   { href: "/reis-planner", label: "Reis Planner" },
   { href: "/tours", label: "Tours" },
   { href: "/transfers", label: "Transfers" },
-  { href: "/restaurants", label: "Restaurants" },
   { href: "/over-ons", label: "Over Ons" },
+];
+
+const allLinks = [
+  ...links,
+  { href: "/restaurants", label: "Restaurants" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -47,21 +51,16 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="group">
-            <div className="flex flex-col">
-              <span
-                className="text-xl font-light tracking-[0.12em] text-[#F5F0E8] uppercase"
-                style={{ fontFamily: "var(--font-cormorant)" }}
-              >
-                Bali<span className="text-[#C9A84C]">voor</span>Nederlanders
-              </span>
-              <span className="text-[0.65rem] tracking-[0.35em] text-[#C9A84C] uppercase">
-                Exclusieve Ervaringen
-              </span>
-            </div>
+            <span
+              className="text-xl font-light tracking-[0.12em] text-[#F5F0E8] uppercase"
+              style={{ fontFamily: "var(--font-cormorant)" }}
+            >
+              Bali<span className="text-[#C9A84C]">voor</span>Nederlanders
+            </span>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-6">
             {links.map((link) => (
               <Link
                 key={link.href}
@@ -116,7 +115,7 @@ export default function Navbar() {
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-40 bg-[#1C2B1E] flex flex-col items-center justify-center gap-6 sm:gap-10"
           >
-            {links.map((link, i) => (
+            {allLinks.map((link, i) => (
               <motion.div
                 key={link.href}
                 initial={{ opacity: 0, y: 20 }}
